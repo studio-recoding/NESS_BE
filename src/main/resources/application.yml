@@ -7,6 +7,3 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
-open-ai:
-  credentials:
-    api-key: # Put Your API Key-Change to env later

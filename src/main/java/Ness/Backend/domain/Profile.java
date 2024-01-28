@@ -1,4 +1,4 @@
-package Ness.Backend.Domain;
+package Ness.Backend.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

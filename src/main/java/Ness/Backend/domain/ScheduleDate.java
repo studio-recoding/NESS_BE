@@ -1,10 +1,8 @@
-package Ness.Backend.Domain;
+package Ness.Backend.domain;
 
 
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Embeddable
 @Getter

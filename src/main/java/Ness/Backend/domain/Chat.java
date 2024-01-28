@@ -16,6 +16,10 @@ public class Chat {
     private LocalDateTime createdDate;
 
     @OneToOne(mappedBy = "chat")
+    private Schedule schedule;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -13,12 +14,24 @@ import java.util.List;
 public class ChatService {
     private final ChatRepository chatRepository;
 
-    public List<Chat> findAllUserChat(){
-        return chatRepository.findAll();
+    public ChatListResponseDto findAllUserChat(){
+        List<Chat> chatList = chatRepository.findAll();
+
+        // ChatListResponseDTO에 매핑
+        List<ChatDto> chatDtos = chatList.stream()
+                .map(chat -> new ChatDto(chat.getId(), chat.getCreatedDate(), chat.getText()))
+                .toList();
+        return new ChatListResponseDto(chatDtos);
     }
 
-    public List<Chat> findOneUserChat(Long id){
-        return chatRepository.findByMemberId(id);
+    public ChatListResponseDto findOneUserChat(Long id){
+        List<Chat> chatList = chatRepository.findByMemberId(id);
+
+        // ChatListResponseDTO에 매핑
+        List<ChatDto> chatDtos = chatList.stream()
+                .map(chat -> new ChatDto(chat.getId(), chat.getCreatedDate(), chat.getText()))
+                .toList();
+        return new ChatListResponseDto(chatDtos);
     }
 
 }

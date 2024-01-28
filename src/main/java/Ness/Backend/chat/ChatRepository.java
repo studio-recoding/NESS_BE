@@ -14,9 +14,6 @@ public interface ChatRepository extends JpaRepository<Chat, Long>{
     // 특정 member_id를 가진 모든 Chat을 찾기 위한 메서드
     List<Chat> findByMemberId(Long memberId);
 
-    //특정 Chat의 ID로 해당 Chat만 반환
-    Chat findOne(Long id);
-
     //모든 Chat의 List를 반환
     List<Chat> findAll();
 }

@@ -15,6 +15,8 @@ public class Chat {
 
     private LocalDateTime createdDate;
 
+    private String text;
+
     @OneToOne(mappedBy = "chat")
     private Schedule schedule;
 

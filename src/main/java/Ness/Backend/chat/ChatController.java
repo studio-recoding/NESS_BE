@@ -20,16 +20,16 @@ public class ChatController {
     private final ChatService chatService;
     @GetMapping("/chat")
     @Operation(summary = "모든 사용자의 채팅 내역", description = "모든 사용자의 채팅 내역을 반환하는 API 입니다.")
-    public ResponseEntity<List<Chat>> getAllUserChat(){
-        List<Chat> allUserChats = chatService.findAllUserChat();
-        return new ResponseEntity<List<Chat>>(allUserChats, HttpStatusCode.valueOf(200));
+    public ResponseEntity<ChatListResponseDto> getAllUserChat(){
+        ChatListResponseDto allUserChats = chatService.findAllUserChat();
+        return new ResponseEntity<>(allUserChats, HttpStatusCode.valueOf(200));
     }
 
     @GetMapping("/chat/user")
-    @Operation(summary = "모든 사용자의 채팅 내역", description = "모든 사용자의 채팅 내역을 반환하는 API 입니다.")
-    public ResponseEntity<List<Chat>> getOneUserChat(@RequestBody ChatRequestDto chatRequestDto){
-        List<Chat> oneUserChats = chatService.findOneUserChat(chatRequestDto.getMember_id());
-        return new ResponseEntity<List<Chat>>(oneUserChats, HttpStatusCode.valueOf(200));
+    @Operation(summary = "한 사용자의 채팅 내역", description = "한 사용자의 모든 채팅 내역을 반환하는 API 입니다.")
+    public ResponseEntity<ChatListResponseDto> getOneUserChat(@RequestBody ChatRequestDto chatRequestDto){
+        ChatListResponseDto oneUserChats = chatService.findOneUserChat(chatRequestDto.getMember_id());
+        return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
     }
 
 }

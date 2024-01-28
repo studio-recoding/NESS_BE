@@ -16,6 +16,6 @@ public class Category {
 
     private String name;
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "category")
     private List<Schedule> schedules = new ArrayList<>();
 }

@@ -25,4 +25,7 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<Schedule> schedules = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<Chat> chats = new ArrayList<>();
+
 }

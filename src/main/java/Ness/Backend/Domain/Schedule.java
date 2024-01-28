@@ -27,4 +27,9 @@ public class Schedule {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToOne
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
+
 }

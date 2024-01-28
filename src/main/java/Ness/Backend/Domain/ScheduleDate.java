@@ -12,6 +12,10 @@ public class ScheduleDate {
     private String time;
     private String date;
 
+    public ScheduleDate(){
+
+    }
+
     public ScheduleDate(String time, String date){
         this.time=time;
         this.date=date;

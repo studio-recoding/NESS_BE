@@ -1,6 +1,8 @@
 package Ness.Backend.chat;
 
 import Ness.Backend.domain.Chat;
+import Ness.Backend.domain.Member;
+import Ness.Backend.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ChatService {
     private final ChatRepository chatRepository;
+    private final MemberRepository memberRepository;
 
     public ChatListResponseDto findAllUserChat(){
         List<Chat> chatList = chatRepository.findAll();
@@ -46,12 +49,15 @@ public class ChatService {
         return new ChatListResponseDto(chatDtos);
     }
 
+    @Transactional
     public Long createNewChat(ChatCreateRequestDto chatCreateRequestDto){
+        Member memberEntity = memberRepository.findMemberById(chatCreateRequestDto.getMember_id());
         //새로운 채팅 생성
         Chat newChat = Chat.builder()
                 .createdDate(LocalDateTime.now())
                 .text(chatCreateRequestDto.getText())
                 .chatType(chatCreateRequestDto.getChatType())
+                .member(memberEntity)
                 .build();
         chatRepository.save(newChat);
         return newChat.getId(); // 저장한 Chat 확인용

@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +27,13 @@ public class ChatController {
     public ResponseEntity<ChatListResponseDto> getOneUserChat(@RequestBody ChatRequestDto chatRequestDto){
         ChatListResponseDto oneUserChats = chatService.findOneUserChat(chatRequestDto.getMember_id());
         return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
+    }
+
+    @PutMapping("/chat/new")
+    @Operation(summary = "새로운 채팅 내역", description = "새로운 채팅 내역 저장하는 API 입니다.")
+    public ResponseEntity<Long> createChat(@RequestBody ChatCreateRequestDto chatCreateRequestDto){
+        Long userId  = chatService.createNewChat(chatCreateRequestDto);
+        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
     }
 
 }

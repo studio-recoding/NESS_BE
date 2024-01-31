@@ -19,8 +19,14 @@ public class ChatService {
 
         // ChatListResponseDTO에 매핑
         List<ChatDto> chatDtos = chatList.stream()
-                .map(chat -> new ChatDto(chat.getId(), chat.getCreatedDate(), chat.getText()))
+                .map(chat -> new ChatDto.ChatDtoBuilder()
+                        .id(chat.getId())
+                        .createdDate(chat.getCreatedDate())
+                        .text(chat.getText())
+                        .chatType(chat.getChatType().toString())
+                        .build())
                 .toList();
+
         return new ChatListResponseDto(chatDtos);
     }
 
@@ -29,7 +35,12 @@ public class ChatService {
 
         // ChatListResponseDTO에 매핑
         List<ChatDto> chatDtos = chatList.stream()
-                .map(chat -> new ChatDto(chat.getId(), chat.getCreatedDate(), chat.getText()))
+                .map(chat -> new ChatDto.ChatDtoBuilder()
+                        .id(chat.getId())
+                        .createdDate(chat.getCreatedDate())
+                        .text(chat.getText())
+                        .chatType(chat.getChatType().toString())
+                        .build())
                 .toList();
         return new ChatListResponseDto(chatDtos);
     }

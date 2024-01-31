@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,4 +46,14 @@ public class ChatService {
         return new ChatListResponseDto(chatDtos);
     }
 
+    public Long createNewChat(ChatCreateRequestDto chatCreateRequestDto){
+        //새로운 채팅 생성
+        Chat newChat = Chat.builder()
+                .createdDate(LocalDateTime.now())
+                .text(chatCreateRequestDto.getText())
+                .chatType(chatCreateRequestDto.getChatType())
+                .build();
+        chatRepository.save(newChat);
+        return newChat.getId(); // 저장한 Chat 확인용
+    }
 }

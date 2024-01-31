@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Schedule API", description = "사용자의 스케쥴 내역 관련 API")
 public class ScheduleController {
     private final ScheduleService scheduleService;
-    @GetMapping("/schedule")
+    @GetMapping("/schedule/user")
     @Operation(summary = "특정 사용자의 스케쥴 내역", description = "특정 사용자의 모든 스케쥴 내역을 반환하는 API 입니다.")
     public ResponseEntity<ScheduleListResponseDto> getOneUserSchedule(@RequestBody ScheduleRequestDto scheduleRequestDto){
         ScheduleListResponseDto oneUserSchedules = scheduleService.findOneUserSchedule(scheduleRequestDto.getMember_id());

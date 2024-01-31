@@ -1,12 +1,15 @@
 package Ness.Backend.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Chat {
     @Id
     @Column(name = "chat_id")
@@ -28,4 +31,13 @@ public class Chat {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Builder
+    public Chat(Long id, LocalDateTime createdDate, String text, ChatType chatType, Schedule schedule, Member member) {
+        this.id = id;
+        this.createdDate = createdDate;
+        this.text = text;
+        this.chatType = chatType;
+        this.schedule = schedule;
+        this.member = member;
+    }
 }

@@ -1,15 +1,20 @@
 package Ness.Backend.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Schedule {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedule_id")
-    private String id;
+    private Long id;
 
     private String info;
 
@@ -31,5 +36,18 @@ public class Schedule {
     @OneToOne
     @JoinColumn(name = "chat_id")
     private Chat chat;
+
+    @Builder
+    public Schedule(Long id, String info, String location, String person, ScheduleDate scheduleDate,
+                    Member member, Category category, Chat chat) {
+        this.id = id;
+        this.info = info;
+        this.location = location;
+        this.person = person;
+        this.scheduleDate = scheduleDate;
+        this.member = member;
+        this.category = category;
+        this.chat = chat;
+    }
 
 }

@@ -6,6 +6,7 @@ import Ness.Backend.chat.ChatListResponseDto;
 import Ness.Backend.domain.Chat;
 import Ness.Backend.domain.Member;
 import Ness.Backend.domain.Schedule;
+import Ness.Backend.domain.ScheduleDate;
 import Ness.Backend.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,10 @@ public class ScheduleService {
                         .id(schedule.getId())
                         .info(schedule.getInfo())
                         .location(schedule.getLocation())
-                        .scheduleDate(schedule.getScheduleDate())
+                        .scheduleDateDto(new ScheduleDateDto.ScheduleDateDtoBuilder()
+                                .time(schedule.getScheduleDate().getTime())
+                                .date(schedule.getScheduleDate().getDate())
+                                .build())
                         .build())
                 .toList();
         return new ScheduleListResponseDto(scheduleDtos);
@@ -40,16 +44,22 @@ public class ScheduleService {
     public Long createNewSchedule(ScheduleCreateRequestDto scheduleCreateRequestDto){
         Member memberEntity = memberRepository.findMemberById(scheduleCreateRequestDto.getMember_id());
 
+        ScheduleDate newScheduleDate = ScheduleDate.builder()
+                .time(scheduleCreateRequestDto.getScheduleDateDto().getTime())
+                .date(scheduleCreateRequestDto.getScheduleDateDto().getDate())
+                .build();
+
         //새로운 채팅 생성
         Schedule newSchedule = Schedule.builder()
                 .info(scheduleCreateRequestDto.getInfo())
                 .location(scheduleCreateRequestDto.getLocation())
                 .person(scheduleCreateRequestDto.getPerson())
-                .scheduleDate(scheduleCreateRequestDto.getScheduleDate())
+                .scheduleDate(newScheduleDate)
                 .member(memberEntity)
                 //.category() //이 연관관계들은 나중에 넣어야 함
                 //.chat()
                 .build();
+
         scheduleRepository.save(newSchedule);
         return newSchedule.getId(); // 저장한 Chat 확인용
     }

@@ -2,6 +2,7 @@ package Ness.Backend.schedule;
 
 import Ness.Backend.domain.ChatType;
 import Ness.Backend.domain.ScheduleDate;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,7 @@ public class ScheduleCreateRequestDto {
     @Schema(description = "스케쥴 사람", example = "영희")
     private String person;
 
+    @JsonProperty("scheduleDate")
     @Schema(description = "스케쥴 날짜", example = "01월 31일 10시 30분")
-    private ScheduleDate scheduleDate;
+    private ScheduleDateDto scheduleDateDto;
 }

@@ -10,9 +10,9 @@ import java.util.List;
 @Getter
 public class Category {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
-    private String id;
+    private Long id;
 
     private String name;
 

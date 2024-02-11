@@ -8,6 +8,7 @@ import Ness.Backend.oAuth.dto.GoogleResponseDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -70,14 +71,20 @@ public class OAuthService {
             return jwtTokenProvider.generateJwtToken(authenticatedId, authenticatedEmail);
         }
         else{ /* 인증이 되지 않았을 경우 */
-            Member member = Member.builder()
-                    .email(email)
-                    .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
-                    .build();
+            try {
+                Member member = Member.builder()
+                        .email(email)
+                        .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
+                        .build();
 
-            memberRepository.save(member); // DB에 저장하기
+                memberRepository.save(member);
+
+                return "회원가입이 완료되었습니다.";
+            } catch (DataIntegrityViolationException e) {
+                /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리 */
+                return "이미 사용 중인 이메일 주소입니다.";
+            }
         }
-        return "회원가입/로그인 체크 완료";
     }
 
     private String getAccessToken(String authorizationCode, String registration) {

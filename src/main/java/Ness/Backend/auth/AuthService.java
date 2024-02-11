@@ -6,6 +6,7 @@ import Ness.Backend.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.Member;
 import Ness.Backend.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -24,15 +25,20 @@ public class AuthService {
 
     @Transactional
     public String registerMember(RegisterRequestDto registerRequestDto) {
-        /* 빌더 패턴을 사용해 MemberRole을 넘겨주지 않아도 객체 생성 가능 */
-        Member member = Member.builder()
-                .email(registerRequestDto.getEmail())
-                .password(bCryptPasswordEncoder.encode(registerRequestDto.getPassword())) //비밀번호는 해싱해서 DB에 저장
-                .build();
+        try {
+            /* 빌더 패턴을 사용해 MemberRole을 넘겨주지 않아도 객체 생성 가능 */
+            Member member = Member.builder()
+                    .email(registerRequestDto.getEmail())
+                    .password(bCryptPasswordEncoder.encode(registerRequestDto.getPassword())) //비밀번호는 해싱해서 DB에 저장
+                    .build();
 
-        memberRepository.save(member); // DB에 저장하기
+            memberRepository.save(member);
 
-        return "회원가입이 완료되었습니다.";
+            return "회원가입이 완료되었습니다.";
+        } catch (DataIntegrityViolationException e) {
+            /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리 */
+            return "이미 사용 중인 이메일 주소입니다.";
+        }
     }
 
     @Transactional

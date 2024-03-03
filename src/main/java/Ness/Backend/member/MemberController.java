@@ -1,6 +1,7 @@
 package Ness.Backend.member;
 
 import Ness.Backend.auth.AuthDetails;
+import Ness.Backend.auth.AuthUser;
 import Ness.Backend.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +26,18 @@ public class MemberController {
 
         // 사용자 ID를 이용하여 데이터베이스에서 사용자 정보 조회
         Member member = memberRepository.findMemberByEmail(email);
-
         return new ResponseEntity<>(member, HttpStatusCode.valueOf(200));
+    }
+
+    /* Member 그대로 반환 불가 -> Dto에 넣어서 */
+    @GetMapping("/user/authuser")
+    @Operation(summary = "맴버 엔티티 반환 API", description = "JWT 토큰을 바탕으로 맴버 엔티티를 반환하는 테스트용 API 입니다.")
+    public ResponseEntity<MemberDto> getAuthUser(@AuthUser Member member) {
+        System.out.println(member.getEmail());
+        MemberDto memberDto = MemberDto.builder()
+                .email(member.getEmail())
+                .id(member.getId())
+                .build();
+        return new ResponseEntity<>(memberDto, HttpStatusCode.valueOf(200));
     }
 }

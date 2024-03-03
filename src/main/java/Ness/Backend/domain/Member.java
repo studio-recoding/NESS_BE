@@ -30,10 +30,10 @@ public class Member {
     @OneToOne(mappedBy = "member")
     private Profile profile;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Schedule> schedules = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Chat> chats = new ArrayList<>();
 
     @Builder

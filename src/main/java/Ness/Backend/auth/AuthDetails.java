@@ -13,7 +13,7 @@ import java.util.Collection;
 @Data
 @RequiredArgsConstructor
 public class AuthDetails implements UserDetails {
-    /* 인증된 사용자에 대한 세부 정보를 다루는 UserDetails의 구현체 */
+    /* 인증된 사용자에 대한 세부 정보를 다루는 UserDetails의 구현체(Principal 객체) */
 
     private final Member member;
 

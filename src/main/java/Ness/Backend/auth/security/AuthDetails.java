@@ -1,6 +1,6 @@
-package Ness.Backend.auth;
+package Ness.Backend.auth.security;
 
-import Ness.Backend.domain.Member;
+import Ness.Backend.entity.Member;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +13,7 @@ import java.util.Collection;
 @Data
 @RequiredArgsConstructor
 public class AuthDetails implements UserDetails {
-    /* 인증된 사용자에 대한 세부 정보를 다루는 UserDetails의 구현체 */
+    /* 인증된 사용자에 대한 세부 정보를 다루는 UserDetails의 구현체(Principal 객체) */
 
     private final Member member;
 

@@ -1,14 +1,14 @@
 package Ness.Backend.chat;
 
-import Ness.Backend.domain.Chat;
+import Ness.Backend.chat.dto.ChatCreateRequestDto;
+import Ness.Backend.chat.dto.ChatListResponseDto;
+import Ness.Backend.chat.dto.ChatRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

@@ -26,7 +26,7 @@ public class CommonResponse<T> {
         this.data = data;
     }
 
-    public static <T> CommonResponse<T> postSuccess(int code, String message) {
+    public static <T> CommonResponse<T> postResponse(int code, String message) {
         return CommonResponse.<T>builder()
                 .code(code)
                 .success(true)
@@ -35,7 +35,7 @@ public class CommonResponse<T> {
                 .build();
     }
 
-    public static <T> CommonResponse<T> getSuccess(int code, String message, T data) {
+    public static <T> CommonResponse<T> getResponse(int code, String message, T data) {
         return CommonResponse.<T>builder()
                 .code(code)
                 .success(true)

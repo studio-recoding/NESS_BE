@@ -1,6 +1,6 @@
 package Ness.Backend.member;
 
-import Ness.Backend.domain.Member;
+import Ness.Backend.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,5 +10,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Member findMemberById(Long memberId);
 
     // 특정 맴버 이메일로 맴버 엔티티 반환
+
+    //Member findMemberByEmail(String email);
+
     Member findMemberByEmail(String email);
 }

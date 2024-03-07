@@ -1,18 +1,17 @@
 package Ness.Backend.schedule;
 
-import Ness.Backend.chat.ChatCreateRequestDto;
-import Ness.Backend.chat.ChatDto;
-import Ness.Backend.chat.ChatListResponseDto;
-import Ness.Backend.domain.Chat;
-import Ness.Backend.domain.Member;
-import Ness.Backend.domain.Schedule;
-import Ness.Backend.domain.ScheduleDate;
+import Ness.Backend.entity.Member;
+import Ness.Backend.entity.Schedule;
+import Ness.Backend.entity.ScheduleDate;
 import Ness.Backend.member.MemberRepository;
+import Ness.Backend.schedule.dto.ScheduleCreateRequestDto;
+import Ness.Backend.schedule.dto.ScheduleDateDto;
+import Ness.Backend.schedule.dto.ScheduleDto;
+import Ness.Backend.schedule.dto.ScheduleListResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service

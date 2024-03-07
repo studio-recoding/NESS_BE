@@ -1,6 +1,7 @@
-package Ness.Backend.domain;
+package Ness.Backend.entity;
 
 
+import Ness.Backend.profile.entity.Profile;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
+    @Column(unique = true)
     private String email;
 
     private String password;
@@ -29,10 +31,10 @@ public class Member {
     @OneToOne(mappedBy = "member")
     private Profile profile;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Schedule> schedules = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Chat> chats = new ArrayList<>();
 
     @Builder

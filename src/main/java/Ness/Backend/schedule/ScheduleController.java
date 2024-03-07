@@ -1,7 +1,7 @@
 package Ness.Backend.schedule;
 
-import Ness.Backend.chat.ChatCreateRequestDto;
-import Ness.Backend.chat.ChatListResponseDto;
+import Ness.Backend.schedule.dto.ScheduleCreateRequestDto;
+import Ness.Backend.schedule.dto.ScheduleListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

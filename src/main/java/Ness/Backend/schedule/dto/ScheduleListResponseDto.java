@@ -1,6 +1,5 @@
-package Ness.Backend.schedule;
+package Ness.Backend.schedule.dto;
 
-import Ness.Backend.chat.ChatDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

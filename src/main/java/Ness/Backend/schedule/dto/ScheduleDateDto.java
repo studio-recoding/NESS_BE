@@ -1,6 +1,5 @@
-package Ness.Backend.schedule;
+package Ness.Backend.schedule.dto;
 
-import Ness.Backend.domain.ScheduleDate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

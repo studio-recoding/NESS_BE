@@ -1,4 +1,4 @@
-package Ness.Backend.domain;
+package Ness.Backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;

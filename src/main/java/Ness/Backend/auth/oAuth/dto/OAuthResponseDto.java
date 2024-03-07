@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GoogleResponseDto {
+public class OAuthResponseDto {
     @Schema(description = "구글 이메일 주소", example = "1234@gmail.com")
     private String email;
 

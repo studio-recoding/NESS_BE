@@ -1,10 +1,10 @@
-package Ness.Backend.oAuth;
+package Ness.Backend.auth.oAuth;
 
-import Ness.Backend.auth.AuthDetails;
+import Ness.Backend.auth.security.AuthDetails;
 import Ness.Backend.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.Member;
+import Ness.Backend.domain.Profile;
 import Ness.Backend.member.MemberRepository;
-import Ness.Backend.oAuth.dto.GoogleResponseDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
@@ -33,25 +33,55 @@ public class OAuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public GoogleResponseDto socialLogin(String code, String registration) {
+    public String socialLogin(String code, String registration) {
+        /*
+        * 로직:
+        * 1. client_id, client_secret 등을 사용해 oauth 서버에서 access_token 발급
+        * 2. access_token를 통해서 리소스 서버에서 user의 리소스(개인정보) 요청
+        * 3. 이미 DB에 존재하는 user인지 확인
+        * */
+        String accessToken = getAccessToken(code, registration);
+        JsonNode userResourceNode = getUserResource(accessToken, registration);
+        String id = userResourceNode.get("id").asText();
+        String email = userResourceNode.get("email").asText();
+
+        return checkSignUp(email, id);
+    }
+
+    public String socialSignUp(String code, String registration) {
+        /*
+         * 로직:
+         * 1. client_id, client_secret 등을 사용해 oauth 서버에서 access_token 발급
+         * 2. access_token를 통해서 리소스 서버에서 user의 리소스(개인정보) 요청
+         * 3. 이미 DB에 존재하는 user인지 확인
+         * */
         String accessToken = getAccessToken(code, registration);
         JsonNode userResourceNode = getUserResource(accessToken, registration);
         String id = userResourceNode.get("id").asText();
         String email = userResourceNode.get("email").asText();
         String picture = userResourceNode.get("picture").asText();
-        String message = checkSignUp(email, id);
 
-        GoogleResponseDto googleResponseDto = GoogleResponseDto.builder()
-                .picture(picture)
-                .email(email)
-                .build();
+        try {
+            Member member = Member.builder()
+                    .email(email)
+                    .password(bCryptPasswordEncoder.encode(id)) //비밀번호는 해싱해서 DB에 저장
+                    .build();
 
-        return googleResponseDto;
+            Profile profile = Profile.builder()
+                    .pictureUrl(picture)
+                    .member(member)
+                    .build();
+            memberRepository.save(member);
+
+            return "회원가입이 완료되었습니다.";
+
+        } catch (DataIntegrityViolationException e) {
+            /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리 */
+            return "이미 사용 중인 이메일 주소입니다.";
+        }
     }
 
     public String checkSignUp(String email, String password){
-        //이런 코드로도 괜찮은 것인가...
-
         /* 사용자가 제출한 이메일과 비밀번호 확인하기 */
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
 
@@ -71,22 +101,11 @@ public class OAuthService {
             return jwtTokenProvider.generateJwtToken(authenticatedId, authenticatedEmail);
         }
         else{ /* 인증이 되지 않았을 경우 */
-            try {
-                Member member = Member.builder()
-                        .email(email)
-                        .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
-                        .build();
-
-                memberRepository.save(member);
-
-                return "회원가입이 완료되었습니다.";
-            } catch (DataIntegrityViolationException e) {
-                /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리 */
-                return "이미 사용 중인 이메일 주소입니다.";
-            }
+            return "로그인에 실패했습니다. 이메일 또는 비밀번호가 일치하는지 확인해주세요.";
         }
     }
 
+    /* oauth 서버에서 access_token 받아옴 */
     private String getAccessToken(String authorizationCode, String registration) {
         //여기 그냥 @Value로 바꿀지 고민 중
         String clientId = env.getProperty("oauth2." + registration + ".client-id");
@@ -111,6 +130,7 @@ public class OAuthService {
         return accessTokenNode.get("access_token").asText();
     }
 
+    /* 리다이렉트 URL을 통해서 리소스 가져옴 */
     private JsonNode getUserResource(String accessToken, String registration) {
         String resourceUri = env.getProperty("oauth2." + registration + ".resource-uri");
 

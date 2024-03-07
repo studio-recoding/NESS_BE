@@ -1,6 +1,7 @@
-package Ness.Backend.domain;
+package Ness.Backend.entity;
 
 
+import Ness.Backend.profile.entity.Profile;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

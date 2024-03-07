@@ -2,8 +2,9 @@ package Ness.Backend.auth.oAuth;
 
 import Ness.Backend.auth.security.AuthDetails;
 import Ness.Backend.auth.jwt.JwtTokenProvider;
-import Ness.Backend.domain.Member;
-import Ness.Backend.domain.Profile;
+import Ness.Backend.entity.Member;
+import Ness.Backend.profile.ProfileRepository;
+import Ness.Backend.profile.entity.Profile;
 import Ness.Backend.member.MemberRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class OAuthService {
+public class OAuth2Service {
     private final Environment env;
     private final RestTemplate restTemplate = new RestTemplate();
 
     private final MemberRepository memberRepository;
+    private final ProfileRepository profileRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -71,12 +73,15 @@ public class OAuthService {
                     .pictureUrl(picture)
                     .member(member)
                     .build();
+
             memberRepository.save(member);
+            profileRepository.save(profile);
 
             return "회원가입이 완료되었습니다.";
 
         } catch (DataIntegrityViolationException e) {
             /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리 */
+            //에러-여기서 Unique 값이 적용되지 않음
             return "이미 사용 중인 이메일 주소입니다.";
         }
     }

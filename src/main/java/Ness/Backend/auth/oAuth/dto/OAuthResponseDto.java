@@ -1,4 +1,4 @@
-package Ness.Backend.oAuth.dto;
+package Ness.Backend.auth.oAuth.dto;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;

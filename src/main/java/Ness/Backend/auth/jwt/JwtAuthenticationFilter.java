@@ -1,7 +1,7 @@
 package Ness.Backend.auth.jwt;
 
-import Ness.Backend.auth.AuthDetails;
-import Ness.Backend.domain.Member;
+import Ness.Backend.auth.security.AuthDetails;
+import Ness.Backend.entity.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

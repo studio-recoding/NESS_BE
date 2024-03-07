@@ -41,6 +41,7 @@ public class OAuth2Service {
         * 1. client_id, client_secret 등을 사용해 oauth 서버에서 access_token 발급
         * 2. access_token를 통해서 리소스 서버에서 user의 리소스(개인정보) 요청
         * 3. 이미 DB에 존재하는 user인지 확인
+        * 4. 존재하는 유저가 맞을 경우 jwt 토큰 반환
         * */
         String accessToken = getAccessToken(code, registration);
         JsonNode userResourceNode = getUserResource(accessToken, registration);
@@ -56,6 +57,7 @@ public class OAuth2Service {
          * 1. client_id, client_secret 등을 사용해 oauth 서버에서 access_token 발급
          * 2. access_token를 통해서 리소스 서버에서 user의 리소스(개인정보) 요청
          * 3. 이미 DB에 존재하는 user인지 확인
+         * 4. 이미 존재한다면 회원가입 금지, 아니라면 email과 id를 각각 아이디와 패스워드로 DB에 저장 
          * */
         String accessToken = getAccessToken(code, registration);
         JsonNode userResourceNode = getUserResource(accessToken, registration);

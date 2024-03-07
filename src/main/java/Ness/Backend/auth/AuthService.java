@@ -4,7 +4,7 @@ import Ness.Backend.auth.dto.LoginRequestDto;
 import Ness.Backend.auth.dto.RegisterRequestDto;
 import Ness.Backend.auth.jwt.JwtTokenProvider;
 import Ness.Backend.auth.security.AuthDetails;
-import Ness.Backend.common.CommonResponse;
+import Ness.Backend.global.common.response.CommonResponse;
 import Ness.Backend.entity.Member;
 import Ness.Backend.member.MemberRepository;
 import lombok.RequiredArgsConstructor;

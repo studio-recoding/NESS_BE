@@ -2,7 +2,7 @@ package Ness.Backend.auth;
 
 import Ness.Backend.auth.dto.LoginRequestDto;
 import Ness.Backend.auth.dto.RegisterRequestDto;
-import Ness.Backend.common.CommonResponse;
+import Ness.Backend.global.common.response.CommonResponse;
 import Ness.Backend.entity.Member;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;

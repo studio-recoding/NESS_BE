@@ -1,4 +1,4 @@
-package Ness.Backend.common;
+package Ness.Backend.global.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

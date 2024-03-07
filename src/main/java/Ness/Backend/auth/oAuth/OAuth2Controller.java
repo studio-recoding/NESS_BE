@@ -1,6 +1,6 @@
 package Ness.Backend.auth.oAuth;
 
-import Ness.Backend.common.CommonResponse;
+import Ness.Backend.global.common.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

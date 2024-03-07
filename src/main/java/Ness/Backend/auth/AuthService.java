@@ -3,10 +3,13 @@ package Ness.Backend.auth;
 import Ness.Backend.auth.dto.LoginRequestDto;
 import Ness.Backend.auth.dto.RegisterRequestDto;
 import Ness.Backend.auth.jwt.JwtTokenProvider;
-import Ness.Backend.domain.Member;
+import Ness.Backend.auth.security.AuthDetails;
+import Ness.Backend.common.CommonResponse;
+import Ness.Backend.entity.Member;
 import Ness.Backend.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -24,7 +27,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     @Transactional
-    public String registerMember(RegisterRequestDto registerRequestDto) {
+    public CommonResponse<?> signUp(RegisterRequestDto registerRequestDto) {
         try {
             /* 빌더 패턴을 사용해 MemberRole을 넘겨주지 않아도 객체 생성 가능 */
             Member member = Member.builder()
@@ -34,19 +37,25 @@ public class AuthService {
 
             memberRepository.save(member);
 
-            return "회원가입이 완료되었습니다.";
+            return CommonResponse.postResponse(
+                    HttpStatus.OK.value(),
+                    "회원가입이 완료되었습니다."); //200
+
         } catch (DataIntegrityViolationException e) {
             /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리 */
-            return "이미 사용 중인 이메일 주소입니다.";
+            return CommonResponse.postResponse(
+                    HttpStatus.CONFLICT.value(),
+                    "이미 회원 가입된 유저입니다."); //409
         }
     }
 
     @Transactional
-    public String loginMember(LoginRequestDto loginRequestDto) {
+    public CommonResponse<?> login(LoginRequestDto loginRequestDto) {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
 
         /* 사용자가 제출한 이메일과 비밀번호 확인하기 */
+        /* UsernamePasswordAuthenticationFilter가 attemptAuthentication 호출 */
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
 
         /* 사용자 인증 완료 */
@@ -62,9 +71,13 @@ public class AuthService {
             String authenticatedEmail = authDetails.getMember().getEmail();
 
             /* JWT 토큰 반환 */
-            return jwtTokenProvider.generateJwtToken(authenticatedId, authenticatedEmail);
+            return CommonResponse.postResponse(
+                    HttpStatus.OK.value(),
+                    "로그인에 성공했습니다."); //200
         }
 
-        return "로그인에 실패했습니다. 이메일 또는 비밀번호가 일치하는지 확인해주세요.";
+        return CommonResponse.postResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "로그인에 실패했습니다. 이메일 또는 비밀번호가 일치하는지 확인해주세요."); //401
     }
 }

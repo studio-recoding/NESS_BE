@@ -1,6 +1,5 @@
 package Ness.Backend.auth.security;
 
-import Ness.Backend.auth.AuthDetailService;
 import Ness.Backend.auth.jwt.JwtAuthenticationFilter;
 import Ness.Backend.auth.jwt.JwtAuthorizationFilter;
 import Ness.Backend.auth.jwt.JwtTokenProvider;

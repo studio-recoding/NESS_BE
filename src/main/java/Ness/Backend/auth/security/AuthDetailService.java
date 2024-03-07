@@ -1,6 +1,6 @@
-package Ness.Backend.auth;
+package Ness.Backend.auth.security;
 
-import Ness.Backend.domain.Member;
+import Ness.Backend.entity.Member;
 import Ness.Backend.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;

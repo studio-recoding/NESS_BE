@@ -1,6 +1,6 @@
-package Ness.Backend.auth;
+package Ness.Backend.auth.security;
 
-import Ness.Backend.domain.Member;
+import Ness.Backend.entity.Member;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

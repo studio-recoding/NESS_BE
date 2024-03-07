@@ -1,4 +1,4 @@
-package Ness.Backend.auth.security;
+package Ness.Backend.global.auth;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,6 +1,6 @@
 package Ness.Backend.member;
 
-import Ness.Backend.domain.Member;
+import Ness.Backend.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

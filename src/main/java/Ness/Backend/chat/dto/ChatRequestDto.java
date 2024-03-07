@@ -1,4 +1,4 @@
-package Ness.Backend.chat;
+package Ness.Backend.chat.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

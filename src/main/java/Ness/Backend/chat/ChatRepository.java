@@ -1,6 +1,6 @@
 package Ness.Backend.chat;
 
-import Ness.Backend.domain.Chat;
+import Ness.Backend.entity.Chat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

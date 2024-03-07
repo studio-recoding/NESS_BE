@@ -1,7 +1,10 @@
 package Ness.Backend.chat;
 
-import Ness.Backend.domain.Chat;
-import Ness.Backend.domain.Member;
+import Ness.Backend.chat.dto.ChatCreateRequestDto;
+import Ness.Backend.chat.dto.ChatDto;
+import Ness.Backend.chat.dto.ChatListResponseDto;
+import Ness.Backend.entity.Chat;
+import Ness.Backend.entity.Member;
 import Ness.Backend.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

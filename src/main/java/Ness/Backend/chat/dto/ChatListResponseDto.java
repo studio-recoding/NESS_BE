@@ -1,4 +1,4 @@
-package Ness.Backend.chat;
+package Ness.Backend.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

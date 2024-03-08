@@ -1,11 +1,13 @@
-package Ness.Backend.domain.entity;
+package Ness.Backend.domain.chat.entity;
 
+import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.domain.schedule.entity.Schedule;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
@@ -16,7 +18,7 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime createdDate;
+    private ZonedDateTime createdDate;
 
     private String text;
 
@@ -32,7 +34,7 @@ public class Chat {
     private Member member;
 
     @Builder
-    public Chat(Long id, LocalDateTime createdDate, String text, ChatType chatType, Schedule schedule, Member member) {
+    public Chat(Long id, ZonedDateTime createdDate, String text, ChatType chatType, Schedule schedule, Member member) {
         this.id = id;
         this.createdDate = createdDate;
         this.text = text;

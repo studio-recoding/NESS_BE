@@ -3,14 +3,15 @@ package Ness.Backend.domain.chat;
 import Ness.Backend.domain.chat.dto.ChatCreateRequestDto;
 import Ness.Backend.domain.chat.dto.ChatDto;
 import Ness.Backend.domain.chat.dto.ChatListResponseDto;
-import Ness.Backend.domain.entity.Chat;
-import Ness.Backend.domain.entity.Member;
+import Ness.Backend.domain.chat.entity.Chat;
+import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -25,9 +26,9 @@ public class ChatService {
 
         // ChatListResponseDTO에 매핑
         List<ChatDto> chatDtos = chatList.stream()
-                .map(chat -> new ChatDto.ChatDtoBuilder()
+                .map(chat -> ChatDto.builder()
                         .id(chat.getId())
-                        .createdDate(chat.getCreatedDate())
+                        .createdDate(chat.getCreatedDate().toString())
                         .text(chat.getText())
                         .chatType(chat.getChatType().toString())
                         .build())
@@ -41,9 +42,9 @@ public class ChatService {
 
         // ChatListResponseDTO에 매핑
         List<ChatDto> chatDtos = chatList.stream()
-                .map(chat -> new ChatDto.ChatDtoBuilder()
+                .map(chat -> ChatDto.builder()
                         .id(chat.getId())
-                        .createdDate(chat.getCreatedDate())
+                        .createdDate(chat.getCreatedDate().toString())
                         .text(chat.getText())
                         .chatType(chat.getChatType().toString())
                         .build())
@@ -52,11 +53,11 @@ public class ChatService {
     }
 
     @Transactional
-    public Long createNewChat(ChatCreateRequestDto chatCreateRequestDto){
-        Member memberEntity = memberRepository.findMemberById(chatCreateRequestDto.getMember_id());
+    public Long createNewChat(Long id, ChatCreateRequestDto chatCreateRequestDto){
+        Member memberEntity = memberRepository.findMemberById(id);
         //새로운 채팅 생성
         Chat newChat = Chat.builder()
-                .createdDate(LocalDateTime.now())
+                .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")).atZone(ZoneId.of("Asia/Seoul")))
                 .text(chatCreateRequestDto.getText())
                 .chatType(chatCreateRequestDto.getChatType())
                 .member(memberEntity)

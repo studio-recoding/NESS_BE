@@ -23,7 +23,7 @@ jobs:
 
       ## gradle build
       - name: Build with Gradle
-        run: ./gradlew clean build --debug
+        run: ./gradlew build
 
       ## 이미지 태그에 시간 설정
       - name: Get current time

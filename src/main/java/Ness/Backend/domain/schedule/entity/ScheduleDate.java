@@ -1,4 +1,4 @@
-package Ness.Backend.domain.entity;
+package Ness.Backend.domain.schedule.entity;
 
 
 import jakarta.persistence.Embeddable;

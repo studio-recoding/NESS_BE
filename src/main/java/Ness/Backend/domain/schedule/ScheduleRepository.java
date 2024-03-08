@@ -1,6 +1,6 @@
 package Ness.Backend.domain.schedule;
 
-import Ness.Backend.domain.entity.Schedule;
+import Ness.Backend.domain.schedule.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

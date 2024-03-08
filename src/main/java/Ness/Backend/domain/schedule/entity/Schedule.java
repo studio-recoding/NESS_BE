@@ -1,9 +1,14 @@
-package Ness.Backend.domain.entity;
+package Ness.Backend.domain.schedule.entity;
 
+import Ness.Backend.domain.entity.Category;
+import Ness.Backend.domain.chat.entity.Chat;
+import Ness.Backend.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
@@ -20,8 +25,12 @@ public class Schedule {
 
     private String person;
 
+    /*
     @Embedded
     private ScheduleDate scheduleDate;
+     */
+
+    private ZonedDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -36,13 +45,14 @@ public class Schedule {
     private Chat chat;
 
     @Builder
-    public Schedule(Long id, String info, String location, String person, ScheduleDate scheduleDate,
+    public Schedule(Long id, String info, String location, String person, ZonedDateTime date,
                     Member member, Category category, Chat chat) {
         this.id = id;
         this.info = info;
         this.location = location;
         this.person = person;
-        this.scheduleDate = scheduleDate;
+        this.date = date;
+        //this.scheduleDate = scheduleDate;
         this.member = member;
         this.category = category;
         this.chat = chat;

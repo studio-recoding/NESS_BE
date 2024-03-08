@@ -7,14 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.ZonedDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ScheduleCreateRequestDto {
-    @Schema(description = "맴버 고유 인식 넘버", example = "0")
-    private Long member_id;
-
     @Schema(description = "스케쥴 텍스트 내용", example = "AI 공부")
     private String info;
 
@@ -24,7 +23,6 @@ public class ScheduleCreateRequestDto {
     @Schema(description = "스케쥴 사람", example = "영희")
     private String person;
 
-    @JsonProperty("scheduleDate")
-    @Schema(description = "스케쥴 날짜", example = "01월 31일 10시 30분")
-    private ScheduleDateDto scheduleDateDto;
+    @Schema(description = "스케쥴 시간", example = "2024-03-08T15:07:27.056103+09:00")
+    private ZonedDateTime date;
 }

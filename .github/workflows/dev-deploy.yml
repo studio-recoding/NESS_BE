@@ -39,7 +39,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: jeonhaeseung/ness-server-dev:dev
+          images: jeonhaeseung/ness-server-dev
 
       ## 멀티-플랫폼 빌드 도구 Buildx 사용
       - name: Set up Docker Buildx

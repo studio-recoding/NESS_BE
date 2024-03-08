@@ -1,6 +1,6 @@
 package Ness.Backend.domain.auth.jwt;
 
-import Ness.Backend.domain.entity.Member;
+import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

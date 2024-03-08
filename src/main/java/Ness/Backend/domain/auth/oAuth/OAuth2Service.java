@@ -4,7 +4,7 @@ import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.profile.ProfileRepository;
 import Ness.Backend.domain.profile.entity.Profile;
-import Ness.Backend.domain.entity.Member;
+import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;

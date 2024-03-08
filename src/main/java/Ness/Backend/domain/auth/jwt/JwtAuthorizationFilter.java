@@ -2,7 +2,7 @@ package Ness.Backend.domain.auth.jwt;
 
 import Ness.Backend.domain.auth.security.AuthDetailService;
 import Ness.Backend.domain.auth.security.AuthDetails;
-import Ness.Backend.domain.entity.Member;
+import Ness.Backend.domain.member.entity.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

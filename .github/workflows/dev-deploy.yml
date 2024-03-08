@@ -28,39 +28,71 @@ jobs:
           echo "$PROPERTIES_DEV" > ./src/main/resources/application-dev.yml
         # Make env file
         env:
-          PROPERTIES_DEV: ${{secrets.PROPERTIES_DEV}}
+          PROPERTIES_DEV: ${{ secrets.PROPERTIES_DEV }}
 
       ## gradle build
       - name: Build with Gradle
         run: ./gradlew clean build
 
-      ## 이미지 태그에 시간 설정
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2
-        id: current-time
+      ## docker metadata(namespace/repository)
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
         with:
-          format: YYYY-MM-DDTHH-mm-ss
-          utcOffset: "+09:00"
-      - name: Show Current Time
-        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
+          images: jeonhaeseung/ness-server-dev:dev
 
-      ## AWS에 로그인
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      ## 멀티-플랫폼 빌드 도구 Buildx 사용
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      ## DockerHub에 로그인
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          aws-region: ${{secrets.AWS_REGION}}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      ## ECR에 로그인
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      ## 위에서 설정한 테그를 참고해 push
+      - name: Docker build & push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
 
-      ## sample라는 ECR 리파지터리에 현재 시간 태그를 생성하고, 푸쉬합니다. xxx부분은 본인의 레파지터리 주소입니다.
-      ## 앞의 스탭에서 ${{steps.current-time.outputs.formattedTime}}로 현재 시간을 가져옵니다.
-      - name: Build, tag, and push image to Amazon ECR
-        run: |
-          docker build -t ${{secrets.AWS_ECR_REPOSITORY}}:${{steps.current-time.outputs.formattedTime}} .
-          docker tag ${{secrets.AWS_ECR_REPOSITORY}}:${{steps.current-time.outputs.formattedTime}} ${{secrets.AWS_IAM_ACCOUNT}}.dkr.ecr.${{secrets.AWS_REGION}}.amazonaws.com/${{secrets.AWS_ECR_REPOSITORY}}:${{steps.current-time.outputs.formattedTime}}
-          docker push ${{secrets.AWS_IAM_ACCOUNT}}.dkr.ecr.${{secrets.AWS_REGION}}.amazonaws.com/${{secrets.AWS_ECR_REPOSITORY}}:${{steps.current-time.outputs.formattedTime}}
+      ## 원격에
+      - name: create remote directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.KEY_DEV }}
+          script: mkdir -p ./dev
+
+      ## 소스 코드 복사 붙여넣기
+      - name: copy source via ssh key
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avzr --delete
+          remote_path: ./dev
+          remote_host: ${{ secrets.HOST_DEV }}
+          remote_user: ${{ secrets.USER_DEV }}
+          remote_key: ${{ secrets.KEY_DEV }}
+
+      ## EC2에 배포(CD)
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.KEY_DEV }}
+          script: |
+            sh ./dev/config/scripts/deploy.sh
+
+            sudo docker stop $(sudo docker ps -a -q)
+            sudo docker rm $(sudo docker ps -a -q)
+            sudo docker rmi $(sudo docker images -q)
+            docker pull jeonhaeseung/ness-server-dev:dev
+            docker run -d --name backend-server -p 8080:8080 --restart unless-stopped jeonhaeseung/ness-server-dev:dev

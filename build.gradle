@@ -7,10 +7,6 @@ plugins {
 group = 'com.recoding'
 version = '0.0.3-SNAPSHOT'
 
-java {
-	sourceCompatibility = '17'
-}
-
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor

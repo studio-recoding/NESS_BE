@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.util.Pair;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -41,23 +42,7 @@ public class OAuth2Service {
         * 1. client_id, client_secret 등을 사용해 oauth 서버에서 access_token 발급
         * 2. access_token를 통해서 리소스 서버에서 user의 리소스(개인정보) 요청
         * 3. 이미 DB에 존재하는 user인지 확인
-        * 4. 존재하는 유저가 맞을 경우 jwt 토큰 반환
-        * */
-        String accessToken = getAccessToken(code, registration);
-        JsonNode userResourceNode = getUserResource(accessToken, registration);
-        String id = userResourceNode.get("id").asText();
-        String email = userResourceNode.get("email").asText();
-
-        return checkSignUp(email, id);
-    }
-
-    public String socialSignUp(String code, String registration) {
-        /*
-         * 로직:
-         * 1. client_id, client_secret 등을 사용해 oauth 서버에서 access_token 발급
-         * 2. access_token를 통해서 리소스 서버에서 user의 리소스(개인정보) 요청
-         * 3. 이미 DB에 존재하는 user인지 확인
-         * 4. 이미 존재한다면 회원가입 금지, 아니라면 email과 id를 각각 아이디와 패스워드로 DB에 저장 
+        * 4. 존재하는 유저가 맞을 경우 jwt 토큰 반환, 아니라면 email과 id를 각각 아이디와 패스워드로 DB에 저장
          * */
         String accessToken = getAccessToken(code, registration);
         JsonNode userResourceNode = getUserResource(accessToken, registration);
@@ -65,10 +50,20 @@ public class OAuth2Service {
         String email = userResourceNode.get("email").asText();
         String picture = userResourceNode.get("picture").asText();
 
+        Pair<Boolean, String> result = checkSignUp(email, id);
+
+        if (result.getFirst()){
+            return result.getSecond();
+        } else {
+            return saveMember(email, id, picture);
+        }
+    }
+
+    public String saveMember(String email, String password, String picture) {
         try {
             Member member = Member.builder()
                     .email(email)
-                    .password(bCryptPasswordEncoder.encode(id)) //비밀번호는 해싱해서 DB에 저장
+                    .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
                     .build();
 
             Profile profile = Profile.builder()
@@ -88,7 +83,7 @@ public class OAuth2Service {
         }
     }
 
-    public String checkSignUp(String email, String password){
+    public Pair<Boolean, String> checkSignUp(String email, String password){
         /* 사용자가 제출한 이메일과 비밀번호 확인하기 */
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
 
@@ -105,10 +100,10 @@ public class OAuth2Service {
             String authenticatedEmail = authDetails.getMember().getEmail();
 
             /* JWT 토큰 반환 */
-            return jwtTokenProvider.generateJwtToken(authenticatedId, authenticatedEmail);
+            return Pair.of(true, jwtTokenProvider.generateJwtToken(authenticatedId, authenticatedEmail));
         }
         else{ /* 인증이 되지 않았을 경우 */
-            return "로그인에 실패했습니다. 이메일 또는 비밀번호가 일치하는지 확인해주세요.";
+            return Pair.of(false, "로그인에 실패했습니다. 이메일 또는 비밀번호가 일치하는지 확인해주세요.");
         }
     }
 

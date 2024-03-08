@@ -14,10 +14,4 @@ public class OAuth2Controller {
         String loginMessage = oAuth2Service.socialLogin(code, registration);
         return CommonResponse.postResponse(HttpStatus.OK.value(), loginMessage);
     }
-
-    @PostMapping("/signup/oauth/{registration}")
-    public CommonResponse<?> socialSignUp(@RequestParam String code, @PathVariable String registration) {
-        String registerMessage = oAuth2Service.socialSignUp(code, registration);
-        return CommonResponse.postResponse(HttpStatus.CREATED.value(), registerMessage);
-    }
 }

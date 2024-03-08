@@ -1,0 +1,57 @@
+name: Deploy to Dev
+
+## dev에 push 일어날 때마다(즉, 하위 디렉토리에서 merge 될 때마다) 빌드
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+    ## checkout 후 자바 17 버전으로 설정
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      ## gradlew에 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      ## gradle build
+      - name: Build with Gradle
+        run: ./gradlew clean build --debug
+
+      ## 이미지 태그에 시간 설정
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DDTHH-mm-ss
+          utcOffset: "+09:00"
+      - name: Show Current Time
+        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
+
+      ## AWS에 로그인
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{secrets.AWS_IAM_ACCOUNT}}
+
+      ## ECR에 로그인
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      ## sample라는 ECR 리파지터리에 현재 시간 태그를 생성하고, 푸쉬합니다. xxx부분은 본인의 레파지터리 주소입니다.
+      ## 앞의 스탭에서 ${{steps.current-time.outputs.formattedTime}}로 현재 시간을 가져옵니다.
+      - name: Build, tag, and push image to Amazon ECR
+        run: |
+          docker build -t ${{secrets.AWS_ECR_REPOSITORY}}:${{steps.current-time.outputs.formattedTime}} .
+          docker tag ${{secrets.AWS_ECR_REPOSITORY}}:latest ${{secrets.AWS_IAM_ACCOUNT}}.dkr.ecr.${{secrets.AWS_REGION}}.amazonaws.com/${{secrets.AWS_ECR_REPOSITORY}}:${{steps.current-time.outputs.formattedTime}}
+          docker push ${{secrets.AWS_IAM_ACCOUNT}}.dkr.ecr.${{secrets.AWS_REGION}}.amazonaws.com/${{secrets.AWS_ECR_REPOSITORY}}:${{steps.current-time.outputs.formattedTime}}

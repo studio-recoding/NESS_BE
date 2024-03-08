@@ -1,4 +1,4 @@
-package Ness.Backend.domain.entity;
+package Ness.Backend.domain.member.entity;
 
 import lombok.Getter;
 import lombok.ToString;

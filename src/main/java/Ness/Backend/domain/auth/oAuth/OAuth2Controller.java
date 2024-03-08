@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OAuth2Controller {
     private final OAuth2Service oAuth2Service;
-    @GetMapping("/login/oauth/{registration}")
+    @PostMapping("/login/oauth/{registration}")
     public CommonResponse<?> socialLogin(@RequestParam String code, @PathVariable String registration) {
         String loginMessage = oAuth2Service.socialLogin(code, registration);
         return CommonResponse.postResponse(HttpStatus.OK.value(), loginMessage);

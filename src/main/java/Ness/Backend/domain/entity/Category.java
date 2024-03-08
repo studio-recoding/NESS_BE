@@ -1,5 +1,6 @@
 package Ness.Backend.domain.entity;
 
+import Ness.Backend.domain.schedule.entity.Schedule;
 import jakarta.persistence.*;
 import lombok.Getter;
 

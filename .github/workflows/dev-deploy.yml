@@ -21,6 +21,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      ## Copy properties files
+      - name: Make application-dev.yml
+        run: |
+          touch ./src/main/resources/application-dev.yml
+          echo "$PROPERTIES_DEV" > ./src/main/resources/application-dev.yml
+        # Make env file
+        env:
+          PROPERTIES_DEV: ${{secrets.PROPERTIES_DEV}}
+
       ## gradle build
       - name: Build with Gradle
         run: ./gradlew clean build

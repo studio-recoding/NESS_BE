@@ -19,5 +19,9 @@ public @interface AuthUser {
 
     어노테이션의 표현식(속성 값 결정하게 만듬), 예시: @MyAnnotation(expression = "#{1 + 2}")
     String expression() default "";
+
+    // 인증된 사용자의 정보를 가져오는 다음 코드를 대체하는 커스텀 어노테이션입니다.
+    AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
+    String email = authDetails.getUsername();
     */
 }

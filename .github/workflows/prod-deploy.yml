@@ -1,9 +1,10 @@
-name: Deploy to Dev
+name: Deploy to Prod
 
-## dev에 push 일어날 때마다(즉, 하위 디렉토리에서 merge 될 때마다) 빌드
+## main에 릴리즈가 일어날 때마다 빌드 및 배포
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ main ]
+    tags: [ "v*.*.*" ]
 
 jobs:
   build:
@@ -22,13 +23,13 @@ jobs:
         run: chmod +x gradlew
 
       ## Copy properties files
-      - name: Make application-dev.yml
+      - name: Make application-prod.yml
         run: |
-          touch ./src/main/resources/application-dev.yml
-          echo "$PROPERTIES_DEV" > ./src/main/resources/application-dev.yml
+          touch ./src/main/resources/application-prod.yml
+          echo "$PROPERTIES_PROD" > ./src/main/resources/application-prod.yml
         # Make env file
         env:
-          PROPERTIES_DEV: ${{ secrets.PROPERTIES_DEV }}
+          PROPERTIES_PROD: ${{ secrets.PROPERTIES_PROD }}
 
       ## gradle build
       - name: Build with Gradle
@@ -39,7 +40,10 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: jeonhaeseung/ness-server-dev
+          images: jeonhaeseung/ness-server-prod
+          tag-semver: |
+            {{version}}
+            {{major}}.{{minor}}
 
       ## 멀티-플랫폼 빌드 도구 Buildx 사용
       - name: Set up Docker Buildx
@@ -57,42 +61,43 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile.dev
+          file: ./Dockerfile.prod
           platforms: linux/amd64
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
 
       ## 원격에 접속 및 디렉토리 생성
       - name: create remote directory
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DEV }}
-          username: ${{ secrets.USER_DEV }}
-          key: ${{ secrets.KEY_DEV }}
-          script: mkdir -p ./dev
+          host: ${{ secrets.HOST_PROD }}
+          username: ${{ secrets.USER_PROD }}
+          key: ${{ secrets.KEY_PROD }}
+          script: mkdir -p ./prod
 
       ## 소스 코드 복사 붙여넣기
       - name: copy source via ssh key
         uses: burnett01/rsync-deployments@4.1
         with:
           switches: -avzr --delete
-          remote_path: ./dev
-          remote_host: ${{ secrets.HOST_DEV }}
-          remote_user: ${{ secrets.USER_DEV }}
-          remote_key: ${{ secrets.KEY_DEV }}
+          remote_path: ./prod
+          remote_host: ${{ secrets.HOST_PROD }}
+          remote_user: ${{ secrets.USER_PROD }}
+          remote_key: ${{ secrets.KEY_PROD }}
 
       ## EC2에 배포(CD)
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DEV }}
-          username: ${{ secrets.USER_DEV }}
-          key: ${{ secrets.KEY_DEV }}
+          host: ${{ secrets.HOST_PROD }}
+          username: ${{ secrets.USER_PROD }}
+          key: ${{ secrets.KEY_PROD }}
           script: |
-            sh ./dev/config/scripts/deploy.sh
+            sh ./prod/config/scripts/deploy.sh
 
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker rm $(sudo docker ps -a -q)
             sudo docker rmi $(sudo docker images -q)
-            docker pull jeonhaeseung/ness-server-dev:dev
-            docker run -d --name backend-server -p 8080:8080 --restart unless-stopped jeonhaeseung/ness-server-dev:dev
+            docker pull jeonhaeseung/ness-server-prod:prod
+            docker run -d --name backend-server -p 8080:8080 --restart unless-stopped jeonhaeseung/ness-server-prod:prod

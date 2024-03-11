@@ -39,6 +39,13 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Chat> chats = new ArrayList<>();
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDeleted;
+
+    public void updateIsDeleted() {
+        this.isDeleted = !this.isDeleted;
+    }
+
     @Builder
     public Member(String email, String password, MemberRole memberRole){
         this.email = email;

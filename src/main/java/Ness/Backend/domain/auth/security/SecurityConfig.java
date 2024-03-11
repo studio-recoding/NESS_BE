@@ -1,5 +1,7 @@
 package Ness.Backend.domain.auth.security;
 
+import Ness.Backend.domain.auth.inmemory.RefreshTokenRepository;
+import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
 import Ness.Backend.domain.auth.jwt.JwtAuthenticationFilter;
 import Ness.Backend.domain.auth.jwt.JwtAuthorizationFilter;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
@@ -28,6 +30,8 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final AuthDetailService authDetailService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /* 회원가입: 패스워드 암호화를 위해 사용 */
     @Bean
@@ -45,6 +49,12 @@ public class SecurityConfig {
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
         return new JwtTokenProvider(memberRepository);
+    }
+
+    /* 로그인: 사용자 정보(memberRepository 내용)를 토대로 토큰을 생성하거나 검증 */
+    @Bean
+    public RefreshTokenService refreshTokenService() {
+        return new RefreshTokenService(refreshTokenRepository);
     }
 
     /* CORS 구성을 URL 패턴에 따라 적용
@@ -78,7 +88,7 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable()) //폼 기반 로그인을 비활성화->토큰 기반 인증 필요
                 .httpBasic(httpBasic -> httpBasic.disable()) //HTTP 기본 인증을 비활성화->비밀번호를 평문으로 보내지 않음
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션을 생성하지 않음->토큰 기반 인증 필요
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider()))  //사용자 인증
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider(), refreshTokenService()))  //사용자 인증
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(),  jwtTokenProvider(), authDetailService)) //사용자 권한 부여
                 .authorizeHttpRequests(request -> request
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()

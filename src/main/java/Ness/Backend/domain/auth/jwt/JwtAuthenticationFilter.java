@@ -1,5 +1,6 @@
 package Ness.Backend.domain.auth.jwt;
 
+import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
 import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.entity.Member;
@@ -25,6 +26,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     /* 사용자의 로그인 시도를 가로채는 attemptAuthentication
      * 인증 객체(Authentication)을 만들기 시도 */
@@ -40,7 +42,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-            return  authentication;
+            return authentication;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,10 +60,38 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String authEmail = authDetails.getMember().getEmail();
 
+        /* JwtToken 생성(accessToken, refreshToken) */
         JwtToken jwtToken = jwtTokenProvider.generateJwtToken(authEmail);
 
-        /* 가장 흔한 방식인 Bearer Token을 사용 */
+        /* RefreshToken 업데이트(email로 authKey 설정) */
+        refreshTokenService.saveRefreshToken(jwtToken.getJwtRefreshToken(), authDetails.getMember().getEmail());
+
+        /* 가장 흔한 방식인 Bearer Token을 사용해 응답 */
         response.addHeader("Authorization", "Bearer " + jwtToken.getJwtAccessToken());
         response.addHeader("Refresh-Token", "Bearer " + jwtToken.getJwtRefreshToken());
+
+        //TODO: JwtToken 과 함께 리다이렉트
+        /*
+        String targetUrl = UriComponentsBuilder.fromUriString(setRedirectUrl(request.getServerName()))
+                .queryParam("jwtAccessToken", jwtToken.getJwtAccessToken())
+                .queryParam("jwtRefreshToken", jwtToken.getJwtRefreshToken())
+                .build().toUriString();
+         */
     }
+
+    /*
+    private String setRedirectUrl(String url) {
+        String redirect_url = null;
+        if (url.equals("localhost")) {
+            redirect_url = "http://localhost:8080/oauth/google/success";
+        }
+        if (url.equals("ness.site")) {
+            redirect_url = "http://localhost:3000/oauth/google/success/ing";
+        }
+        if (url.equals("ness.com")) {
+            redirect_url = "https://www.teampple.com/oauth/google/success/ing";
+        }
+        return redirect_url;
+    }
+     */
 }

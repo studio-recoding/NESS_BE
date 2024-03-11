@@ -54,7 +54,7 @@ public class JwtTokenProvider {
         final Date now = new Date();
         return JwtToken.builder()
                 .jwtAccessToken(generateAccessToken(authKey, now))
-                .jwtRefreshToken(generateRefreshToken(now))
+                .jwtRefreshToken(generateRefreshToken(authKey, now))
                 .build();
     }
 
@@ -63,8 +63,8 @@ public class JwtTokenProvider {
         Date accessTokenExpireDate = new Date(System.currentTimeMillis() + (JWT_EXPIRATION_TIME));
 
         Map<String, Object> headerMap = new HashMap<>();
-        headerMap.put("algorithm", "HMAC512");
-        headerMap.put("type", "JWT");
+        headerMap.put("alg", "HMAC512");
+        headerMap.put("typ", "JWT");
 
         return JWT.create()
                 .withHeader(headerMap)
@@ -76,17 +76,18 @@ public class JwtTokenProvider {
                 .sign(this.getSign());
     }
 
-    public String generateRefreshToken(Date now) {
+    public String generateRefreshToken(String authKey, Date now) {
         final Date refreshTokenExpireDate = new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME);
 
         Map<String, Object> headerMap = new HashMap<>();
-        headerMap.put("algorithm", "HMAC512");
-        headerMap.put("type", "JWT");
+        headerMap.put("alg", "HMAC512");
+        headerMap.put("typ", "JWT");
 
         return JWT.create()
                 .withHeader(headerMap)
                 .withIssuer("re:coding")
                 .withExpiresAt(refreshTokenExpireDate) //토큰의 만료 시간
+                .withClaim(AUTHORITIES_KEY, authKey)
                 .sign(this.getSign());
     }
 

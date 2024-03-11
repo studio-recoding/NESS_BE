@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @Getter
 @NoArgsConstructor
 @RedisHash(value = "refreshToken")
-public class RefreshToken {
+public class RefreshToken { /* Redis에 저장해서 RefreshToken이 유효한지 검증 */
     @Id
     @Indexed
     private String jwtRefreshToken;

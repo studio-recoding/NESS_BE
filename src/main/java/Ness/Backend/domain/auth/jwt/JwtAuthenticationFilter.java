@@ -1,5 +1,7 @@
 package Ness.Backend.domain.auth.jwt;
 
+import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
+import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.entity.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,9 +22,11 @@ import java.io.IOException;
 /* 사용자 인증(확인)
  * 사용자의 로그인 시도를 가로채서 JWT 토큰을 생성하고, 성공적으로 로그인이 완료되면 생성된 토큰을 응답 헤더에 추가 */
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     /* 사용자의 로그인 시도를 가로채는 attemptAuthentication
      * 인증 객체(Authentication)을 만들기 시도 */
@@ -37,10 +42,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-            return  authentication;
+            return authentication;
 
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("Could not set user authentication in security context", e);
         }
 
         return null;
@@ -52,13 +58,40 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         AuthDetails authDetails = (AuthDetails) authResult.getPrincipal();
 
-        Long id = authDetails.getMember().getId();
-        String email = authDetails.getMember().getEmail();
+        String authEmail = authDetails.getMember().getEmail();
 
-        String jwtToken = jwtTokenProvider.generateJwtToken(id, email);
+        /* JwtToken 생성(accessToken, refreshToken) */
+        JwtToken jwtToken = jwtTokenProvider.generateJwtToken(authEmail);
 
-        /* 가장 흔한 방식인 Bearer Token을 사용 */
-        response.addHeader("Authorization", "Bearer " + jwtToken);
+        /* RefreshToken 업데이트(email로 authKey 설정) */
+        refreshTokenService.saveRefreshToken(jwtToken.getJwtRefreshToken(), authDetails.getMember().getEmail());
 
+        /* 가장 흔한 방식인 Bearer Token을 사용해 응답 */
+        response.addHeader("Authorization", "Bearer " + jwtToken.getJwtAccessToken());
+        response.addHeader("Refresh-Token", "Bearer " + jwtToken.getJwtRefreshToken());
+
+        //TODO: JwtToken 과 함께 리다이렉트
+        /*
+        String targetUrl = UriComponentsBuilder.fromUriString(setRedirectUrl(request.getServerName()))
+                .queryParam("jwtAccessToken", jwtToken.getJwtAccessToken())
+                .queryParam("jwtRefreshToken", jwtToken.getJwtRefreshToken())
+                .build().toUriString();
+         */
     }
+
+    /*
+    private String setRedirectUrl(String url) {
+        String redirect_url = null;
+        if (url.equals("localhost")) {
+            redirect_url = "http://localhost:8080/oauth/google/success";
+        }
+        if (url.equals("ness.site")) {
+            redirect_url = "http://localhost:3000/oauth/google/success/ing";
+        }
+        if (url.equals("ness.com")) {
+            redirect_url = "https://www.teampple.com/oauth/google/success/ing";
+        }
+        return redirect_url;
+    }
+     */
 }

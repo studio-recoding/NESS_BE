@@ -25,6 +25,10 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	set('springCloudVersion', "2023.0.0")
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter' //mysql connect를 위해 필요
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -44,6 +48,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	//Jwt
 	implementation group: 'com.auth0', name: 'java-jwt', version: '3.14.0'
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	//FeignClient
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('bootBuildImage') {

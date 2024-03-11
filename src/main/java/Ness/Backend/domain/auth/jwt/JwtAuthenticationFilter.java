@@ -1,5 +1,6 @@
 package Ness.Backend.domain.auth.jwt;
 
+import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.entity.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ import java.io.IOException;
 /* 사용자 인증(확인)
  * 사용자의 로그인 시도를 가로채서 JWT 토큰을 생성하고, 성공적으로 로그인이 완료되면 생성된 토큰을 응답 헤더에 추가 */
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -41,6 +44,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("Could not set user authentication in security context", e);
         }
 
         return null;
@@ -52,13 +56,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         AuthDetails authDetails = (AuthDetails) authResult.getPrincipal();
 
-        Long id = authDetails.getMember().getId();
-        String email = authDetails.getMember().getEmail();
+        String authEmail = authDetails.getMember().getEmail();
 
-        String jwtToken = jwtTokenProvider.generateJwtToken(id, email);
+        JwtToken jwtToken = jwtTokenProvider.generateJwtToken(authEmail);
 
         /* 가장 흔한 방식인 Bearer Token을 사용 */
-        response.addHeader("Authorization", "Bearer " + jwtToken);
-
+        response.addHeader("Authorization", "Bearer " + jwtToken.getJwtAccessToken());
+        response.addHeader("Refresh-Token", "Bearer " + jwtToken.getJwtRefreshToken());
     }
 }

@@ -10,10 +10,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Member findMemberById(Long memberId);
 
     // 특정 맴버 이메일로 맴버 엔티티 반환
-
-    //Member findMemberByEmail(String email);
-
     Member findMemberByEmail(String email);
-
-    Member findMemberByAuthKey(String authKey);
 }

@@ -2,15 +2,11 @@ package Ness.Backend.domain.auth.oAuth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor
 public class GoogleResourceDto {
     @JsonProperty("id")
     private String id;
@@ -20,4 +16,15 @@ public class GoogleResourceDto {
 
     @JsonProperty("picture")
     private String picture;
+
+    @JsonProperty("name")
+    private String nickname;
+
+    @Builder
+    public GoogleResourceDto(String id, String email, String picture, String nickname){
+        this.id = id;
+        this.email = email;
+        this.picture = picture;
+        this.nickname = nickname;
+    }
 }

@@ -5,15 +5,16 @@ import feign.Headers;
 import feign.Param;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(
         name = "GoogleResource",
         url = "https://www.googleapis.com")
 public interface GoogleResourceApi {
-    @PostMapping(
+    @GetMapping(
             value = "/oauth2/v2/userinfo",
             produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    @Headers("Authorization: {authorization}")
-    GoogleResourceDto googleGetResource(@Param("authorization") String accessToken);
+    GoogleResourceDto googleGetResource(@RequestHeader("Authorization") String accessToken);
 }

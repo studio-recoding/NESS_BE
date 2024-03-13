@@ -17,13 +17,20 @@ public class Profile {
 
     private String pictureUrl;
 
+    private String nickname;
+
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
     @Builder
-    public Profile(String pictureUrl, Member member){
+    public Profile(String pictureUrl, String nickname, Member member){
         this.pictureUrl = pictureUrl;
+        this.nickname = nickname;
         this.member = member;
     }
 }

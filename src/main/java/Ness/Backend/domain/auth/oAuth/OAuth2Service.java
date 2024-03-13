@@ -14,10 +14,14 @@ import Ness.Backend.global.auth.oAuth.dto.GoogleOAuthApi;
 import Ness.Backend.global.auth.oAuth.dto.GoogleResourceApi;
 import Ness.Backend.global.error.ErrorCode;
 import Ness.Backend.global.error.exception.UnauthorizedException;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -41,6 +45,12 @@ public class OAuth2Service {
     private final GoogleOAuthApi googleOAuthApi;
     private final GoogleResourceApi googleResourceApi;
 
+    public GoogleResourceDto devSocialLogin(String code, String registration) {
+        String accessToken = getAccessToken(code, registration);
+        GoogleResourceDto googleResourceDto = getUserResource(accessToken, registration);
+        return googleResourceDto;
+    }
+
     public String socialLogin(String code, String registration) {
         /*
         * 로직:
@@ -55,22 +65,23 @@ public class OAuth2Service {
         String id = googleResourceDto.getId();
         String email = googleResourceDto.getEmail();
         String picture = googleResourceDto.getPicture();
+        String nickname = googleResourceDto.getNickname();
 
         if (checkSignUp(email)){
             /* 여기서 response 이루어짐 */
             jwtTokenProvider.generateJwtToken(email);
             return "로그인에 성공했습니다.";
         } else {
-            socialSignUp(email, id, picture);
+            socialSignUp(email, id, picture, nickname);
             jwtTokenProvider.generateJwtToken(email);
             return "회원가입 및 로그인에 성공했습니다.";
         }
     }
 
-    public String socialSignUp(String email, String password, String picture) {
+    public String socialSignUp(String email, String password, String picture, String nickname) {
         /* 프로필 및 맴버 저장 */
         try {
-            memberService.createMember(email, password, picture);
+            memberService.createMember(email, password, picture, nickname);
             return "회원가입이 완료되었습니다.";
 
         } catch (DataIntegrityViolationException e) {

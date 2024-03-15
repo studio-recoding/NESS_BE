@@ -45,10 +45,20 @@ public class OAuth2Service {
     private final GoogleOAuthApi googleOAuthApi;
     private final GoogleResourceApi googleResourceApi;
 
-    public GoogleResourceDto devSocialLogin(String code, String registration) {
+    public String devSocialLogin(String code, String registration) {
         String accessToken = getAccessToken(code, registration);
         GoogleResourceDto googleResourceDto = getUserResource(accessToken, registration);
-        return googleResourceDto;
+        String id = googleResourceDto.getId();
+        String email = googleResourceDto.getEmail();
+        String picture = googleResourceDto.getPicture();
+        String nickname = googleResourceDto.getNickname();
+
+        if (checkSignUp(email)){
+            return "로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
+        } else {
+            socialSignUp(email, id, picture, nickname);
+            return "회원가입 및 로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
+        }
     }
 
     public String socialLogin(String code, String registration) {

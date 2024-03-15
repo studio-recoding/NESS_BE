@@ -3,6 +3,9 @@ package Ness.Backend.domain.member.entity;
 
 import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.profile.entity.Profile;
+import Ness.Backend.domain.report.entity.ReportMemory;
+import Ness.Backend.domain.report.entity.ReportRecommend;
+import Ness.Backend.domain.report.entity.ReportTag;
 import Ness.Backend.domain.schedule.entity.Schedule;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -38,6 +41,15 @@ public class Member {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Chat> chats = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<ReportTag> reportTags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<ReportMemory> reportMemories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<ReportRecommend> reportRecommends = new ArrayList<>();
 
     @Column(columnDefinition = "boolean default false")
     private boolean isDeleted;

@@ -16,8 +16,8 @@ public class OAuth2Controller {
     @GetMapping("/dev/login/oauth/{registration}")
     @Operation(summary = "OAuth 로그인 요청", description = "개발 테스트용 API 입니다. 클라이언트에게 공개되지 않습니다.")
     public CommonResponse<?> devSocialLogin(@RequestParam String code, @PathVariable String registration) {
-        GoogleResourceDto googleResourceDto = oAuth2Service.devSocialLogin(code, registration);
-        return CommonResponse.getResponse(HttpStatus.OK.value(), "로그인 성공", googleResourceDto);
+        String loginMessage = oAuth2Service.devSocialLogin(code, registration);
+        return CommonResponse.postResponse(HttpStatus.OK.value(), loginMessage);
     }
 
     @PostMapping("/login/oauth/{registration}")

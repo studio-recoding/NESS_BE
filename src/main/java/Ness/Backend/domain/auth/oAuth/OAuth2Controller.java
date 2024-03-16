@@ -1,6 +1,5 @@
 package Ness.Backend.domain.auth.oAuth;
 
-import Ness.Backend.domain.auth.oAuth.dto.GoogleResourceDto;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.auth.AuthUser;
 import Ness.Backend.global.common.response.CommonResponse;

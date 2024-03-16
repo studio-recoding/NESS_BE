@@ -1,35 +1,22 @@
 package Ness.Backend.domain.auth.oAuth;
 
 import Ness.Backend.domain.auth.inmemory.RefreshTokenRepository;
-import Ness.Backend.domain.auth.oAuth.dto.GoogleResourceDto;
-import Ness.Backend.domain.auth.oAuth.dto.GoogleTokenDto;
-import Ness.Backend.domain.auth.security.AuthDetails;
+import Ness.Backend.domain.auth.oAuth.google.dto.GoogleResourceDto;
+import Ness.Backend.domain.auth.oAuth.google.dto.GoogleTokenDto;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.member.MemberService;
-import Ness.Backend.domain.profile.ProfileRepository;
-import Ness.Backend.domain.profile.entity.Profile;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
-import Ness.Backend.global.auth.oAuth.dto.GoogleOAuthApi;
-import Ness.Backend.global.auth.oAuth.dto.GoogleResourceApi;
+import Ness.Backend.global.auth.oAuth.google.GoogleOAuthApi;
+import Ness.Backend.global.auth.oAuth.google.GoogleResourceApi;
 import Ness.Backend.global.error.ErrorCode;
 import Ness.Backend.global.error.exception.UnauthorizedException;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.util.Pair;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 @Service

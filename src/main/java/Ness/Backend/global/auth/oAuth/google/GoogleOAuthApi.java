@@ -1,8 +1,6 @@
-package Ness.Backend.global.auth.oAuth.google.dto;
+package Ness.Backend.global.auth.oAuth.google;
 
-import Ness.Backend.domain.auth.oAuth.dto.GoogleTokenDto;
-import feign.Headers;
-import org.springframework.beans.factory.annotation.Value;
+import Ness.Backend.domain.auth.oAuth.google.dto.GoogleTokenDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;

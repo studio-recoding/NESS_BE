@@ -1,12 +1,9 @@
-package Ness.Backend.global.auth.oAuth.google.dto;
+package Ness.Backend.global.auth.oAuth.google;
 
-import Ness.Backend.domain.auth.oAuth.dto.GoogleResourceDto;
-import feign.Headers;
-import feign.Param;
+import Ness.Backend.domain.auth.oAuth.google.dto.GoogleResourceDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(

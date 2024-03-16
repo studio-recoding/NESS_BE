@@ -1,4 +1,4 @@
-package Ness.Backend.domain.auth.oAuth.dto;
+package Ness.Backend.domain.auth.oAuth.google.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package Ness.Backend.global.auth.oAuth.dto;
+package Ness.Backend.global.auth.oAuth.google.dto;
 
 import Ness.Backend.domain.auth.oAuth.dto.GoogleResourceDto;
 import feign.Headers;

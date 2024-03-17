@@ -1,26 +1,22 @@
-package Ness.Backend.global.auth.oAuth.dto;
+package Ness.Backend.global.auth.oAuth.kakao;
 
-import Ness.Backend.domain.auth.oAuth.dto.GoogleTokenDto;
-import feign.Headers;
-import org.springframework.beans.factory.annotation.Value;
+import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoTokenDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @FeignClient(
-        name = "GoogleOAuth",
-        url = "https://oauth2.googleapis.com")
-public interface GoogleOAuthApi {
+        name = "KakaoOAuth",
+        url = "https://kauth.kakao.com")
+public interface KakaoOAuthApi {
     @PostMapping(
-            value = "/token?" +
+            value = "/oauth/token?" +
                     "code={CODE}" +
                     "&client_id={CLIENT_ID}" +
                     "&client_secret={CLIENT_SECRET}" +
                     "&redirect_uri={REDIRECT_URI}" +
-                    "&grant_type={GRANT_TYPE}",
-            produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    GoogleTokenDto googleGetToken(
+                    "&grant_type={GRANT_TYPE}")
+    KakaoTokenDto kakaoGetToken(
             @PathVariable("CODE") String code,
             @PathVariable("CLIENT_ID") String clientId,
             @PathVariable("CLIENT_SECRET") String clientSecret,

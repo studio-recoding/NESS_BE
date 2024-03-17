@@ -1,50 +1,62 @@
 package Ness.Backend.domain.auth.oAuth;
 
+import Ness.Backend.domain.auth.dto.ResourceDto;
 import Ness.Backend.domain.auth.inmemory.RefreshTokenRepository;
 import Ness.Backend.domain.auth.oAuth.google.dto.GoogleResourceDto;
 import Ness.Backend.domain.auth.oAuth.google.dto.GoogleTokenDto;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
+import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoResourceDto;
+import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoTokenDto;
 import Ness.Backend.domain.member.MemberService;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.global.auth.oAuth.google.GoogleOAuthApi;
 import Ness.Backend.global.auth.oAuth.google.GoogleResourceApi;
+import Ness.Backend.global.auth.oAuth.kakao.KakaoOAuthApi;
+import Ness.Backend.global.auth.oAuth.kakao.KakaoResourceApi;
 import Ness.Backend.global.error.ErrorCode;
 import Ness.Backend.global.error.exception.UnauthorizedException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class OAuth2Service {
     private final Environment env;
-
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
     private final GoogleOAuthApi googleOAuthApi;
     private final GoogleResourceApi googleResourceApi;
+    private final KakaoOAuthApi kakaoOAuthApi;
+    private final KakaoResourceApi kakaoResourceApi;
 
     public String devSocialLogin(String code, String registration) {
-        String accessToken = getAccessToken(code, registration);
-        GoogleResourceDto googleResourceDto = getUserResource(accessToken, registration);
-        String id = googleResourceDto.getId();
-        String email = googleResourceDto.getEmail();
-        String picture = googleResourceDto.getPicture();
-        String nickname = googleResourceDto.getNickname();
+        String accessToken = getOAuthAccessToken(code, registration);
+        ResourceDto resourceDto = getUserResource(accessToken, registration);
+        String id = resourceDto.getId();
+        String email = resourceDto.getEmail();
+        String picture = resourceDto.getPicture();
+        String nickname = resourceDto.getNickname();
 
         if (checkSignUp(email)){
-            return "로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
+            return registration+" 로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
         } else {
             socialSignUp(email, id, picture, nickname);
-            return "회원가입 및 로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
+            return registration+" 회원가입 및 로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
         }
     }
 
@@ -57,12 +69,12 @@ public class OAuth2Service {
         * 3-1. 존재하는 유저가 아니라면 email과 id를 각각 아이디와 패스워드로 DB에 저장한 후 jwt 토큰 반환
         * 3-2. 존재하는 유저가 맞다면
          * */
-        String accessToken = getAccessToken(code, registration);
-        GoogleResourceDto googleResourceDto = getUserResource(accessToken, registration);
-        String id = googleResourceDto.getId();
-        String email = googleResourceDto.getEmail();
-        String picture = googleResourceDto.getPicture();
-        String nickname = googleResourceDto.getNickname();
+        String accessToken = getOAuthAccessToken(code, registration);
+        ResourceDto resourceDto = getUserResource(accessToken, registration);
+        String id = resourceDto.getId();
+        String email = resourceDto.getEmail();
+        String picture = resourceDto.getPicture();
+        String nickname = resourceDto.getNickname();
 
         if (checkSignUp(email)){
             /* 여기서 response 이루어짐 */
@@ -93,22 +105,60 @@ public class OAuth2Service {
     }
 
     /* oauth 서버에서 access_token 받아옴 */
-    private String getAccessToken(String authorizationCode, String registration) {
+    private String getOAuthAccessToken(String authorizationCode, String registration) {
         String clientId = env.getProperty("oauth2." + registration + ".client-id");
         String clientSecret = env.getProperty("oauth2." + registration + ".client-secret");
         String redirectUri = env.getProperty("oauth2." + registration + ".redirect-uri");
-        String tokenUri = env.getProperty("oauth2." + registration + ".token-uri");
+        String accessToken = null;
 
-        GoogleTokenDto tokenDto = googleOAuthApi.googleGetToken(authorizationCode, clientId, clientSecret, redirectUri, "authorization_code");
+        switch (registration) {
+            case "google":
+                accessToken = googleOAuthApi
+                        .googleGetToken(authorizationCode, clientId, clientSecret, redirectUri, "authorization_code")
+                        .getAccessToken();
+                break;
+            case "kakao":
+                accessToken = kakaoOAuthApi
+                        .kakaoGetToken(authorizationCode, clientId, clientSecret, redirectUri, "authorization_code")
+                        .getAccessToken();
+                log.info("accessToken: "+accessToken);
+                break;
+        }
 
-        return tokenDto.getAccessToken();
+        return accessToken;
     }
 
     /* 리다이렉트 URL을 통해서 리소스 가져옴 */
-    private GoogleResourceDto getUserResource(String accessToken, String registration) {
-        String resourceUri = env.getProperty("oauth2." + registration + ".resource-uri");
+    private ResourceDto getUserResource(String accessToken, String registration) {
+        ResourceDto resourceDto = null;
 
-        return googleResourceApi.googleGetResource("Bearer " + accessToken);
+        switch (registration) {
+            case "google":
+                GoogleResourceDto googleResourceDto =
+                        googleResourceApi.googleGetResource("Bearer " + accessToken);
+                resourceDto = ResourceDto.builder()
+                        .id(googleResourceDto.getId())
+                        .email(googleResourceDto.getEmail())
+                        .picture(googleResourceDto.getPicture())
+                        .nickname(googleResourceDto.getNickname())
+                        .build();
+                break;
+            case "kakao":
+                KakaoResourceDto kakaoResourceDto =
+                        kakaoResourceApi.kakaoGetResource(
+                        "Bearer " + accessToken,
+                        "application/x-www-form-urlencoded;charset=utf-8");
+
+                resourceDto = ResourceDto.builder()
+                        .id(kakaoResourceDto.getId())
+                        .email(kakaoResourceDto.getKakaoAccount().getEmail())
+                        .picture(kakaoResourceDto.getKakaoAccount().getKakaoProfile().getPicture())
+                        .nickname(kakaoResourceDto.getKakaoAccount().getKakaoProfile().getNickname())
+                        .build();
+                log.info("email: "+resourceDto.getEmail());
+                break;
+        }
+        return resourceDto;
     }
 
     public void logout(Member member) {

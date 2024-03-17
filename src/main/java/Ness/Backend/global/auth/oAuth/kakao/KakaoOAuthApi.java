@@ -13,11 +13,13 @@ public interface KakaoOAuthApi {
             value = "/oauth/token?" +
                     "code={CODE}" +
                     "&client_id={CLIENT_ID}" +
+                    "&client_secret={CLIENT_SECRET}" +
                     "&redirect_uri={REDIRECT_URI}" +
                     "&grant_type={GRANT_TYPE}")
     KakaoTokenDto kakaoGetToken(
             @PathVariable("CODE") String code,
             @PathVariable("CLIENT_ID") String clientId,
+            @PathVariable("CLIENT_SECRET") String clientSecret,
             @PathVariable("REDIRECT_URI") String redirectUri,
             @PathVariable("GRANT_TYPE") String grantType);
 }

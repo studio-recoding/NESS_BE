@@ -28,6 +28,7 @@ public class ProfileService {
                 .id(profile.getId())
                 .pictureUrl(profile.getPictureUrl())
                 .nickname(profile.getNickname())
+                .name(profile.getName())
                 .build();
 
         return profileResponseDto;

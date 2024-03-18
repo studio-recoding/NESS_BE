@@ -17,13 +17,17 @@ public class ProfileResponseDto {
     @Schema(description = "사용자의 공유 프로필 URL", example = "https://lh3.googleusercontent.com/...")
     private String pictureUrl;
 
-    @Schema(description = "사용자의 닉네임", example = "홍길동")
+    @Schema(description = "사용자의 닉네임", example = "DongDong")
     private String nickname;
 
+    @Schema(description = "사용자의 이름", example = "홍길동")
+    private String name;
+
     @Builder
-    public ProfileResponseDto(Long id, String pictureUrl, String nickname){
+    public ProfileResponseDto(Long id, String pictureUrl, String nickname, String name){
         this.id = id;
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;
+        this.name = name;
     }
 }

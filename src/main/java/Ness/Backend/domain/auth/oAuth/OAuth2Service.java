@@ -3,10 +3,9 @@ package Ness.Backend.domain.auth.oAuth;
 import Ness.Backend.domain.auth.dto.ResourceDto;
 import Ness.Backend.domain.auth.inmemory.RefreshTokenRepository;
 import Ness.Backend.domain.auth.oAuth.google.dto.GoogleResourceDto;
-import Ness.Backend.domain.auth.oAuth.google.dto.GoogleTokenDto;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoResourceDto;
-import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoTokenDto;
+import Ness.Backend.domain.auth.oAuth.naver.dto.NaverResourceDto;
 import Ness.Backend.domain.member.MemberService;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
@@ -14,10 +13,11 @@ import Ness.Backend.global.auth.oAuth.google.GoogleOAuthApi;
 import Ness.Backend.global.auth.oAuth.google.GoogleResourceApi;
 import Ness.Backend.global.auth.oAuth.kakao.KakaoOAuthApi;
 import Ness.Backend.global.auth.oAuth.kakao.KakaoResourceApi;
+import Ness.Backend.global.auth.oAuth.naver.NaverOAuthApi;
+import Ness.Backend.global.auth.oAuth.naver.NaverResourceApi;
 import Ness.Backend.global.error.ErrorCode;
 import Ness.Backend.global.error.exception.UnauthorizedException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -26,7 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 
 @Service
@@ -43,6 +44,8 @@ public class OAuth2Service {
     private final GoogleResourceApi googleResourceApi;
     private final KakaoOAuthApi kakaoOAuthApi;
     private final KakaoResourceApi kakaoResourceApi;
+    private final NaverOAuthApi naverOAuthApi;
+    private final NaverResourceApi naverResourceApi;
 
     public String devSocialLogin(String code, String registration) {
         String accessToken = getOAuthAccessToken(code, registration);
@@ -51,11 +54,12 @@ public class OAuth2Service {
         String email = resourceDto.getEmail();
         String picture = resourceDto.getPicture();
         String nickname = resourceDto.getNickname();
+        String name = resourceDto.getName();
 
         if (checkSignUp(email)){
             return registration+" 로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
         } else {
-            socialSignUp(email, id, picture, nickname);
+            socialSignUp(email, id, picture, nickname, name);
             return registration+" 회원가입 및 로그인에 성공했습니다, "+jwtTokenProvider.generateJwtToken(email).getJwtAccessToken();
         }
     }
@@ -75,22 +79,23 @@ public class OAuth2Service {
         String email = resourceDto.getEmail();
         String picture = resourceDto.getPicture();
         String nickname = resourceDto.getNickname();
+        String name = resourceDto.getName();
 
         if (checkSignUp(email)){
             /* 여기서 response 이루어짐 */
             jwtTokenProvider.generateJwtToken(email);
             return "로그인에 성공했습니다.";
         } else {
-            socialSignUp(email, id, picture, nickname);
+            socialSignUp(email, id, picture, nickname, name);
             jwtTokenProvider.generateJwtToken(email);
             return "회원가입 및 로그인에 성공했습니다.";
         }
     }
 
-    public String socialSignUp(String email, String password, String picture, String nickname) {
+    public String socialSignUp(String email, String password, String picture, String nickname, String name) {
         /* 프로필 및 맴버 저장 */
         try {
-            memberService.createMember(email, password, picture, nickname);
+            memberService.createMember(email, password, picture, nickname, name);
             return "회원가입이 완료되었습니다.";
 
         } catch (DataIntegrityViolationException e) {
@@ -114,14 +119,27 @@ public class OAuth2Service {
         switch (registration) {
             case "google":
                 accessToken = googleOAuthApi
-                        .googleGetToken(authorizationCode, clientId, clientSecret, redirectUri, "authorization_code")
+                        .googleGetToken(authorizationCode,clientId, clientSecret,
+                                redirectUri,
+                                "authorization_code")
                         .getAccessToken();
                 break;
             case "kakao":
                 accessToken = kakaoOAuthApi
-                        .kakaoGetToken(authorizationCode, clientId, clientSecret, redirectUri, "authorization_code")
+                        .kakaoGetToken(authorizationCode, clientId, clientSecret,
+                                redirectUri,
+                                "authorization_code")
                         .getAccessToken();
-                log.info("accessToken: "+accessToken);
+                break;
+            case "naver":
+                String state = env.getProperty("oauth2." + registration + ".state");
+                accessToken = naverOAuthApi
+                        .naverGetToken(authorizationCode, clientId, clientSecret,
+                                URLEncoder.encode(redirectUri, StandardCharsets.UTF_8),
+                                "authorization_code",
+                                URLEncoder.encode(state, StandardCharsets.UTF_8))
+                        .getAccessToken();
+                log.info("accessToken: " + accessToken);
                 break;
         }
 
@@ -140,7 +158,8 @@ public class OAuth2Service {
                         .id(googleResourceDto.getId())
                         .email(googleResourceDto.getEmail())
                         .picture(googleResourceDto.getPicture())
-                        .nickname(googleResourceDto.getNickname())
+                        .nickname(googleResourceDto.getName())
+                        .name(googleResourceDto.getName())
                         .build();
                 break;
             case "kakao":
@@ -154,6 +173,19 @@ public class OAuth2Service {
                         .email(kakaoResourceDto.getKakaoAccount().getEmail())
                         .picture(kakaoResourceDto.getKakaoAccount().getKakaoProfile().getPicture())
                         .nickname(kakaoResourceDto.getKakaoAccount().getKakaoProfile().getNickname())
+                        .name(kakaoResourceDto.getKakaoAccount().getKakaoProfile().getNickname())
+                        .build();
+                log.info("email: "+resourceDto.getEmail());
+                break;
+            case "naver":
+                NaverResourceDto naverResourceDto =
+                        naverResourceApi.naverGetResource("Bearer " + accessToken);
+                resourceDto = ResourceDto.builder()
+                        .id(naverResourceDto.getNaverResponse().getId())
+                        .email(naverResourceDto.getNaverResponse().getEmail())
+                        .picture(naverResourceDto.getNaverResponse().getPicture())
+                        .nickname(naverResourceDto.getNaverResponse().getNickname())
+                        .name(naverResourceDto.getNaverResponse().getName())
                         .build();
                 log.info("email: "+resourceDto.getEmail());
                 break;

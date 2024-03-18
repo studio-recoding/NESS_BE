@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class KakaoAccount {
     @JsonProperty("profile")
     private KakaoProfile kakaoProfile;
+
     @JsonProperty("email")
     private String email;
 }

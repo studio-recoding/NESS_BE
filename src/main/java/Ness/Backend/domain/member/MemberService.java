@@ -22,7 +22,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public Member createMember(String email, String password, String picture, String nickname) {
+    public Member createMember(String email, String password, String picture, String nickname, String name) {
         Member member = Member.builder()
                 .email(email)
                 .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
@@ -31,6 +31,7 @@ public class MemberService {
         Profile profile = Profile.builder()
                 .pictureUrl(picture)
                 .nickname(nickname)
+                .name(name)
                 .member(member)
                 .build();
 

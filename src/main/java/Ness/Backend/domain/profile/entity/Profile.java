@@ -19,6 +19,8 @@ public class Profile {
 
     private String nickname;
 
+    private String name;
+
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -28,9 +30,10 @@ public class Profile {
     }
 
     @Builder
-    public Profile(String pictureUrl, String nickname, Member member){
+    public Profile(String pictureUrl, String nickname, String name, Member member){
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;
+        this.name = name;
         this.member = member;
     }
 }

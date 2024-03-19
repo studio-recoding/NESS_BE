@@ -53,8 +53,8 @@ public class JwtTokenProvider {
     public JwtToken generateJwtToken(String authKey) throws HttpServerErrorException.InternalServerError {
         final Date now = new Date();
         return JwtToken.builder()
-                .jwtAccessToken(generateAccessToken(authKey, now))
-                .jwtRefreshToken(generateRefreshToken(authKey, now))
+                .jwtAccessToken("Bearer " + generateAccessToken(authKey, now))
+                .jwtRefreshToken("Bearer " + generateRefreshToken(authKey, now))
                 .build();
     }
 

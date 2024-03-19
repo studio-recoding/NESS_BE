@@ -17,12 +17,15 @@ public class ResourceDto {
 
     private String nickname;
 
+    private String name;
+
     @Builder
-    public ResourceDto(String id, String email, String picture, String nickname){
+    public ResourceDto(String id, String email, String picture, String nickname, String name){
         this.id = id;
         this.email = email;
         this.picture = picture;
         this.nickname = nickname;
+        this.name = name;
     }
 }
 

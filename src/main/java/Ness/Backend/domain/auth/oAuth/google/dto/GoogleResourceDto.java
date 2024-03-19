@@ -18,13 +18,13 @@ public class GoogleResourceDto {
     private String picture;
 
     @JsonProperty("name")
-    private String nickname;
+    private String name;
 
     @Builder
-    public GoogleResourceDto(String id, String email, String picture, String nickname){
+    public GoogleResourceDto(String id, String email, String picture, String name){
         this.id = id;
         this.email = email;
         this.picture = picture;
-        this.nickname = nickname;
+        this.name = name;
     }
 }

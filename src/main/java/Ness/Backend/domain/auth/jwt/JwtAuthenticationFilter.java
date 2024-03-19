@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -44,12 +45,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
             return authentication;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not set user authentication in security context", e);
+        } catch (IOException e) {
+            throw new BadCredentialsException("Failed to parse authentication request.");
         }
-
-        return null;
     }
 
     /* attemptAuthentication 메소드가 호출 된 후, response에 JWT 토큰을 담아서 전송 */

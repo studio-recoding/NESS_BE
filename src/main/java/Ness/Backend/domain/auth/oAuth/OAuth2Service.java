@@ -2,10 +2,12 @@ package Ness.Backend.domain.auth.oAuth;
 
 import Ness.Backend.domain.auth.dto.ResourceDto;
 import Ness.Backend.domain.auth.inmemory.RefreshTokenRepository;
+import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.auth.oAuth.google.dto.GoogleResourceDto;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoResourceDto;
 import Ness.Backend.domain.auth.oAuth.naver.dto.NaverResourceDto;
+import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.MemberService;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
@@ -15,6 +17,7 @@ import Ness.Backend.global.auth.oAuth.kakao.KakaoOAuthApi;
 import Ness.Backend.global.auth.oAuth.kakao.KakaoResourceApi;
 import Ness.Backend.global.auth.oAuth.naver.NaverOAuthApi;
 import Ness.Backend.global.auth.oAuth.naver.NaverResourceApi;
+import Ness.Backend.global.common.response.CommonResponse;
 import Ness.Backend.global.error.ErrorCode;
 import Ness.Backend.global.error.exception.UnauthorizedException;
 
@@ -22,6 +25,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +53,7 @@ public class OAuth2Service {
     private final KakaoResourceApi kakaoResourceApi;
     private final NaverOAuthApi naverOAuthApi;
     private final NaverResourceApi naverResourceApi;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     public String devSocialLogin(String code, String registration) {
         String accessToken = getOAuthAccessToken(code, registration);
@@ -64,7 +72,7 @@ public class OAuth2Service {
         }
     }
 
-    public String socialLogin(String code, String registration) {
+    public JwtToken socialLogin(String code, String registration) {
         /*
         * 로직:
         * 1. client_id, client_secret 등을 사용해 oauth 서버에서 access_token 발급
@@ -82,13 +90,12 @@ public class OAuth2Service {
         String name = resourceDto.getName();
 
         if (checkSignUp(email)){
-            /* 여기서 response 이루어짐 */
-            jwtTokenProvider.generateJwtToken(email);
-            return "로그인에 성공했습니다.";
+        //if (getAuthentication(email, id)){
+            return getToken(email);
         } else {
             socialSignUp(email, id, picture, nickname, name);
-            jwtTokenProvider.generateJwtToken(email);
-            return "회원가입 및 로그인에 성공했습니다.";
+            //getAuthentication(email, id);
+            return getToken(email);
         }
     }
 
@@ -102,6 +109,10 @@ public class OAuth2Service {
             /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리,unique = true 때문에 발생하는 에러 */
             return "이미 사용 중인 이메일 주소입니다.";
         }
+    }
+
+    public JwtToken getToken(String email){
+        return jwtTokenProvider.generateJwtToken(email);
     }
 
     public Boolean checkSignUp(String email){
@@ -119,7 +130,7 @@ public class OAuth2Service {
         switch (registration) {
             case "google":
                 accessToken = googleOAuthApi
-                        .googleGetToken(authorizationCode,clientId, clientSecret,
+                        .googleGetToken(authorizationCode, clientId, clientSecret,
                                 redirectUri,
                                 "authorization_code")
                         .getAccessToken();

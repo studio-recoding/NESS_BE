@@ -1,5 +1,8 @@
 package Ness.Backend.domain.schedule;
 
+import Ness.Backend.domain.report.dto.ReportMemoryDto;
+import Ness.Backend.domain.report.dto.ReportMemoryListResponseDto;
+import Ness.Backend.domain.report.entity.ReportMemory;
 import Ness.Backend.domain.schedule.dto.ScheduleDto;
 import Ness.Backend.domain.schedule.dto.ScheduleListResponseDto;
 import Ness.Backend.domain.member.entity.Member;
@@ -10,6 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -19,8 +26,34 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final MemberRepository memberRepository;
 
-    public ScheduleListResponseDto findOneUserSchedule(Long id){
-        List<Schedule> scheduleList = scheduleRepository.findByMember_Id(id);
+    public ScheduleListResponseDto findOneUserMonthSchedule(Long id, String date){
+        // 년도, 월, 일 추출
+        String[] parts = date.split("-");
+        int year = Integer.parseInt(parts[0]);
+        int month = Integer.parseInt(parts[1]);
+
+        List<Schedule> scheduleList = scheduleRepository.findSchedulesByMember_IdAndMonthOrderByDateAsc(id, year, month);
+
+        // ScheduleListResponseDto에 매핑
+        List<ScheduleDto> scheduleDtos = scheduleList.stream()
+                .map(schedule -> ScheduleDto.builder()
+                        .id(schedule.getId())
+                        .info(schedule.getInfo())
+                        .date(schedule.getDate())
+                        .location(schedule.getLocation())
+                        .build())
+                .toList();
+        return new ScheduleListResponseDto(scheduleDtos);
+    }
+
+    public ScheduleListResponseDto findOneUserDaySchedule(Long id, String date){
+        // 년도, 월, 일 추출
+        String[] parts = date.split("-");
+        int year = Integer.parseInt(parts[0]);
+        int month = Integer.parseInt(parts[1]);
+        int day = Integer.parseInt(parts[2]);
+
+        List<Schedule> scheduleList = scheduleRepository.findSchedulesByMember_IdAndDayOrderByDateAsc(id, year, month, day);
 
         // ScheduleListResponseDto에 매핑
         List<ScheduleDto> scheduleDtos = scheduleList.stream()

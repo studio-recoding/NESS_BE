@@ -22,27 +22,27 @@ public class MailConfig {
     private String host;
 
     // 계정
-    @Value("$spring.mail.username")
+    @Value("${spring.mail.username}")
     private String username;
 
     // 비밀번호
-    @Value("$spring.mail.password")
+    @Value("${spring.mail.password}")
     private String password;
 
     // 포트번호
-    @Value("$spring.mail.port")
+    @Value("${spring.mail.port}")
     private int port;
 
-    @Value("$spring.mail.properties.mail.smtp.auth")
+    @Value("${spring.mail.properties.mail.smtp.auth}")
     private boolean auth;
 
-    @Value("$spring.mail.properties.mail.smtp.debug")
+    @Value("${spring.mail.properties.mail.smtp.debug}")
     private boolean debug;
 
-    @Value("$spring.mail.properties.mail.smtp.connectiontimeout")
+    @Value("${spring.mail.properties.mail.smtp.connectiontimeout}")
     private int connectionTimeout;
 
-    @Value("$spring.mail.properties.mail.starttls.enable")
+    @Value("${spring.mail.properties.mail.starttls.enable}")
     private boolean startTlsEnable;
 
     @Bean

@@ -1,5 +1,6 @@
 package Ness.Backend.domain.schedule;
 
+import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -27,41 +29,21 @@ public class ScheduleService {
     private final MemberRepository memberRepository;
     private final FastApiScheduleApi fastApiScheduleApi;
 
-    public GetScheduleListDto findOneUserMonthSchedule(Long id, String date){
+    public GetScheduleListDto getOneMonthUserSchedule(Long id, String date){
         // 년도, 월, 일 추출
         String[] parts = date.split("-");
         int year = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]);
 
-        List<Schedule> scheduleList = scheduleRepository.findSchedulesByMember_IdAndMonthOrderByDateAsc(id, year, month);
+        List<Schedule> scheduleList = scheduleRepository.findOneMonthSchedulesByMember_Id(id, year, month);
 
         // ScheduleListResponseDto에 매핑
         List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
                 .map(schedule -> GetScheduleDto.builder()
                         .id(schedule.getId())
                         .info(schedule.getInfo())
-                        .date(schedule.getDate())
-                        .location(schedule.getLocation())
-                        .build())
-                .toList();
-        return new GetScheduleListDto(getScheduleDtos);
-    }
-
-    public GetScheduleListDto findOneUserDaySchedule(Long id, String date){
-        // 년도, 월, 일 추출
-        String[] parts = date.split("-");
-        int year = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        int day = Integer.parseInt(parts[2]);
-
-        List<Schedule> scheduleList = scheduleRepository.findSchedulesByMember_IdAndDayOrderByDateAsc(id, year, month, day);
-
-        // ScheduleListResponseDto에 매핑
-        List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
-                .map(schedule -> GetScheduleDto.builder()
-                        .id(schedule.getId())
-                        .info(schedule.getInfo())
-                        .date(schedule.getDate())
+                        .startTime(schedule.getStartTime())
+                        .endTime(schedule.getEndTime())
                         .location(schedule.getLocation())
                         .build())
                 .toList();
@@ -69,7 +51,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public Long createNewSchedule(Long id, PostScheduleDto postScheduleDto){
+    public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
         Member memberEntity = memberRepository.findMemberById(id);
 
         //새로운 채팅 생성
@@ -77,8 +59,8 @@ public class ScheduleService {
                 .info(postScheduleDto.getInfo())
                 .location(postScheduleDto.getLocation())
                 .person(postScheduleDto.getPerson())
-                .date(postScheduleDto.getDate())
-                //.date(LocalDateTime.now(ZoneId.of("Asia/Seoul")).atZone(ZoneId.of("Asia/Seoul")))
+                .startTime(postScheduleDto.getStartTime())
+                .endTime(postScheduleDto.getEndTime())
                 .member(memberEntity)
                 //.category() //이 연관관계들은 나중에 넣어야 함
                 //.chat()
@@ -86,14 +68,29 @@ public class ScheduleService {
 
         scheduleRepository.save(newSchedule);
 
+        postNewAiSchedule(
+                postScheduleDto.getInfo(),
+                postScheduleDto.getLocation(),
+                postScheduleDto.getPerson(),
+                postScheduleDto.getStartTime(),
+                "카테고리 없음",
+                newSchedule.getMember().getId(),
+                newSchedule.getId());
+
+        return newSchedule.getId(); // 저장한 Chat 확인용
+    }
+
+    public void postNewAiSchedule(String info, String location, String person,
+                                  ZonedDateTime startTime, String category, Long memberId, Long scheduleId){
+
         PostFastApiScheduleDto dto = PostFastApiScheduleDto.builder()
-                .info(postScheduleDto.getInfo())
-                .location(postScheduleDto.getLocation())
-                .person(postScheduleDto.getPerson())
-                .date(postScheduleDto.getDate())
-                .category("카테고리 없음") //일단은 null 처리하기
-                .member_id(newSchedule.getMember().getId())
-                .schedule_id(newSchedule.getId())
+                .info(info)
+                .location(location)
+                .person(person)
+                .date(startTime)
+                .category(category) //일단은 null 처리하기
+                .member_id(memberId)
+                .schedule_id(scheduleId)
                 .build();
 
         ResponseEntity<JsonNode> responseNode = fastApiScheduleApi.creatFastApiSchedule(dto);
@@ -102,7 +99,5 @@ public class ScheduleService {
         } else {
             log.error("Failed to save data in Vector DB");
         }
-
-        return newSchedule.getId(); // 저장한 Chat 확인용
     }
 }

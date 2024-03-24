@@ -17,31 +17,32 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/schedule")
 public class ScheduleController {
     private final ScheduleService scheduleService;
-    @GetMapping("/month")
-    @Operation(summary = "특정 사용자의 한달 스케쥴 내역", description = "&month=2024-01 와 같은 형식으로 데이터가 전달됩니다.")
-    public ResponseEntity<GetScheduleListDto> getOneMonthUserSchedule(@AuthUser Member member, @RequestParam String month){
-        GetScheduleListDto oneUserMonthSchedules = scheduleService.findOneUserMonthSchedule(member.getId(), month);
+
+    @GetMapping("/month/dev")
+    @Operation(summary = "개발 테스트용 특정 사용자의 한달치 스케쥴 내역", description = "&month=2024-01 와 같은 형식으로 데이터가 전달됩니다.")
+    public ResponseEntity<GetScheduleListDto> getUserSchedule(@RequestParam String month){
+        GetScheduleListDto oneUserMonthSchedules = scheduleService.getOneMonthUserSchedule(1L, month);
         return new ResponseEntity<>(oneUserMonthSchedules, HttpStatusCode.valueOf(200));
     }
 
-    @GetMapping("/day")
-    @Operation(summary = "특정 사용자의 하루 스케쥴 내역", description = "&day=2024-01-01와 같은 형식으로 데이터가 전달됩니다.")
-    public ResponseEntity<GetScheduleListDto> getOneUserDaySchedule(@AuthUser Member member, @RequestParam String day){
-        GetScheduleListDto oneUserDaySchedules = scheduleService.findOneUserDaySchedule(member.getId(), day);
-        return new ResponseEntity<>(oneUserDaySchedules, HttpStatusCode.valueOf(200));
+    @PutMapping("/new/dev")
+    @Operation(summary = "개발 테스트용 새로운 스케쥴 내역", description = "새로운 스케쥴 내역 저장하는 API 입니다.")
+    public ResponseEntity<Long> postUserSchedule(@RequestBody PostScheduleDto postScheduleDto){
+        Long userId  = scheduleService.postNewUserSchedule(1L, postScheduleDto);
+        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(201));
+    }
+
+    @GetMapping("/month")
+    @Operation(summary = "특정 사용자의 한달치 스케쥴 내역", description = "&month=2024-01 와 같은 형식으로 데이터가 전달됩니다.")
+    public ResponseEntity<GetScheduleListDto> getUserSchedule(@AuthUser Member member, @RequestParam String month){
+        GetScheduleListDto oneUserMonthSchedules = scheduleService.getOneMonthUserSchedule(member.getId(), month);
+        return new ResponseEntity<>(oneUserMonthSchedules, HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("/new")
     @Operation(summary = "새로운 스케쥴 내역", description = "새로운 스케쥴 내역 저장하는 API 입니다.")
-    public ResponseEntity<Long> createSchedule(@AuthUser Member member, @RequestBody PostScheduleDto postScheduleDto){
-        Long userId  = scheduleService.createNewSchedule(member.getId(), postScheduleDto);
-        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
-    }
-
-    @PutMapping("/dev/new")
-    @Operation(summary = "새로운 스케쥴 내역", description = "새로운 스케쥴 내역 저장하는 API 입니다.")
-    public ResponseEntity<Long> createDevSchedule(@RequestBody PostScheduleDto postScheduleDto){
-        Long userId  = scheduleService.createNewSchedule(1L, postScheduleDto);
-        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
+    public ResponseEntity<Long> postUserSchedule(@AuthUser Member member, @RequestBody PostScheduleDto postScheduleDto){
+        Long userId  = scheduleService.postNewUserSchedule(member.getId(), postScheduleDto);
+        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(201));
     }
 }

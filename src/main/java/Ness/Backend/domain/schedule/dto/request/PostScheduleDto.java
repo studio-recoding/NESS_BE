@@ -22,6 +22,9 @@ public class PostScheduleDto {
     @Schema(description = "스케쥴 사람", example = "영희")
     private String person;
 
-    @Schema(description = "스케쥴 시간", example = "2024-03-08T15:07:27.056103+09:00")
-    private ZonedDateTime date;
+    @Schema(description = "스케쥴 시작 시간", example = "2024-03-08T15:07:27.056103+09:00")
+    private ZonedDateTime startTime;
+
+    @Schema(description = "스케쥴 끝 시간", example = "2024-03-08T15:07:27.056103+09:00")
+    private ZonedDateTime endTime;
 }

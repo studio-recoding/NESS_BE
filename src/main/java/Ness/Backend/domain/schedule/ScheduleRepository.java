@@ -10,30 +10,16 @@ import java.util.List;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    // 특정 맴버 ID로 스케줄 리스트 반환
-    List<Schedule> findByMember_Id(Long memberId);
 
+    // 특정 맴버의 한달 치 스케쥴 반환
     @Query( value = "SELECT * FROM schedule " +
                     "WHERE member_id = :memberId " +
-                    "AND YEAR(date) = :year " +
-                    "AND MONTH(date) = :month " +
-                    "ORDER BY date ASC",
+                    "AND YEAR(start_time) = :year " +
+                    "AND MONTH(start_time) = :month " +
+                    "ORDER BY start_time ASC",
             nativeQuery = true)
-    List<Schedule> findSchedulesByMember_IdAndMonthOrderByDateAsc(
+    List<Schedule> findOneMonthSchedulesByMember_Id(
             @Param("memberId") Long memberId,
             @Param("year") int year,
             @Param("month") int month);
-
-    @Query( value = "SELECT * FROM schedule " +
-            "WHERE member_id = :memberId " +
-            "AND YEAR(date) = :year " +
-            "AND MONTH(date) = :month " +
-            "AND DATE(date) = :day " +
-            "ORDER BY date ASC",
-            nativeQuery = true)
-    List<Schedule> findSchedulesByMember_IdAndDayOrderByDateAsc(
-            @Param("memberId") Long memberId,
-            @Param("year") int year,
-            @Param("month") int month,
-            @Param("day") int day);
 }

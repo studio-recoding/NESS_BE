@@ -25,12 +25,9 @@ public class Schedule {
 
     private String person;
 
-    /*
-    @Embedded
-    private ScheduleDate scheduleDate;
-     */
+    private ZonedDateTime startTime;
 
-    private ZonedDateTime date;
+    private ZonedDateTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -45,14 +42,14 @@ public class Schedule {
     private Chat chat;
 
     @Builder
-    public Schedule(Long id, String info, String location, String person, ZonedDateTime date,
+    public Schedule(Long id, String info, String location, String person, ZonedDateTime startTime, ZonedDateTime endTime,
                     Member member, Category category, Chat chat) {
         this.id = id;
         this.info = info;
         this.location = location;
         this.person = person;
-        this.date = date;
-        //this.scheduleDate = scheduleDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.member = member;
         this.category = category;
         this.chat = chat;

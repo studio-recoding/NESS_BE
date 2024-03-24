@@ -1,18 +1,17 @@
 package Ness.Backend.domain.chat;
 
-import Ness.Backend.domain.chat.dto.request.PostChatDto;
+import Ness.Backend.domain.chat.dto.request.PostUserChatDto;
 import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
+import Ness.Backend.domain.chat.dto.response.GetAiChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatListDto;
+import Ness.Backend.domain.chat.dto.response.PostFastApiAiChatDto;
 import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.fastApi.FastApiChatApi;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,36 +44,41 @@ public class ChatService {
     }
 
     @Transactional
-    public Long postNewUserChat(Long id, PostChatDto postChatDto){
+    public GetAiChatDto postNewUserChat(Long id, PostUserChatDto postUserChatDto){
         Member memberEntity = memberRepository.findMemberById(id);
         //새로운 채팅 생성
         Chat newChat = Chat.builder()
                 .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul"))
                         .atZone(ZoneId.of("Asia/Seoul")))
-                .text(postChatDto.getText())
-                .chatType(postChatDto.getChatType())
+                .text(postUserChatDto.getText())
+                .chatType(postUserChatDto.getChatType())
                 .member(memberEntity)
                 .build();
         chatRepository.save(newChat);
 
-        postNewAiChat(id, postChatDto.getText());
+        String answer = postNewAiChat(id, postUserChatDto.getText());
+        String parsedAnswer = parseAiChat(answer);
 
-        return newChat.getId(); // 저장한 Chat 확인용
+        GetAiChatDto getAiChatDto = GetAiChatDto.builder()
+                .answer(parsedAnswer)
+                .build();
+
+        return getAiChatDto;
     }
 
-    public void postNewAiChat(Long id, String text){
+    public String parseAiChat(String text){
+        return text.replace("\"", "");
+    }
 
-        PostFastApiUserChatDto dto = PostFastApiUserChatDto.builder()
-                .member_id(id)
+    public String postNewAiChat(Long id, String text){
+
+        PostFastApiUserChatDto Userdto = PostFastApiUserChatDto.builder()
                 .message(text)
                 .build();
 
         //Fast API에 전송하기
-        ResponseEntity<JsonNode> responseNode = fastApiChatApi.creatFastApiChat(dto);
-        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(200)) {
-            log.info("Succeed to get Response from LLM");
-        } else {
-            log.error("Failed to get Response from LLM");
-        }
+        PostFastApiAiChatDto AiDto = fastApiChatApi.creatFastApiChat(Userdto);
+
+        return AiDto.getAnswer();
     }
 }

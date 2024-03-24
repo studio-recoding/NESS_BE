@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
         name = "FastApiSchedule",
         url = "${spring.cloud.openfeign.client.config.fastapi.url}")
 public interface FastApiScheduleApi {
-    @PostMapping(value = "/add_schedule")
+    @PostMapping(value = "/chromadb/add_schedule")
     ResponseEntity<JsonNode> creatFastApiSchedule(PostFastApiScheduleDto postFastApiScheduleDto);
 }

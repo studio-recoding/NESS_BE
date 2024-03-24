@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostChatDto {
+public class PostUserChatDto {
     @Schema(description = "채팅 내용", example = "오늘 내가 공부한 내역을 보여줘.")
     private String text;
 

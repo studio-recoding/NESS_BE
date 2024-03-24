@@ -1,7 +1,9 @@
 package Ness.Backend.domain.chat;
 
-import Ness.Backend.domain.chat.dto.request.PostChatDto;
+import Ness.Backend.domain.chat.dto.request.PostUserChatDto;
+import Ness.Backend.domain.chat.dto.response.GetAiChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatListDto;
+import Ness.Backend.domain.chat.dto.response.PostFastApiAiChatDto;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +27,13 @@ public class ChatController {
         return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
     }
 
+    @PostMapping("/dev")
+    @Operation(summary = "새로운 채팅으로 AI와 통신", description = "새로운 채팅 내역을 저장하고, AI의 응답을 받는 API 입니다.")
+    public ResponseEntity<GetAiChatDto> postAiChat(@RequestBody PostUserChatDto postUserChatDto){
+        GetAiChatDto answer = chatService.postNewUserChat(1L, postUserChatDto);
+        return new ResponseEntity<>(answer, HttpStatusCode.valueOf(200));
+    }
+
     @GetMapping("")
     @Operation(summary = "한 사용자의 채팅 내역", description = "한 사용자의 일주일치 채팅 내역을 반환하는 API 입니다.")
     public ResponseEntity<GetChatListDto> getUserChat(@AuthUser Member member){
@@ -34,8 +43,8 @@ public class ChatController {
 
     @PostMapping("")
     @Operation(summary = "새로운 채팅으로 AI와 통신", description = "새로운 채팅 내역을 저장하고, AI의 응답을 받는 API 입니다.")
-    public ResponseEntity<Long> postAiChat(@AuthUser Member member, @RequestBody PostChatDto postChatDto){
-        Long userId  = chatService.postNewUserChat(member.getId(), postChatDto);
-        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
+    public ResponseEntity<GetAiChatDto> postAiChat(@AuthUser Member member, @RequestBody PostUserChatDto postUserChatDto){
+        GetAiChatDto answer = chatService.postNewUserChat(member.getId(), postUserChatDto);
+        return new ResponseEntity<>(answer, HttpStatusCode.valueOf(200));
     }
 }

@@ -1,4 +1,4 @@
-package Ness.Backend.Common;
+package Ness.Backend.global.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,20 +26,20 @@ public class CommonResponse<T> {
         this.data = data;
     }
 
-    public static <T> CommonResponse<T> onSuccess(int code) {
+    public static <T> CommonResponse<T> postResponse(int code, String message) {
         return CommonResponse.<T>builder()
                 .code(code)
                 .success(true)
-                .message("요청에 성공하였습니다.")
+                .message(message)
                 .data(null)
                 .build();
     }
 
-    public static <T> CommonResponse<T> onSuccess(int code, T data) {
+    public static <T> CommonResponse<T> getResponse(int code, String message, T data) {
         return CommonResponse.<T>builder()
                 .code(code)
                 .success(true)
-                .message("요청에 성공하였습니다.")
+                .message(message)
                 .data(data)
                 .build();
     }

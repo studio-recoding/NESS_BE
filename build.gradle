@@ -1,11 +1,15 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.0.12'
+	id 'org.springframework.boot' version '3.2.3'
 	id 'io.spring.dependency-management' version '1.1.3'
 }
 
 group = 'com.recoding'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.3-SNAPSHOT'
+
+jar {
+	enabled = false
+}
 
 java {
 	sourceCompatibility = '17'
@@ -21,15 +25,47 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	set('springCloudVersion', "2023.0.0")
+}
+
 dependencies {
-	//implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter' //mysql connect를 위해 필요
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	//Mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//thymeleaf(for email service)
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
 	compileOnly 'org.projectlombok:lombok'
-	//runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
 	//Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	//Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	//Jwt
+	implementation group: 'com.auth0', name: 'java-jwt', version: '3.14.0'
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	//FeignClient
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	//Object Mapper
+	//implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('bootBuildImage') {

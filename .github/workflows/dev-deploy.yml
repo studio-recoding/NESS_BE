@@ -1,0 +1,98 @@
+name: Deploy to Dev
+
+## dev에 push 일어날 때마다(즉, 하위 디렉토리에서 merge 될 때마다) 빌드
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+    ## checkout 후 자바 17 버전으로 설정
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      ## gradlew에 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      ## Copy properties files
+      - name: Make application-dev.yml
+        run: |
+          touch ./src/main/resources/application-dev.yml
+          echo "$PROPERTIES_DEV" > ./src/main/resources/application-dev.yml
+        # Make env file
+        env:
+          PROPERTIES_DEV: ${{ secrets.PROPERTIES_DEV }}
+
+      ## gradle build
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      ## docker metadata(namespace/repository)
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: jeonhaeseung/ness-server-dev
+
+      ## 멀티-플랫폼 빌드 도구 Buildx 사용
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      ## DockerHub에 로그인
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      ## 위에서 설정한 테그를 참고해 push
+      - name: Docker build & push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.dev
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+
+      ## 원격에 접속 및 디렉토리 생성
+      - name: create remote directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.KEY_DEV }}
+          script: mkdir -p ./dev
+
+      ## 소스 코드 복사 붙여넣기
+      - name: copy source via ssh key
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avzr --delete
+          remote_path: ./dev
+          remote_host: ${{ secrets.HOST_DEV }}
+          remote_user: ${{ secrets.USER_DEV }}
+          remote_key: ${{ secrets.KEY_DEV }}
+
+      ## EC2에 배포(CD)
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.KEY_DEV }}
+          script: |
+            sh ./dev/config/scripts/deploy.sh
+
+            sudo docker stop $(sudo docker ps -a -q)
+            sudo docker rm $(sudo docker ps -a -q)
+            sudo docker rmi $(sudo docker images -q)
+            docker pull jeonhaeseung/ness-server-dev:dev
+            docker run -d --name backend-server -p 8080:8080 --restart unless-stopped jeonhaeseung/ness-server-dev:dev

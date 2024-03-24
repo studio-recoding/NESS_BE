@@ -1,4 +1,4 @@
-package Ness.Backend.Config;
+package Ness.Backend.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

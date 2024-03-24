@@ -77,6 +77,7 @@ public class ScheduleService {
                 postScheduleDto.getLocation(),
                 postScheduleDto.getPerson(),
                 postScheduleDto.getStartTime(),
+                postScheduleDto.getEndTime(),
                 "카테고리 없음",
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
@@ -85,20 +86,22 @@ public class ScheduleService {
     }
 
     public void postNewAiSchedule(String info, String location, String person,
-                                  ZonedDateTime startTime, String category, Long memberId, Long scheduleId){
+                                  ZonedDateTime startTime, ZonedDateTime endTime,
+                                  String category, Long memberId, Long scheduleId){
 
         PostFastApiScheduleDto dto = PostFastApiScheduleDto.builder()
                 .info(info)
                 .location(location)
                 .person(person)
-                .date(startTime)
+                .startTime(startTime)
+                .endTime(endTime)
                 .category(category) //일단은 null 처리하기
                 .member_id(memberId)
                 .schedule_id(scheduleId)
                 .build();
 
         ResponseEntity<JsonNode> responseNode = fastApiScheduleApi.creatFastApiSchedule(dto);
-        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(200)) {
+        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
             log.info("Succeed to save data in Vector DB");
         } else {
             log.error("Failed to save data in Vector DB");

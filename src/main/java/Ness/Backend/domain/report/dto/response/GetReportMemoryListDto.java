@@ -1,4 +1,4 @@
-package Ness.Backend.domain.report.dto;
+package Ness.Backend.domain.report.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportMemoryListResponseDto {
-    private List<ReportMemoryDto> reportMemoryDtos;
+public class GetReportMemoryListDto {
+    private List<GetReportMemoryDto> getReportMemoryDtos;
 }

@@ -7,7 +7,6 @@ import Ness.Backend.domain.auth.oAuth.google.dto.GoogleResourceDto;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoResourceDto;
 import Ness.Backend.domain.auth.oAuth.naver.dto.NaverResourceDto;
-import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.MemberService;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
@@ -17,7 +16,6 @@ import Ness.Backend.global.auth.oAuth.kakao.KakaoOAuthApi;
 import Ness.Backend.global.auth.oAuth.kakao.KakaoResourceApi;
 import Ness.Backend.global.auth.oAuth.naver.NaverOAuthApi;
 import Ness.Backend.global.auth.oAuth.naver.NaverResourceApi;
-import Ness.Backend.global.common.response.CommonResponse;
 import Ness.Backend.global.error.ErrorCode;
 import Ness.Backend.global.error.exception.UnauthorizedException;
 
@@ -25,10 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -186,7 +181,7 @@ public class OAuth2Service {
                         .nickname(kakaoResourceDto.getKakaoAccount().getKakaoProfile().getNickname())
                         .name(kakaoResourceDto.getKakaoAccount().getKakaoProfile().getNickname())
                         .build();
-                log.info("email: "+resourceDto.getEmail());
+                log.info("email: "+ resourceDto.getEmail());
                 break;
             case "naver":
                 NaverResourceDto naverResourceDto =
@@ -198,7 +193,7 @@ public class OAuth2Service {
                         .nickname(naverResourceDto.getNaverResponse().getNickname())
                         .name(naverResourceDto.getNaverResponse().getName())
                         .build();
-                log.info("email: "+resourceDto.getEmail());
+                log.info("email: "+ resourceDto.getEmail());
                 break;
         }
         return resourceDto;

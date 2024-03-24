@@ -1,6 +1,5 @@
 package Ness.Backend.domain.schedule.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +12,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScheduleCreateRequestDto {
+public class PostScheduleDto {
     @Schema(description = "스케쥴 텍스트 내용", example = "AI 공부")
     private String info;
 

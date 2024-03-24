@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScheduleListResponseDto {
-    private List<ScheduleDto> scheduleList;
+public class GetScheduleListDto {
+    private List<GetScheduleDto> scheduleList;
 }

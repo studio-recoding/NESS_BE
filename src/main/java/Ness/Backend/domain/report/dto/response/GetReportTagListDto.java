@@ -1,4 +1,4 @@
-package Ness.Backend.domain.report.dto;
+package Ness.Backend.domain.report.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportTagListResponseDto {
-    private List<ReportTagDto> reportTagDtos;
+public class GetReportTagListDto {
+    private List<GetReportTagDto> getReportTagDtos;
 }

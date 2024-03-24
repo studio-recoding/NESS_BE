@@ -1,4 +1,4 @@
-package Ness.Backend.domain.schedule.dto;
+package Ness.Backend.domain.schedule.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScheduleCreateFastApiDto {
+public class PostFastApiScheduleDto {
 
     private Long schedule_id;
 

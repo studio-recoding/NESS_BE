@@ -1,4 +1,4 @@
-package Ness.Backend.domain.report.dto;
+package Ness.Backend.domain.report.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.GeneratedValue;
@@ -7,10 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.ZonedDateTime;
-
 @Data
-public class ReportRecommendResponseDto {
+public class GetReportRecommendDto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +20,7 @@ public class ReportRecommendResponseDto {
     private String recommendText;
 
     @Builder
-    public ReportRecommendResponseDto(Long id, String createdDate, String recommendText){
+    public GetReportRecommendDto(Long id, String createdDate, String recommendText){
         this.id = id;
         this.createdDate = createdDate;
         this.recommendText = recommendText;

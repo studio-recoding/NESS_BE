@@ -1,7 +1,6 @@
 package Ness.Backend.domain.profile;
 
-import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.domain.profile.dto.ProfileResponseDto;
+import Ness.Backend.domain.profile.dto.response.GetProfileDto;
 import Ness.Backend.domain.profile.entity.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,15 +21,15 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public ProfileResponseDto getProfile(Long id) {
+    public GetProfileDto getProfile(Long id) {
         Profile profile = profileRepository.findProfileByMember_Id(id);
-        ProfileResponseDto profileResponseDto = ProfileResponseDto.builder()
+        GetProfileDto getProfileDto = GetProfileDto.builder()
                 .id(profile.getId())
                 .pictureUrl(profile.getPictureUrl())
                 .nickname(profile.getNickname())
                 .name(profile.getName())
                 .build();
 
-        return profileResponseDto;
+        return getProfileDto;
     }
 }

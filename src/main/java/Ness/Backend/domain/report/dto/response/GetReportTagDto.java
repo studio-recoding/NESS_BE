@@ -1,15 +1,13 @@
-package Ness.Backend.domain.report.dto;
+package Ness.Backend.domain.report.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
-
 @Data
 @NoArgsConstructor
-public class ReportTagDto {
+public class GetReportTagDto {
     @Schema(description = "테그 고유 인식 넘버", example = "0")
     private Long id;
 
@@ -23,7 +21,7 @@ public class ReportTagDto {
     private String tagDesc;
 
     @Builder
-    public ReportTagDto(Long id, String createdDate, String tagTitle, String tagDesc){
+    public GetReportTagDto(Long id, String createdDate, String tagTitle, String tagDesc){
         this.id = id;
         this.createdDate = createdDate;
         this.tagTitle = tagTitle;

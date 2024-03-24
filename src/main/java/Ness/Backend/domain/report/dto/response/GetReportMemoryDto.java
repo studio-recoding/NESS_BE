@@ -1,4 +1,4 @@
-package Ness.Backend.domain.report.dto;
+package Ness.Backend.domain.report.dto.response;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -6,11 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
-
 @Data
 @NoArgsConstructor
-public class ReportMemoryDto {
+public class GetReportMemoryDto {
     @Schema(description = "메모리 인식 넘버", example = "0")
     private Long id;
 
@@ -20,7 +18,7 @@ public class ReportMemoryDto {
     private String pictureUrl;
 
     @Builder
-    public ReportMemoryDto(Long id, String createdDate, String pictureUrl){
+    public GetReportMemoryDto(Long id, String createdDate, String pictureUrl){
         this.id = id;
         this.createdDate = createdDate;
         this.pictureUrl = pictureUrl;

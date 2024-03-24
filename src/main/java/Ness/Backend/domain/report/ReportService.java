@@ -1,8 +1,6 @@
 package Ness.Backend.domain.report;
 
-import Ness.Backend.domain.chat.dto.ChatDto;
-import Ness.Backend.domain.chat.entity.Chat;
-import Ness.Backend.domain.report.dto.*;
+import Ness.Backend.domain.report.dto.response.*;
 import Ness.Backend.domain.report.entity.ReportMemory;
 import Ness.Backend.domain.report.entity.ReportRecommend;
 import Ness.Backend.domain.report.entity.ReportTag;
@@ -13,7 +11,6 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -23,7 +20,7 @@ public class ReportService {
     private final ReportTagRepository reportTagRepository;
     private final ReportRecommendRepository reportRecommendRepository;
 
-    public ReportMemoryListResponseDto getMemory(Long id){
+    public GetReportMemoryListDto getMemory(Long id){
         // 이번 주의 데이터 가져오기
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         ZonedDateTime startOfWeek = now.with(DayOfWeek.MONDAY).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -32,18 +29,18 @@ public class ReportService {
         List<ReportMemory> reportMemories = reportMemoryRepository.findReportMemoriesByMember_idAndCreatedDateBetweenOrderByCreatedDateAsc(id, startOfWeek, now);
 
         //ReportMemoryListResponseDto에 매핑
-        List<ReportMemoryDto> reportMemoryDtos = reportMemories.stream()
-                .map(memory -> ReportMemoryDto.builder()
+        List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
+                .map(memory -> GetReportMemoryDto.builder()
                         .id(memory.getId())
                         .createdDate(memory.getCreatedDate().toString())
                         .pictureUrl(memory.getPictureUrl())
                         .build())
                 .toList();
 
-        return new ReportMemoryListResponseDto(reportMemoryDtos);
+        return new GetReportMemoryListDto(getReportMemoryDtos);
     }
 
-    public ReportTagListResponseDto getTag(Long id){
+    public GetReportTagListDto getTag(Long id){
         // 이번 달의 데이터 가져오기
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         ZonedDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -51,8 +48,8 @@ public class ReportService {
         List<ReportTag> reportTags = reportTagRepository.findReportTagsByMember_idAndCreatedDateBetweenOrderByCreatedDateAsc(id, startOfMonth, now);
 
         //ReportTagListResponseDto에 매핑
-        List<ReportTagDto> reportTagDtos = reportTags.stream()
-                .map(tag -> ReportTagDto.builder()
+        List<GetReportTagDto> getReportTagDtos = reportTags.stream()
+                .map(tag -> GetReportTagDto.builder()
                         .id(tag.getId())
                         .createdDate(tag.getCreatedDate().toString())
                         .tagTitle(tag.getTagTitle())
@@ -60,10 +57,10 @@ public class ReportService {
                         .build())
                 .toList();
 
-        return new ReportTagListResponseDto(reportTagDtos);
+        return new GetReportTagListDto(getReportTagDtos);
     }
 
-    public ReportRecommendResponseDto getRecommend(Long id){
+    public GetReportRecommendDto getRecommend(Long id){
         // 이번 달의 데이터 가져오기
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         ZonedDateTime startOfToday = now.toLocalDate().atStartOfDay(now.getZone());
@@ -71,7 +68,7 @@ public class ReportService {
 
         ReportRecommend reportRecommend = reportRecommendRepository.findReportRecommendByMember_IdAndCreatedDateBetween(id, startOfToday, endOfToday);
 
-        return ReportRecommendResponseDto.builder()
+        return GetReportRecommendDto.builder()
                 .id(reportRecommend.getId())
                 .createdDate(reportRecommend.getCreatedDate().toString())
                 .recommendText(reportRecommend.getRecommendText())

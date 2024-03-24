@@ -1,18 +1,15 @@
 package Ness.Backend.domain.schedule.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Data
 @NoArgsConstructor
-public class ScheduleDto {
+public class GetScheduleDto {
     @Schema(description = "스케쥴 고유 인식 넘버", example = "0")
     private Long id;
 
@@ -32,7 +29,7 @@ public class ScheduleDto {
     private ZonedDateTime date;
 
     @Builder
-    public ScheduleDto(Long id, String info, String location, ZonedDateTime date){
+    public GetScheduleDto(Long id, String info, String location, ZonedDateTime date){
         this.id = id;
         this.info = info;
         this.location = location;

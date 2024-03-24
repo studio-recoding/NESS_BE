@@ -29,8 +29,8 @@ public class ChatService {
     private final MemberRepository memberRepository;
     private final FastApiChatApi fastApiChatApi;
 
-    public GetChatListDto findOneUserChat(Long id){
-        List<Chat> chatList = chatRepository.findByMemberId(id);
+    public GetChatListDto getOneWeekUserChat(Long id){
+        List<Chat> chatList = chatRepository.findOneWeekUserChatsByMember_Id(id);
 
         // ChatListResponseDTO에 매핑
         List<GetChatDto> getChatDtos = chatList.stream()
@@ -45,30 +45,36 @@ public class ChatService {
     }
 
     @Transactional
-    public Long createNewChat(Long id, PostChatDto postChatDto){
+    public Long postNewUserChat(Long id, PostChatDto postChatDto){
         Member memberEntity = memberRepository.findMemberById(id);
         //새로운 채팅 생성
         Chat newChat = Chat.builder()
-                .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")).atZone(ZoneId.of("Asia/Seoul")))
+                .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul"))
+                        .atZone(ZoneId.of("Asia/Seoul")))
                 .text(postChatDto.getText())
                 .chatType(postChatDto.getChatType())
                 .member(memberEntity)
                 .build();
         chatRepository.save(newChat);
 
-        //Fast API에 전송하기
+        postNewAiChat(id, postChatDto.getText());
+
+        return newChat.getId(); // 저장한 Chat 확인용
+    }
+
+    public void postNewAiChat(Long id, String text){
+
         PostFastApiUserChatDto dto = PostFastApiUserChatDto.builder()
                 .member_id(id)
-                .message(postChatDto.getText())
+                .message(text)
                 .build();
 
+        //Fast API에 전송하기
         ResponseEntity<JsonNode> responseNode = fastApiChatApi.creatFastApiChat(dto);
         if (responseNode.getStatusCode() == HttpStatusCode.valueOf(200)) {
             log.info("Succeed to get Response from LLM");
         } else {
             log.error("Failed to get Response from LLM");
         }
-
-        return newChat.getId(); // 저장한 Chat 확인용
     }
 }

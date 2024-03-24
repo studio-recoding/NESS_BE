@@ -1,4 +1,4 @@
-package Ness.Backend.domain.chat.dto;
+package Ness.Backend.domain.chat.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ChatDto {
+public class GetChatDto {
     @Schema(description = "채팅 고유 인식 넘버", example = "0")
     private Long id;
 
@@ -21,7 +21,7 @@ public class ChatDto {
     private String chatType;
 
     @Builder
-    public ChatDto(Long id, String createdDate, String text, String chatType){
+    public GetChatDto(Long id, String createdDate, String text, String chatType){
         this.id = id;
         this.createdDate = createdDate;
         this.text = text;

@@ -1,4 +1,4 @@
-package Ness.Backend.domain.chat.dto;
+package Ness.Backend.domain.chat.dto.request;
 
 import Ness.Backend.domain.chat.entity.ChatType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatCreateRequestDto {
+public class PostUserChatDto {
     @Schema(description = "채팅 내용", example = "오늘 내가 공부한 내역을 보여줘.")
     private String text;
 

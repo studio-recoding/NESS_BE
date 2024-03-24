@@ -1,7 +1,6 @@
-package Ness.Backend.domain.profile.dto;
+package Ness.Backend.domain.profile.dto.response;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ProfileResponseDto {
+public class GetProfileDto {
 
     @Schema(description = "프로필 고유 아이디", example = "0")
     private Long id;
@@ -24,7 +23,7 @@ public class ProfileResponseDto {
     private String name;
 
     @Builder
-    public ProfileResponseDto(Long id, String pictureUrl, String nickname, String name){
+    public GetProfileDto(Long id, String pictureUrl, String nickname, String name){
         this.id = id;
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;

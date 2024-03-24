@@ -1,13 +1,10 @@
 package Ness.Backend.domain.auth.jwt;
 
 import Ness.Backend.domain.auth.jwt.entity.JwtToken;
-import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
-import Ness.Backend.global.error.ErrorCode;
-import Ness.Backend.global.error.exception.UnauthorizedException;
+import Ness.Backend.domain.member.entity.Member;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,29 +1,31 @@
-package Ness.Backend.domain.report.dto;
+package Ness.Backend.domain.report.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
-
 @Data
 @NoArgsConstructor
-public class ReportTagDto {
+public class GetReportTagDto {
     @Schema(description = "테그 고유 인식 넘버", example = "0")
     private Long id;
 
     @Schema(description = "테그 생성 날짜", example = "2024-01-28 12:34:56")
+    @JsonProperty("createdAt")
     private String createdDate;
 
     @Schema(description = "테그 이름", example = "공부 매니아")
+    @JsonProperty("title")
     private String tagTitle;
 
     @Schema(description = "테그 설명", example = "이번 달에 공부를 많이 하셨네요. 공부에 열정이 넘치는 당신은 공부 매니아!")
+    @JsonProperty("info")
     private String tagDesc;
 
     @Builder
-    public ReportTagDto(Long id, String createdDate, String tagTitle, String tagDesc){
+    public GetReportTagDto(Long id, String createdDate, String tagTitle, String tagDesc){
         this.id = id;
         this.createdDate = createdDate;
         this.tagTitle = tagTitle;

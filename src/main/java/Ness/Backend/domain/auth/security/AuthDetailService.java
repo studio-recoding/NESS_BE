@@ -1,7 +1,7 @@
 package Ness.Backend.domain.auth.security;
 
-import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
+import Ness.Backend.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;

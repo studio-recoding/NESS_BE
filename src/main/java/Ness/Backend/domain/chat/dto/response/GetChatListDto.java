@@ -1,4 +1,4 @@
-package Ness.Backend.domain.schedule.dto;
+package Ness.Backend.domain.chat.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScheduleListResponseDto {
-    private List<ScheduleDto> scheduleList;
+public class GetChatListDto {
+    private List<GetChatDto> chatList;
 }

@@ -1,5 +1,6 @@
-package Ness.Backend.domain.chat.dto;
+package Ness.Backend.domain.schedule.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatListResponseDto {
-    private List<ChatDto> chatList;
+public class GetOneMonthSchedulesDto {
+    private List<GetScheduleDto> scheduleList;
 }

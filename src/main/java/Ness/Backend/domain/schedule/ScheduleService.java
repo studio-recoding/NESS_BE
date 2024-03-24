@@ -1,12 +1,12 @@
 package Ness.Backend.domain.schedule;
 
-import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
+import Ness.Backend.domain.schedule.dto.response.GetOneMonthSchedulesDto;
+import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
-import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
 import Ness.Backend.global.fastApi.FastApiScheduleApi;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +29,7 @@ public class ScheduleService {
     private final MemberRepository memberRepository;
     private final FastApiScheduleApi fastApiScheduleApi;
 
-    public GetScheduleListDto getOneMonthUserSchedule(Long id, String date){
+    public GetOneMonthSchedulesDto getOneMonthUserSchedule(Long id, String date){
         // 년도, 월, 일 추출
         String[] parts = date.split("-");
         int year = Integer.parseInt(parts[0]);
@@ -40,14 +40,18 @@ public class ScheduleService {
         // ScheduleListResponseDto에 매핑
         List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
                 .map(schedule -> GetScheduleDto.builder()
-                        .id(schedule.getId())
+                        .category(schedule.getCategory().getName())
                         .info(schedule.getInfo())
                         .startTime(schedule.getStartTime())
                         .endTime(schedule.getEndTime())
-                        .location(schedule.getLocation())
+                        .details(GetScheduleDetailDto.builder()
+                                .id(schedule.getId())
+                                .person(schedule.getPerson())
+                                .location(schedule.getLocation())
+                                .build())
                         .build())
                 .toList();
-        return new GetScheduleListDto(getScheduleDtos);
+        return new GetOneMonthSchedulesDto(getScheduleDtos);
     }
 
     @Transactional

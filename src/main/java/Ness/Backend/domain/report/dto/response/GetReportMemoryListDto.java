@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetReportMemoryListDto {
-    private List<GetReportMemoryDto> getReportMemoryDtos;
+    private List<GetReportMemoryDto> ReportMemoryList;
 }

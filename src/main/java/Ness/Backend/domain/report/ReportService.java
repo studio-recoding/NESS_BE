@@ -5,6 +5,7 @@ import Ness.Backend.domain.report.entity.ReportMemory;
 import Ness.Backend.domain.report.entity.ReportRecommend;
 import Ness.Backend.domain.report.entity.ReportTag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -15,18 +16,19 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReportService {
     private final ReportMemoryRepository reportMemoryRepository;
     private final ReportTagRepository reportTagRepository;
     private final ReportRecommendRepository reportRecommendRepository;
 
     public GetReportMemoryListDto getMemory(Long id){
-        // 이번 주의 데이터 가져오기
+        // 2주치의 데이터 가져오기
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         ZonedDateTime startOfWeek = now.with(DayOfWeek.MONDAY).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        ZonedDateTime startOfLastWeek = startOfWeek.minusWeeks(1);
 
-        //ZonedDateTime oneWeekAgo = now.minus(7, ChronoUnit.DAYS).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        List<ReportMemory> reportMemories = reportMemoryRepository.findReportMemoriesByMember_idAndCreatedDateBetweenOrderByCreatedDateAsc(id, startOfWeek, now);
+        List<ReportMemory> reportMemories = reportMemoryRepository.findReportMemoriesByMember_idAndCreatedDateBetweenOrderByCreatedDateAsc(id, startOfLastWeek, now);
 
         //ReportMemoryListResponseDto에 매핑
         List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
@@ -41,11 +43,11 @@ public class ReportService {
     }
 
     public GetReportTagListDto getTag(Long id){
-        // 이번 달의 데이터 가져오기
+        // 지난 달 10일~이번 달 9일 간의 데이터 가져오기
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        ZonedDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-
-        List<ReportTag> reportTags = reportTagRepository.findReportTagsByMember_idAndCreatedDateBetweenOrderByCreatedDateAsc(id, startOfMonth, now);
+        ZonedDateTime lastMonth10 = now.withMonth(now.getMonthValue() - 1).withDayOfMonth(10).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        ZonedDateTime thisMonth9 = now.withMonth(now.getMonthValue()).withDayOfMonth(9).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<ReportTag> reportTags = reportTagRepository.findReportTagsByMember_idAndCreatedDateBetweenOrderByCreatedDateAsc(id, lastMonth10, thisMonth9);
 
         //ReportTagListResponseDto에 매핑
         List<GetReportTagDto> getReportTagDtos = reportTags.stream()

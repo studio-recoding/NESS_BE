@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetReportTagListDto {
-    private List<GetReportTagDto> getReportTagDtos;
+    private List<GetReportTagDto> ReportTagList;
 }

@@ -1,5 +1,6 @@
 package Ness.Backend.domain.report.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -12,12 +13,15 @@ public class GetReportTagDto {
     private Long id;
 
     @Schema(description = "테그 생성 날짜", example = "2024-01-28 12:34:56")
+    @JsonProperty("createdAt")
     private String createdDate;
 
     @Schema(description = "테그 이름", example = "공부 매니아")
+    @JsonProperty("title")
     private String tagTitle;
 
     @Schema(description = "테그 설명", example = "이번 달에 공부를 많이 하셨네요. 공부에 열정이 넘치는 당신은 공부 매니아!")
+    @JsonProperty("info")
     private String tagDesc;
 
     @Builder

@@ -1,7 +1,6 @@
 package Ness.Backend.domain.schedule.entity;
 
 import Ness.Backend.domain.chat.entity.Chat;
-import Ness.Backend.domain.entity.Category;
 import Ness.Backend.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;

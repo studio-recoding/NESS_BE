@@ -1,18 +1,12 @@
 package Ness.Backend.domain.auth.oAuth;
 
-import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.auth.AuthUser;
-import Ness.Backend.global.common.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,12 +1,12 @@
 package Ness.Backend.domain.schedule;
 
+import Ness.Backend.domain.member.MemberRepository;
+import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
+import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
-import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.entity.Schedule;
-import Ness.Backend.domain.member.MemberRepository;
-import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
 import Ness.Backend.global.fastApi.FastApiScheduleApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;

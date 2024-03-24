@@ -1,7 +1,6 @@
 package Ness.Backend.global.auth.oAuth.kakao;
 
 import Ness.Backend.domain.auth.oAuth.kakao.dto.KakaoResourceDto;
-import com.fasterxml.jackson.core.JsonParser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

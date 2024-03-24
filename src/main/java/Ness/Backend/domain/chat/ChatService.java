@@ -1,12 +1,12 @@
 package Ness.Backend.domain.chat;
 
-import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
 import Ness.Backend.domain.chat.dto.request.PostChatDto;
+import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatListDto;
 import Ness.Backend.domain.chat.entity.Chat;
-import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.member.MemberRepository;
+import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.fastApi.FastApiChatApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;

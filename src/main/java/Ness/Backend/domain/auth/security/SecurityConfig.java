@@ -1,6 +1,5 @@
 package Ness.Backend.domain.auth.security;
 
-import Ness.Backend.domain.auth.inmemory.RefreshTokenRepository;
 import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
 import Ness.Backend.domain.auth.jwt.JwtAuthenticationFilter;
 import Ness.Backend.domain.auth.jwt.JwtAuthorizationFilter;

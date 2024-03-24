@@ -2,11 +2,10 @@ package Ness.Backend.domain.auth;
 
 import Ness.Backend.domain.auth.dto.LoginRequestDto;
 import Ness.Backend.domain.auth.dto.RegisterRequestDto;
-import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.MemberRepository;
-import Ness.Backend.global.common.response.CommonResponse;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.global.common.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

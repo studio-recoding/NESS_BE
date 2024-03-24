@@ -1,7 +1,6 @@
 package Ness.Backend.domain.auth.oAuth.kakao.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

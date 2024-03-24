@@ -30,4 +30,10 @@ public class ScheduleController {
         return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
     }
 
+    @PutMapping("/dev/schedule/new")
+    @Operation(summary = "새로운 스케쥴 내역", description = "새로운 스케쥴 내역 저장하는 API 입니다.")
+    public ResponseEntity<Long> createDevSchedule(@RequestBody ScheduleCreateRequestDto scheduleCreateRequestDto){
+        Long userId  = scheduleService.createNewSchedule(1L, scheduleCreateRequestDto);
+        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
+    }
 }

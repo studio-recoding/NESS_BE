@@ -18,12 +18,6 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 public class OAuth2Controller {
     private final OAuth2Service oAuth2Service;
-    @GetMapping("/dev/login/oauth/{registration}")
-    @Operation(summary = "OAuth 로그인 요청", description = "개발 테스트용 API 입니다. 클라이언트에게 공개되지 않습니다.")
-    public CommonResponse<?> devSocialLogin(@RequestParam String code, @PathVariable String registration) {
-        String loginMessage = oAuth2Service.devSocialLogin(code, registration);
-        return CommonResponse.postResponse(HttpStatus.OK.value(), loginMessage);
-    }
 
     @PostMapping("/login/oauth/{registration}")
     @Operation(summary = "OAuth 로그인 요청", description = "구글 계정으로 로그인하는 API 입니다.")

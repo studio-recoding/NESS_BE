@@ -51,6 +51,6 @@ public class EmailService {
     public String setContext(String date) {
         Context context = new Context();
         context.setVariable("date", date);
-        return templateEngine.process("notice", context);
+        return templateEngine.process("todo", context);
     }
 }

@@ -25,7 +25,7 @@ public class ScheduleController {
         return new ResponseEntity<>(oneUserMonthSchedules, HttpStatusCode.valueOf(200));
     }
 
-    @PutMapping("/new/dev")
+    @PostMapping("/new/dev")
     @Operation(summary = "개발 테스트용 새로운 스케쥴 내역", description = "새로운 스케쥴 내역 저장하는 API 입니다.")
     public ResponseEntity<Long> postUserSchedule(@RequestBody PostScheduleDto postScheduleDto){
         Long userId  = scheduleService.postNewUserSchedule(1L, postScheduleDto);

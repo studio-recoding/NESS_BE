@@ -7,14 +7,14 @@ import lombok.Getter;
  * status : 401
  */
 @Getter
-public class UnauthorizedException extends BaseException {
-    public UnauthorizedException() {
+public class UnauthorizedAccessException extends BaseException {
+    public UnauthorizedAccessException() {
         super(ErrorCode.UNAUTHORIZED_ACCESS, ErrorCode.UNAUTHORIZED_ACCESS.getMessage());
     }
-    public UnauthorizedException(String message) {
+    public UnauthorizedAccessException(String message) {
         super(ErrorCode.UNAUTHORIZED_ACCESS, message);
     }
-    public UnauthorizedException(ErrorCode errorCode) {
+    public UnauthorizedAccessException(ErrorCode errorCode) {
         super(errorCode, errorCode.getMessage());
     }
 }

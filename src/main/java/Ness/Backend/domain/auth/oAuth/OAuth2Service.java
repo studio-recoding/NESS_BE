@@ -17,7 +17,7 @@ import Ness.Backend.global.auth.oAuth.kakao.KakaoResourceApi;
 import Ness.Backend.global.auth.oAuth.naver.NaverOAuthApi;
 import Ness.Backend.global.auth.oAuth.naver.NaverResourceApi;
 import Ness.Backend.global.error.ErrorCode;
-import Ness.Backend.global.error.exception.UnauthorizedException;
+import Ness.Backend.global.error.exception.UnauthorizedAccessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -201,7 +201,7 @@ public class OAuth2Service {
     public void logout(Member member) {
         /* refreshToken 만료 여부 확인 */
         if (!refreshTokenRepository.existsById(member.getId())) {
-            throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new UnauthorizedAccessException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         refreshTokenRepository.deleteById(member.getId());

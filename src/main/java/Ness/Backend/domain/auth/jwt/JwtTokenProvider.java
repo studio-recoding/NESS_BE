@@ -3,10 +3,15 @@ package Ness.Backend.domain.auth.jwt;
 import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.global.error.ErrorCode;
+import Ness.Backend.global.error.exception.ExpiredTokenException;
+import Ness.Backend.global.error.exception.UnauthorizedAccessException;
+import Ness.Backend.global.error.exception.UnauthorizedUserException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -19,6 +24,7 @@ import java.util.Map;
 
 /* JSON Web Token (JWT)을 생성하고 검증하는 역할 */
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
 
     private final MemberRepository memberRepository;
@@ -127,21 +133,25 @@ public class JwtTokenProvider {
         /* email 값이 null이 아닌지 확인 */
         String authKey = getAuthKeyClaim(jwtToken);
         if (authKey == null){ //null 값이라면 올바른 jwtToken이 아님
-            //throw new UnauthorizedException(ErrorCode.INVALID_AUTH_TOKEN);
-            return null;
+            log.error("UnauthorizedAccessException");
+            throw new UnauthorizedAccessException();
         }
 
         /* JWT_EXPIRATION_TIME이 지나지 않았는지 확인 */
-        Date expiresAt =getExpireTimeClaim(jwtToken);
+        Date expiresAt = getExpireTimeClaim(jwtToken);
         if (!this.validExpiredTime(expiresAt)) { //만료시간이 지났다면 올바른 jwtToken이 아님
-            //throw new UnauthorizedException(ErrorCode.EXPIRED_TOKEN);
-            return null;
+            log.error("ExpiredTokenException");
+            throw new ExpiredTokenException();
         }
 
         /* email 값이 정상적으로 있고, JWT_EXPIRATION_TIME도 지나지 않았다면,
          * 해당 토큰의 email 정보를 가진 맴버가 있는지 DB에서 확인 */
-        //Member tokenUser = memberRepository.findMemberByEmail(email);
+        Member tokenMember = memberRepository.findMemberByEmail(authKey);
+        if (tokenMember == null) { //DB에 해당 맴버가 없다면 올바른 jwtToken이 아님
+            log.error("UnauthorizedUserException");
+            throw new UnauthorizedUserException();
+        }
 
-        return memberRepository.findMemberByEmail(authKey);
+        return tokenMember;
     }
 }

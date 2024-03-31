@@ -27,13 +27,6 @@ public class ChatController {
         return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
     }
 
-    @PostMapping("/dev")
-    @Operation(summary = "새로운 채팅으로 AI와 통신", description = "새로운 채팅 내역을 저장하고, AI의 응답을 받는 API 입니다.")
-    public ResponseEntity<GetAiChatDto> postAiChat(@RequestBody PostUserChatDto postUserChatDto){
-        GetAiChatDto answer = chatService.postNewUserChat(1L, postUserChatDto);
-        return new ResponseEntity<>(answer, HttpStatusCode.valueOf(200));
-    }
-
     @GetMapping("")
     @Operation(summary = "한 사용자의 채팅 내역", description = "한 사용자의 일주일치 채팅 내역을 반환하는 API 입니다.")
     public ResponseEntity<GetChatListDto> getUserChat(@AuthUser Member member){
@@ -54,8 +47,7 @@ public class ChatController {
     @PostMapping("")
     @Operation(summary = "새로운 채팅으로 AI와 통신", description = "새로운 채팅 내역을 저장하고, 새로운 내역을 포함해서 AI의 응답을 받는 API 입니다.")
     public ResponseEntity<GetChatListDto> postAiChat(@AuthUser Member member, @RequestBody PostUserChatDto postUserChatDto) {
-        GetAiChatDto answer = chatService.postNewUserChat(member.getId(), postUserChatDto);
-        GetChatListDto oneUserChats = chatService.getOneWeekUserChat(member.getId());
+        GetChatListDto oneUserChats = chatService.postNewUserChat(member.getId(), postUserChatDto);
         return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
     }
 }

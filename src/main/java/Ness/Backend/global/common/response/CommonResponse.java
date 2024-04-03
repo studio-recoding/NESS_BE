@@ -1,8 +1,13 @@
 package Ness.Backend.global.common.response;
 
+import Ness.Backend.global.error.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import net.minidev.json.JSONObject;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CommonResponse<T> {
     @JsonProperty("status")
@@ -41,6 +46,26 @@ public class CommonResponse<T> {
                 .success(true)
                 .message(message)
                 .data(data)
+                .build();
+    }
+
+
+    public static JSONObject jsonOf(ErrorCode errorCode) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.put("success", false);
+        jsonObject.put("message", errorCode.getMessage());
+        jsonObject.put("status", errorCode.getHttpStatus().value());
+        jsonObject.put("code", errorCode.getCode());
+        return jsonObject;
+    }
+
+    public static <T> CommonResponse<T> onFailure(ErrorCode errorCode, String message) {
+        return CommonResponse.<T>builder()
+                .code(errorCode.getHttpStatus().value())
+                .success(false)
+                .message(message)
+                .data(null)
                 .build();
     }
 }

@@ -3,10 +3,6 @@ package Ness.Backend.domain.auth.jwt;
 import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.global.error.ErrorCode;
-import Ness.Backend.global.error.exception.ExpiredTokenException;
-import Ness.Backend.global.error.exception.UnauthorizedAccessException;
-import Ness.Backend.global.error.exception.UnauthorizedUserException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.annotation.PostConstruct;
@@ -133,23 +129,21 @@ public class JwtTokenProvider {
         /* email 값이 null이 아닌지 확인 */
         String authKey = getAuthKeyClaim(jwtToken);
         if (authKey == null){ //null 값이라면 올바른 jwtToken이 아님
-            log.error("UnauthorizedAccessException");
-            throw new UnauthorizedAccessException();
+            //TODO: 명시적 throw new 에러를 하지 않아도 자동 에러 감지되는 이유 파악 필요
+            return null;
         }
 
         /* JWT_EXPIRATION_TIME이 지나지 않았는지 확인 */
         Date expiresAt = getExpireTimeClaim(jwtToken);
         if (!this.validExpiredTime(expiresAt)) { //만료시간이 지났다면 올바른 jwtToken이 아님
-            log.error("ExpiredTokenException");
-            throw new ExpiredTokenException();
+            return null;
         }
 
         /* email 값이 정상적으로 있고, JWT_EXPIRATION_TIME도 지나지 않았다면,
          * 해당 토큰의 email 정보를 가진 맴버가 있는지 DB에서 확인 */
         Member tokenMember = memberRepository.findMemberByEmail(authKey);
         if (tokenMember == null) { //DB에 해당 맴버가 없다면 올바른 jwtToken이 아님
-            log.error("UnauthorizedUserException");
-            throw new UnauthorizedUserException();
+            return null;
         }
 
         return tokenMember;

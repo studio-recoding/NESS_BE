@@ -4,9 +4,8 @@ import Ness.Backend.domain.auth.security.AuthDetailService;
 import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.error.ErrorCode;
-import Ness.Backend.global.error.exception.ExpiredTokenException;
-import Ness.Backend.global.error.exception.UnauthorizedAccessException;
-import Ness.Backend.global.error.exception.UnauthorizedUserException;
+import static Ness.Backend.global.error.FilterExceptionHandler.setResponse;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
 import java.io.IOException;
 
 /* 사용자의 권한 부여
@@ -59,17 +57,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
                 /* 시큐리티 세션에 Authentication 을 저장 */
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        } catch (UnauthorizedAccessException e){
-            request.setAttribute("exception", ErrorCode.UNAUTHORIZED_ACCESS.getCode());
-            log.error("UNAUTHORIZED_ACCESS");
-        } catch (ExpiredTokenException e){
+           }
+
+            chain.doFilter(request, response);
+
+        } catch (TokenExpiredException e){
             log.error("EXPIRED_TOKEN");
             request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
-        } catch (UnauthorizedUserException e){
-            log.error("UNAUTHORIZED_USER");
-            request.setAttribute("exception", ErrorCode.UNAUTHORIZED_USER.getCode());
+            setResponse(response, ErrorCode.EXPIRED_TOKEN);
         }
-        chain.doFilter(request, response);
     }
 }

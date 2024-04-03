@@ -27,7 +27,8 @@ public enum ErrorCode {
     FORBIDDEN_USER(FORBIDDEN, "AUTH007", "권한이 없는 유저입니다."),
     LOGIN_FAILED(UNAUTHORIZED, "AUTH008", "로그인에 실패했습니다."),
     INVALID_TOKEN(BAD_REQUEST, "AUTH009", "유효하지 않은 토큰입니다."),
-    INVALID_PRINCIPAL(BAD_REQUEST, "AUTH010", "인증정보가 존재하지 않습니다.");
+    INVALID_TOKEN_SIGNATURE(BAD_REQUEST, "AUTH010", "유효하지 않은 시그니처를 가진 토큰입니다. 온전한 토큰이 맞는지 확인해주세요."),
+    INVALID_PRINCIPAL(BAD_REQUEST, "AUTH011", "인증정보가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

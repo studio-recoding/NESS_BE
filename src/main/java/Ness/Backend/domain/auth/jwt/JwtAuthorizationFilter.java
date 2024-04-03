@@ -5,6 +5,8 @@ import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.error.ErrorCode;
 import static Ness.Backend.global.error.FilterExceptionHandler.setResponse;
+
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -65,6 +67,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             log.error("EXPIRED_TOKEN");
             request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
             setResponse(response, ErrorCode.EXPIRED_TOKEN);
+        } catch (SignatureVerificationException e){
+            log.error("INVALID_TOKEN_SIGNATURE");
+            request.setAttribute("exception", ErrorCode.INVALID_TOKEN_SIGNATURE.getCode());
+            setResponse(response, ErrorCode.INVALID_TOKEN_SIGNATURE);
         }
     }
 }

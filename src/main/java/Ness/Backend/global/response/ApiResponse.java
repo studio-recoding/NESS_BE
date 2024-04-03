@@ -1,4 +1,4 @@
-package Ness.Backend.global.common.response;
+package Ness.Backend.global.response;
 
 import Ness.Backend.global.error.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,7 +9,7 @@ import net.minidev.json.JSONObject;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class CommonResponse<T> {
+public class ApiResponse<T> {
     @JsonProperty("status")
     private int code;
 
@@ -24,15 +24,15 @@ public class CommonResponse<T> {
     private T data;
 
     @Builder
-    public CommonResponse(int code, boolean success, String message, T data) {
+    public ApiResponse(int code, boolean success, String message, T data) {
         this.code = code;
         this.success = success;
         this.message = message;
         this.data = data;
     }
 
-    public static <T> CommonResponse<T> postResponse(int code, String message) {
-        return CommonResponse.<T>builder()
+    public static <T> ApiResponse<T> postResponse(int code, String message) {
+        return ApiResponse.<T>builder()
                 .code(code)
                 .success(true)
                 .message(message)
@@ -40,8 +40,8 @@ public class CommonResponse<T> {
                 .build();
     }
 
-    public static <T> CommonResponse<T> getResponse(int code, String message, T data) {
-        return CommonResponse.<T>builder()
+    public static <T> ApiResponse<T> getResponse(int code, String message, T data) {
+        return ApiResponse.<T>builder()
                 .code(code)
                 .success(true)
                 .message(message)
@@ -60,8 +60,8 @@ public class CommonResponse<T> {
         return jsonObject;
     }
 
-    public static <T> CommonResponse<T> onFailure(ErrorCode errorCode, String message) {
-        return CommonResponse.<T>builder()
+    public static <T> ApiResponse<T> onFailure(ErrorCode errorCode, String message) {
+        return ApiResponse.<T>builder()
                 .code(errorCode.getHttpStatus().value())
                 .success(false)
                 .message(message)

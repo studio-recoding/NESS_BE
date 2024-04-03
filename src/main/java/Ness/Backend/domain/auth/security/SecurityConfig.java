@@ -81,6 +81,12 @@ public class SecurityConfig {
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션을 생성하지 않음->토큰 기반 인증 필요
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider(), refreshTokenService))  //사용자 인증
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(),  jwtTokenProvider(), authDetailService)) //사용자 권한 부여
+                /*
+                .exceptionHandling((exceptionHandling) ->
+
+                        exceptionHandling.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                ) //인가(Authorization)가 실패시 실행, 항상 JwtAuthenticationFilter 뒤에 설정되어 있어야 함.
+                 */
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         //.requestMatchers("/signup/**", "/login/**").permitAll() // 회원가입 및 로그인 경로는 인증 생략

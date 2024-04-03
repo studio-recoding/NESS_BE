@@ -7,6 +7,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 
 /* JSON Web Token (JWT)을 생성하고 검증하는 역할 */
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
 
     private final MemberRepository memberRepository;
@@ -127,21 +129,23 @@ public class JwtTokenProvider {
         /* email 값이 null이 아닌지 확인 */
         String authKey = getAuthKeyClaim(jwtToken);
         if (authKey == null){ //null 값이라면 올바른 jwtToken이 아님
-            //throw new UnauthorizedException(ErrorCode.INVALID_AUTH_TOKEN);
+            //TODO: 명시적 throw new 에러를 하지 않아도 자동 에러 감지되는 이유 파악 필요
             return null;
         }
 
         /* JWT_EXPIRATION_TIME이 지나지 않았는지 확인 */
-        Date expiresAt =getExpireTimeClaim(jwtToken);
+        Date expiresAt = getExpireTimeClaim(jwtToken);
         if (!this.validExpiredTime(expiresAt)) { //만료시간이 지났다면 올바른 jwtToken이 아님
-            //throw new UnauthorizedException(ErrorCode.EXPIRED_TOKEN);
             return null;
         }
 
         /* email 값이 정상적으로 있고, JWT_EXPIRATION_TIME도 지나지 않았다면,
          * 해당 토큰의 email 정보를 가진 맴버가 있는지 DB에서 확인 */
-        //Member tokenUser = memberRepository.findMemberByEmail(email);
+        Member tokenMember = memberRepository.findMemberByEmail(authKey);
+        if (tokenMember == null) { //DB에 해당 맴버가 없다면 올바른 jwtToken이 아님
+            return null;
+        }
 
-        return memberRepository.findMemberByEmail(authKey);
+        return tokenMember;
     }
 }

@@ -5,7 +5,7 @@ import Ness.Backend.domain.auth.dto.RegisterRequestDto;
 import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.global.common.response.CommonResponse;
+import Ness.Backend.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     @Transactional
-    public CommonResponse<?> signUp(RegisterRequestDto registerRequestDto) {
+    public ApiResponse<?> signUp(RegisterRequestDto registerRequestDto) {
         try {
             /* 빌더 패턴을 사용해 MemberRole을 넘겨주지 않아도 객체 생성 가능 */
             Member member = Member.builder()
@@ -35,20 +35,20 @@ public class AuthService {
 
             memberRepository.save(member);
 
-            return CommonResponse.postResponse(
+            return ApiResponse.postResponse(
                     HttpStatus.OK.value(),
                     "회원가입이 완료되었습니다."); //200
 
         } catch (DataIntegrityViolationException e) {
             /* 중복된 이메일 값이 삽입되려고 할 때 발생하는 예외 처리 */
-            return CommonResponse.postResponse(
+            return ApiResponse.postResponse(
                     HttpStatus.CONFLICT.value(),
                     "이미 회원 가입된 유저입니다."); //409
         }
     }
 
     @Transactional
-    public CommonResponse<?> login(LoginRequestDto loginRequestDto) {
+    public ApiResponse<?> login(LoginRequestDto loginRequestDto) {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
 
@@ -69,12 +69,12 @@ public class AuthService {
             String authenticatedEmail = authDetails.getMember().getEmail();
 
             /* JWT 토큰 반환 */
-            return CommonResponse.postResponse(
+            return ApiResponse.postResponse(
                     HttpStatus.OK.value(),
                     "로그인에 성공했습니다."); //200
         }
 
-        return CommonResponse.postResponse(
+        return ApiResponse.postResponse(
                 HttpStatus.UNAUTHORIZED.value(),
                 "로그인에 실패했습니다. 이메일 또는 비밀번호가 일치하는지 확인해주세요."); //401
     }

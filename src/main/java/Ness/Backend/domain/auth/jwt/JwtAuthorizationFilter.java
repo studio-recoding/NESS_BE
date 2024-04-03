@@ -71,6 +71,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             log.error("INVALID_TOKEN_SIGNATURE");
             request.setAttribute("exception", ErrorCode.INVALID_TOKEN_SIGNATURE.getCode());
             setResponse(response, ErrorCode.INVALID_TOKEN_SIGNATURE);
+        } catch (Exception e){
+            log.error("TOKEN_EXCEPTION");
+            request.setAttribute("exception", ErrorCode.TOKEN_ERROR.getCode());
+            setResponse(response, ErrorCode.TOKEN_ERROR);
         }
     }
 }

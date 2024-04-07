@@ -2,6 +2,7 @@ package Ness.Backend.domain.report;
 
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.report.dto.response.GetReportMemoryListDto;
+import Ness.Backend.domain.report.dto.response.GetReportRecommendDto;
 import Ness.Backend.domain.report.dto.response.GetReportTagListDto;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,8 +31,8 @@ public class ReportController {
 
     @GetMapping("/recommend/dev")
     @Operation(summary = "개발 테스트용 한줄 추천 조회 API", description = "사용자의 ID로 한줄 추천을 조회하는 API 입니다.")
-    public GetReportTagListDto getRecommend() {
-        return reportService.getTag(1L);
+    public GetReportRecommendDto getRecommend() {
+        return reportService.getRecommend(1L);
     }
 
     @GetMapping("/memory")
@@ -48,8 +49,8 @@ public class ReportController {
 
     @GetMapping("/recommend")
     @Operation(summary = "한줄 추천 조회 API", description = "사용자의 ID로 한줄 추천을 조회하는 API 입니다.")
-    public GetReportTagListDto getRecommend(@AuthUser Member member) {
-        return reportService.getTag(member.getId());
+    public GetReportRecommendDto getRecommend(@AuthUser Member member) {
+        return reportService.getRecommend(member.getId());
     }
 
 }

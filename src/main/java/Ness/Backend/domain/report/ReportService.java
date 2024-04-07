@@ -1,9 +1,15 @@
 package Ness.Backend.domain.report;
 
+import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
+import Ness.Backend.domain.chat.dto.response.PostFastApiAiChatDto;
+import Ness.Backend.domain.member.MemberRepository;
+import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.domain.report.dto.request.PostFastApiUserRecommendDto;
 import Ness.Backend.domain.report.dto.response.*;
 import Ness.Backend.domain.report.entity.ReportMemory;
 import Ness.Backend.domain.report.entity.ReportRecommend;
 import Ness.Backend.domain.report.entity.ReportTag;
+import Ness.Backend.global.fastApi.FastApiRecommendApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +27,8 @@ public class ReportService {
     private final ReportMemoryRepository reportMemoryRepository;
     private final ReportTagRepository reportTagRepository;
     private final ReportRecommendRepository reportRecommendRepository;
+    private final FastApiRecommendApi fastApiRecommendApi;
+    private final MemberRepository memberRepository;
 
     public GetReportMemoryListDto getMemory(Long id){
         // 2주치의 데이터 가져오기
@@ -65,15 +73,55 @@ public class ReportService {
     public GetReportRecommendDto getRecommend(Long id){
         // 이번 달의 데이터 가져오기
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        ZonedDateTime startOfToday = now.toLocalDate().atStartOfDay(now.getZone());
-        ZonedDateTime endOfToday = now.toLocalDate().atTime(LocalTime.MAX).atZone(now.getZone());
+        ZonedDateTime today = now.toLocalDate().atStartOfDay(now.getZone());
 
-        ReportRecommend reportRecommend = reportRecommendRepository.findReportRecommendByMember_IdAndCreatedDateBetween(id, startOfToday, endOfToday);
+        ReportRecommend reportRecommend = reportRecommendRepository.findTodayReportRecommendByMember_Id(id);
 
-        return GetReportRecommendDto.builder()
-                .id(reportRecommend.getId())
-                .createdDate(reportRecommend.getCreatedDate().toString())
-                .recommendText(reportRecommend.getRecommendText())
+        if(reportRecommend == null){
+            //새로운 한 줄 추천 생성하기
+            String answer = postNewAiRecommend(id, today);
+            String parsedAnswer = parseAiRecommend(answer);
+
+            Member memberEntity = memberRepository.findMemberById(id);
+
+            ReportRecommend newRecommend = ReportRecommend.builder()
+                    .createdDate(today)
+                    .recommendText(answer)
+                    .member(memberEntity)
+                    .build();
+            
+            //새롭게 생성된 한 줄 추천 저장하기
+            reportRecommendRepository.save(newRecommend);
+
+            return GetReportRecommendDto.builder()
+                    .id(newRecommend.getId())
+                    .createdDate(newRecommend.getCreatedDate().toString())
+                    .recommendText(newRecommend.getRecommendText())
+                    .build();
+        } else{
+            return GetReportRecommendDto.builder()
+                    .id(reportRecommend.getId())
+                    .createdDate(reportRecommend.getCreatedDate().toString())
+                    .recommendText(reportRecommend.getRecommendText())
+                    .build();
+        }
+    }
+
+    public String parseAiRecommend(String text){
+        return text.replace("\"", "");
+    }
+
+    public String postNewAiRecommend(Long id, ZonedDateTime today){
+        PostFastApiUserRecommendDto userDto = PostFastApiUserRecommendDto.builder()
+                .member_id(id.intValue())
+                .user_persona("")
+                .schedule_datetime_start(today)
+                .schedule_datetime_end(today)
                 .build();
+
+        //Fast API에 전송하기
+        PostFastApiAiRecommendDto AiDto = fastApiRecommendApi.creatFastApiRecommend(userDto);
+
+        return AiDto.getAnswer();
     }
 }

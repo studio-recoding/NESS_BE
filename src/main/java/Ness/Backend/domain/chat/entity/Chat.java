@@ -22,6 +22,8 @@ public class Chat {
 
     private String text;
 
+    private int caseNumber;
+
     //AI 발화인지, USER 발화인지 구분해주는 타입 값
     @Enumerated(EnumType.STRING)
     private ChatType chatType;
@@ -34,11 +36,13 @@ public class Chat {
     private Member member;
 
     @Builder
-    public Chat(Long id, ZonedDateTime createdDate, String text, ChatType chatType, Schedule schedule, Member member) {
+    public Chat(Long id, ZonedDateTime createdDate, String text, ChatType chatType,
+                int caseNumber, Schedule schedule, Member member) {
         this.id = id;
         this.createdDate = createdDate;
         this.text = text;
         this.chatType = chatType;
+        this.caseNumber = caseNumber;
         this.schedule = schedule;
         this.member = member;
     }

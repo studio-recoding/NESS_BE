@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,13 +31,14 @@ public class ScheduleService {
     private final FastApiScheduleApi fastApiScheduleApi;
 
     public GetOneMonthSchedulesDto getOneMonthUserSchedule(Long id, String date){
+        log.info("getOneMonthUserSchedule called by "+ id);
         // 년도, 월, 일 추출
         String[] parts = date.split("-");
         int year = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]);
 
         List<Schedule> scheduleList = scheduleRepository.findOneMonthSchedulesByMember_Id(id, year, month);
-
+        
         // ScheduleListResponseDto에 매핑
         List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
                 .map(schedule -> GetScheduleDto.builder()
@@ -56,6 +58,7 @@ public class ScheduleService {
 
     @Transactional
     public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
+        log.info("postNewUserSchedule called by "+ id);
         Member memberEntity = memberRepository.findMemberById(id);
 
         //새로운 채팅 생성

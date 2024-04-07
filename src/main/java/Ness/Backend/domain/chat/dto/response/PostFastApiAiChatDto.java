@@ -13,4 +13,7 @@ import lombok.NoArgsConstructor;
 public class PostFastApiAiChatDto {
     @JsonProperty("ness")
     private String answer;
+
+    @JsonProperty("case")
+    private int caseNumber;
 }

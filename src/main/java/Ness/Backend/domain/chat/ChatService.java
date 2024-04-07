@@ -37,6 +37,7 @@ public class ChatService {
                         .id(chat.getId())
                         .createdDate(chat.getCreatedDate().toString())
                         .text(chat.getText())
+                        .caseNumber(chat.getCaseNumber())
                         .chatType(chat.getChatType().toString())
                         .build())
                 .toList();
@@ -51,13 +52,14 @@ public class ChatService {
                         .atZone(ZoneId.of("Asia/Seoul")))
                 .text(postUserChatDto.getText())
                 .chatType(postUserChatDto.getChatType())
+                .caseNumber(0) //유저는 디폴트로 case
                 .member(memberEntity)
                 .build();
 
         chatRepository.save(newUserChat);
 
-        String answer = postNewAiChat(id, postUserChatDto.getText());
-        String parsedAnswer = parseAiChat(answer);
+        PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText());
+        String parsedAnswer = parseAiChat(AiDto.getAnswer());
 
         //AI 챗 답변 저장
         Chat newAiChat = Chat.builder()
@@ -65,6 +67,7 @@ public class ChatService {
                         .atZone(ZoneId.of("Asia/Seoul")))
                 .text(parsedAnswer)
                 .chatType(ChatType.AI)
+                .caseNumber(AiDto.getCaseNumber()) //AI는 받아온 값으로 저장
                 .member(memberEntity)
                 .build();
 
@@ -77,7 +80,7 @@ public class ChatService {
         return text.replace("\"", "");
     }
 
-    public String postNewAiChat(Long id, String text){
+    public PostFastApiAiChatDto postNewAiChat(Long id, String text){
 
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()
                 .message(text)
@@ -86,6 +89,6 @@ public class ChatService {
         //Fast API에 전송하기
         PostFastApiAiChatDto AiDto = fastApiChatApi.creatFastApiChat(userDto);
 
-        return AiDto.getAnswer();
+        return AiDto;
     }
 }

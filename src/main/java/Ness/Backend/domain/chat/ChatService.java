@@ -79,12 +79,12 @@ public class ChatService {
 
     public String postNewAiChat(Long id, String text){
 
-        PostFastApiUserChatDto Userdto = PostFastApiUserChatDto.builder()
+        PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()
                 .message(text)
                 .build();
 
         //Fast API에 전송하기
-        PostFastApiAiChatDto AiDto = fastApiChatApi.creatFastApiChat(Userdto);
+        PostFastApiAiChatDto AiDto = fastApiChatApi.creatFastApiChat(userDto);
 
         return AiDto.getAnswer();
     }

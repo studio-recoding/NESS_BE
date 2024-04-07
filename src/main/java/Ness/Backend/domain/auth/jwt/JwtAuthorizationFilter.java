@@ -64,17 +64,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
 
         } catch (TokenExpiredException e){
-            log.error("EXPIRED_TOKEN");
-            request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
+            log.error(e + " EXPIRED_TOKEN");
+            //request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
             setResponse(response, ErrorCode.EXPIRED_TOKEN);
         } catch (SignatureVerificationException e){
-            log.error("INVALID_TOKEN_SIGNATURE");
-            request.setAttribute("exception", ErrorCode.INVALID_TOKEN_SIGNATURE.getCode());
+            log.error(e + " INVALID_TOKEN_SIGNATURE");
             setResponse(response, ErrorCode.INVALID_TOKEN_SIGNATURE);
-        } catch (Exception e){
-            log.error("TOKEN_EXCEPTION");
-            request.setAttribute("exception", ErrorCode.TOKEN_ERROR.getCode());
-            setResponse(response, ErrorCode.TOKEN_ERROR);
         }
     }
 }

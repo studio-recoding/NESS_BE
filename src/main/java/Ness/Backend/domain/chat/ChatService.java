@@ -87,8 +87,8 @@ public class ChatService {
                 .build();
 
         //Fast API에 전송하기
-        PostFastApiAiChatDto AiDto = fastApiChatApi.creatFastApiChat(userDto);
+        PostFastApiAiChatDto aiDto = fastApiChatApi.creatFastApiChat(userDto);
 
-        return AiDto;
+        return aiDto;
     }
 }

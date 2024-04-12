@@ -35,7 +35,6 @@ public class WeatherService {
         return 0;
     }
 
-    //단기 예보 조회 호출
     public GetPublicDataWeatherDto getPublicDataWeather(){
         log.info(getToday().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
         log.info(getToday().format(DateTimeFormatter.ofPattern("Hm")));
@@ -47,4 +46,19 @@ public class WeatherService {
                 //getToday().format(DateTimeFormatter.ofPattern("Hm")),
                 126.999641666666, 37.5610027777777); //테스트용 값
     }
+
+    //단기 예보 조회 호출
+    /*
+    public GetPublicDataWeatherDto getPublicDataWeather(){
+        log.info(getToday().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+        log.info(getToday().format(DateTimeFormatter.ofPattern("Hm")));
+        return publicDataWeatherApi.getPublicDataWeather(
+                "application/json",
+                publicWeatherApiKey, 2, 2, "JSON",
+                getToday().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
+                "0630",
+                //getToday().format(DateTimeFormatter.ofPattern("Hm")),
+                126.999641666666, 37.5610027777777); //테스트용 값
+    }
+     */
 }

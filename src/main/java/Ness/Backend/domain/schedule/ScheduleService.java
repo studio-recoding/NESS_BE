@@ -43,6 +43,7 @@ public class ScheduleService {
         List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
                 .map(schedule -> GetScheduleDto.builder()
                         .category(schedule.getCategory().getName())
+                        .categoryNum(schedule.getCategory().getId())
                         .info(schedule.getInfo())
                         .startTime(schedule.getStartTime())
                         .endTime(schedule.getEndTime())

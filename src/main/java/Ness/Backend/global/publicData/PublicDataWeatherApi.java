@@ -34,4 +34,5 @@ public interface PublicDataWeatherApi {
             @PathVariable("BASE_TIME") String formattedLocalTime,
             @PathVariable("NX") double x,
             @PathVariable("NY") double y);
+    //GetPublicDataWeatherDto
 }

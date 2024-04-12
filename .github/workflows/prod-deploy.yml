@@ -25,7 +25,6 @@ jobs:
       ## Copy properties files
       - name: Make application.yml
         run: |
-          touch ./src/main/resources/application.yml
           echo "PROFILE_PROD" > ./src/main/resources/application.yml
         # Make env file
         env:

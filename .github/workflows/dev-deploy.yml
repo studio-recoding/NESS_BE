@@ -22,6 +22,15 @@ jobs:
         run: chmod +x gradlew
 
       ## Copy properties files
+      - name: Make application.yml
+        run: |
+          touch ./src/main/resources/application.yml
+          echo "PROFILE_DEV" > ./src/main/resources/application.yml
+        # Make env file
+        env:
+          PROPERTIES_PROD: ${{ secrets.PROFILE_DEV }}
+
+      ## Copy properties files
       - name: Make application-dev.yml
         run: |
           touch ./src/main/resources/application-dev.yml

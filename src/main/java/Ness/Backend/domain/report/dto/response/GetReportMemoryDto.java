@@ -14,15 +14,15 @@ public class GetReportMemoryDto {
     private Long id;
 
     @Schema(description = "채팅 고유 인식 넘버", example = "0")
-    @JsonProperty("createdAt")
+    @JsonProperty("createdDate")
     private String createdDate;
 
-    private String pictureUrl;
+    private String memory;
 
     @Builder
-    public GetReportMemoryDto(Long id, String createdDate, String pictureUrl){
+    public GetReportMemoryDto(Long id, String createdDate, String memory){
         this.id = id;
         this.createdDate = createdDate;
-        this.pictureUrl = pictureUrl;
+        this.memory = memory;
     }
 }

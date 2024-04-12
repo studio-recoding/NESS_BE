@@ -2,12 +2,14 @@ package Ness.Backend.domain.report;
 
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.domain.report.dto.request.PostFastApiUserMemoryDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserRecommendDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserTagDto;
 import Ness.Backend.domain.report.dto.response.*;
 import Ness.Backend.domain.report.entity.ReportMemory;
 import Ness.Backend.domain.report.entity.ReportRecommend;
 import Ness.Backend.domain.report.entity.ReportTag;
+import Ness.Backend.global.fastApi.FastApiMemoryApi;
 import Ness.Backend.global.fastApi.FastApiRecommendApi;
 import Ness.Backend.global.fastApi.FastApiTagApi;
 import lombok.RequiredArgsConstructor;
@@ -28,26 +30,33 @@ public class ReportService {
     private final ReportRecommendRepository reportRecommendRepository;
     private final FastApiRecommendApi fastApiRecommendApi;
     private final FastApiTagApi fastApiTagApi;
+    private final FastApiMemoryApi fastApiMemoryApi;
     private final MemberRepository memberRepository;
 
     public GetReportMemoryListDto getMemory(Long id){
+        // 오늘 날짜 가져오기
+        ZonedDateTime now = getToday();
+
+        ReportMemory reportMemory = reportMemoryRepository.findTodayReportMemoryByMember_Id(id);
+
+        if (reportMemory == null){
+            // 오늘치가 없다면 새롭게 생성하기
+            String memory = postNewAiMemory(id, now);
+
+            Member memberEntity = memberRepository.findMemberById(id);
+
+            ReportMemory newMemory = ReportMemory.builder()
+                    .createdDate(now)
+                    .memory(memory)
+                    .member(memberEntity)
+                    .build();
+
+            reportMemoryRepository.save(newMemory);
+        }
+
         // 2주치의 데이터 가져오기
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        ZonedDateTime startOfWeek = now.with(DayOfWeek.MONDAY).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        ZonedDateTime startOfLastWeek = startOfWeek.minusWeeks(1);
-
-        List<ReportMemory> reportMemories = reportMemoryRepository.findReportMemoriesByMember_idAndCreatedDateBetweenOrderByCreatedDateAsc(id, startOfLastWeek, now);
-
-        //ReportMemoryListResponseDto에 매핑
-        List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
-                .map(memory -> GetReportMemoryDto.builder()
-                        .id(memory.getId())
-                        .createdDate(memory.getCreatedDate().toString())
-                        .pictureUrl(memory.getPictureUrl())
-                        .build())
-                .toList();
-
-        return new GetReportMemoryListDto(getReportMemoryDtos);
+        List<ReportMemory> reportMemories = reportMemoryRepository.findTwoWeekUserMemoryByMember_Id(id);
+        return createReportMemoryListDto(reportMemories);
     }
 
     public GetReportTagListDto getTag(Long id){
@@ -56,7 +65,7 @@ public class ReportService {
 
         List<ReportTag> reportTags = reportTagRepository.findLastMonthReportTagByMember_Id(id);
 
-        if (reportTags == null){
+        if (reportTags == null) {
             PostFastApiAiTagDto aiDto = postNewAiTag(id, getToday());
 
             Member memberEntity = memberRepository.findMemberById(id);
@@ -72,10 +81,9 @@ public class ReportService {
                 reportTagRepository.save(reportTag);
             }
              */
-            return createReportTagListDto(reportTags);
-        } else{
-            return createReportTagListDto(reportTags);
         }
+
+        return createReportTagListDto(reportTags);
     }
 
     public GetReportRecommendDto getRecommend(Long id){
@@ -110,7 +118,21 @@ public class ReportService {
         return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
+    public GetReportMemoryListDto createReportMemoryListDto(List<ReportMemory> reportMemories) {
+        //ReportMemoryListResponseDto에 매핑
+        List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
+                .map(memory -> GetReportMemoryDto.builder()
+                        .id(memory.getId())
+                        .createdDate(memory.getCreatedDate().toString())
+                        .memory(memory.getMemory())
+                        .build())
+                .toList();
+
+        return new GetReportMemoryListDto(getReportMemoryDtos);
+    }
+
     public GetReportTagListDto createReportTagListDto(List<ReportTag> reportTags) {
+
         List<GetReportTagDto> getReportTagDtos = reportTags.stream()
                 .map(tag -> GetReportTagDto.builder()
                         .id(tag.getId())
@@ -133,6 +155,20 @@ public class ReportService {
 
     public String parseAiRecommend(String text){
         return text.replace("\"", "");
+    }
+
+    public String postNewAiMemory(Long id, ZonedDateTime today){
+        PostFastApiUserMemoryDto userDto = PostFastApiUserMemoryDto.builder()
+                .member_id(id.intValue())
+                .user_persona("")
+                .schedule_datetime_start(today)
+                .schedule_datetime_end(today)
+                .build();
+
+        //Fast API에 전송하기
+        PostFastApiAiMemoryDto aiDto = fastApiMemoryApi.creatFastApiMemory(userDto);
+
+        return aiDto.getMemory();
     }
 
     public String postNewAiRecommend(Long id, ZonedDateTime today){

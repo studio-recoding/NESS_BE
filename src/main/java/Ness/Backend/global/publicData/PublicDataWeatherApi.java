@@ -1,6 +1,6 @@
 package Ness.Backend.global.publicData;
 
-import Ness.Backend.domain.weather.dto.response.GetPublicDataWeatherDto;
+import Ness.Backend.domain.weather.dto.response.PublicDataWeather;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +19,12 @@ public interface PublicDataWeatherApi {
             "&pageNo={PAGE_NO}" +
             "&dataType={DATA_TYPE}" +
             "&base_date={BASE_DATE}" +
-            "&base_date={BASE_TIME}" +
+            "&base_time={BASE_TIME}" +
             "&nx={NX}" +
             "&ny={NY}",
             consumes = "application/json",
             produces = "application/json")
-    GetPublicDataWeatherDto getPublicDataWeather(
+    PublicDataWeather getPublicDataWeather(
             @RequestHeader("Content-type") String contentType,
             @PathVariable("SERVICE_KEY") String serviceKey,
             @PathVariable("NUMBER_OF_ROWS") int numOfRows,
@@ -32,7 +32,6 @@ public interface PublicDataWeatherApi {
             @PathVariable("DATA_TYPE") String dataType,
             @PathVariable("BASE_DATE") String formattedLocalDate,
             @PathVariable("BASE_TIME") String formattedLocalTime,
-            @PathVariable("NX") double x,
-            @PathVariable("NY") double y);
-    //GetPublicDataWeatherDto
+            @PathVariable("NX") int x,
+            @PathVariable("NY") int y);
 }

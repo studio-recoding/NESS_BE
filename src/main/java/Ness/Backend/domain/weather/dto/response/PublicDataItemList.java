@@ -6,14 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublicDataResponse {
-    @JsonProperty("header")
-    private PublicDataHeader header;
-
-    @JsonProperty("body")
-    private PublicDataBody body;
+public class PublicDataItemList {
+    @JsonProperty("item")
+    List<PublicDataItem> publicDataItems;
 }

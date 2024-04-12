@@ -4,11 +4,13 @@ import Ness.Backend.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class ReportTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,14 +6,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/*
-* 초단기예보
-* */
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetPublicDataWeatherDto {
-    @JsonProperty("response")
-    private PublicDataResponse response;
+public class PublicDataHeader {
+    @JsonProperty("resultCode")
+    private int resultCode;
+
+    @JsonProperty("resultMsg")
+    private String resultMsg;
 }

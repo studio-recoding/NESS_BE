@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -58,6 +57,9 @@ public class ReportService {
         List<ReportMemory> reportMemories = reportMemoryRepository.findTwoWeekUserMemoryByMember_Id(id);
         return createReportMemoryListDto(reportMemories);
     }
+    public PostFastApiAiTagListDto getAiTag(Long id){
+         return postNewAiTag(id, getToday());
+    }
 
     public GetReportTagListDto getTag(Long id){
         // 오늘 날짜 가져오기
@@ -65,25 +67,24 @@ public class ReportService {
 
         List<ReportTag> reportTags = reportTagRepository.findLastMonthReportTagByMember_Id(id);
 
-        if (reportTags == null) {
-            PostFastApiAiTagDto aiDto = postNewAiTag(id, getToday());
+        if (reportTags == null || reportTags.isEmpty()) {
+            PostFastApiAiTagListDto aiDto = postNewAiTag(id, getToday());
 
             Member memberEntity = memberRepository.findMemberById(id);
-            /*
-            for (String tag : aiDto.getTags()) {
+
+            for (PostFastApiAiTagDto tag : aiDto.getTags()) {
                 ReportTag reportTag = ReportTag.builder()
-                        .tagTitle()
-                        .tagDesc()
+                        .tagTitle(tag.getTitle())
+                        .tagDesc(tag.getDesc())
                         .createdDate(now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0))
                         .member(memberEntity)
                         .build();
-
                 reportTagRepository.save(reportTag);
             }
-             */
+            return createReportTagListDto(reportTagRepository.findLastMonthReportTagByMember_Id(id));
+        } else {
+            return createReportTagListDto(reportTags);
         }
-
-        return createReportTagListDto(reportTags);
     }
 
     public GetReportRecommendDto getRecommend(Long id){
@@ -118,6 +119,19 @@ public class ReportService {
         return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
+    public GetReportTagListDto createReportTagListDto(List<ReportTag> reportTags){
+        List<GetReportTagDto> getReportTagDtos = reportTags.stream()
+                .map(tag -> GetReportTagDto.builder()
+                        .id(tag.getId())
+                        .createdDate(tag.getCreatedDate().toString())
+                        .tagTitle(tag.getTagTitle())
+                        .tagDesc(tag.getTagDesc())
+                        .build())
+                .toList();
+
+        return new GetReportTagListDto(getReportTagDtos);
+    }
+
     public GetReportMemoryListDto createReportMemoryListDto(List<ReportMemory> reportMemories) {
         //ReportMemoryListResponseDto에 매핑
         List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
@@ -131,20 +145,6 @@ public class ReportService {
         return new GetReportMemoryListDto(getReportMemoryDtos);
     }
 
-    public GetReportTagListDto createReportTagListDto(List<ReportTag> reportTags) {
-
-        List<GetReportTagDto> getReportTagDtos = reportTags.stream()
-                .map(tag -> GetReportTagDto.builder()
-                        .id(tag.getId())
-                        .createdDate(tag.getCreatedDate().toString())
-                        .tagTitle(tag.getTagTitle())
-                        .tagDesc(tag.getTagDesc())
-                        .build())
-                .toList();
-
-        return new GetReportTagListDto(getReportTagDtos);
-    }
-
     public GetReportRecommendDto createReportRecommendDto(Long id, String date, String text){
         return GetReportRecommendDto.builder()
                 .id(id)
@@ -153,8 +153,16 @@ public class ReportService {
                 .build();
     }
 
-    public String parseAiRecommend(String text){
-        return text.replace("\"", "");
+    public PostFastApiAiTagListDto postNewAiTag(Long id, ZonedDateTime today){
+        PostFastApiUserTagDto userDto = PostFastApiUserTagDto.builder()
+                .member_id(id.intValue())
+                .user_persona("")
+                .schedule_datetime_start(today)
+                .schedule_datetime_end(today)
+                .build();
+
+        //Fast API에 전송하고 값 받아오기
+        return fastApiTagApi.creatFastApiTag(userDto);
     }
 
     public String postNewAiMemory(Long id, ZonedDateTime today){
@@ -171,6 +179,10 @@ public class ReportService {
         return aiDto.getMemory();
     }
 
+    public String parseAiRecommend(String text){
+        return text.replace("\"", "");
+    }
+
     public String postNewAiRecommend(Long id, ZonedDateTime today){
         PostFastApiUserRecommendDto userDto = PostFastApiUserRecommendDto.builder()
                 .member_id(id.intValue())
@@ -183,17 +195,5 @@ public class ReportService {
         PostFastApiAiRecommendDto aiDto = fastApiRecommendApi.creatFastApiRecommend(userDto);
 
         return aiDto.getAnswer();
-    }
-
-    public PostFastApiAiTagDto postNewAiTag(Long id, ZonedDateTime today){
-        PostFastApiUserTagDto userDto = PostFastApiUserTagDto.builder()
-                .member_id(id.intValue())
-                .user_persona("")
-                .schedule_datetime_start(today)
-                .schedule_datetime_end(today)
-                .build();
-
-        //Fast API에 전송하고 값 받아오기
-        return fastApiTagApi.creatFastApiTag(userDto);
     }
 }

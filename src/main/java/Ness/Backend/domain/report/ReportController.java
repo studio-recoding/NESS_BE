@@ -4,12 +4,16 @@ import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.report.dto.response.GetReportMemoryListDto;
 import Ness.Backend.domain.report.dto.response.GetReportRecommendDto;
 import Ness.Backend.domain.report.dto.response.GetReportTagListDto;
+import Ness.Backend.domain.report.dto.response.PostFastApiAiTagListDto;
+import Ness.Backend.domain.report.entity.ReportTag;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

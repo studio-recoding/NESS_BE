@@ -6,14 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostFastApiAiTagDto {
-    @JsonProperty("tag")
-    private String title;
-
-    @JsonProperty("desc")
-    private String desc;
+public class PostFastApiAiTagListDto {
+    @JsonProperty("tagList")
+    private List<PostFastApiAiTagDto> tags;
 }

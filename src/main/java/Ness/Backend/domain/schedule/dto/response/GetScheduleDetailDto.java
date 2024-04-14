@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class GetScheduleDetailDto {
-    @Schema(description = "스케쥴 고유 인식 넘버", example = "0")
-    private Long id;
-
     @Schema(description = "스케쥴 위치", example = "이화여대 ECC")
     private String location;
 
@@ -19,8 +16,7 @@ public class GetScheduleDetailDto {
     private String person;
 
     @Builder
-    public GetScheduleDetailDto(Long id, String location, String person){
-        this.id = id;
+    public GetScheduleDetailDto(String location, String person){
         this.location = location;
         this.person = person;
     }

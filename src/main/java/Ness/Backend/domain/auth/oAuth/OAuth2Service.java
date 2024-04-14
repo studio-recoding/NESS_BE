@@ -84,11 +84,11 @@ public class OAuth2Service {
         String name = resourceDto.getName();
 
         if (checkSignUp(email)){
-        //if (getAuthentication(email, id)){
+            log.info("로그인하는 경우");
             return getToken(email);
         } else {
             socialSignUp(email, id, picture, nickname, name);
-            //getAuthentication(email, id);
+            log.info("회원가입하는 경우");
             return getToken(email);
         }
     }
@@ -116,6 +116,7 @@ public class OAuth2Service {
 
     /* oauth 서버에서 access_token 받아옴 */
     private String getOAuthAccessToken(String authorizationCode, String registration) {
+        log.info("access token 가져오는 로직 호출");
         String clientId = env.getProperty("oauth2." + registration + ".client-id");
         String clientSecret = env.getProperty("oauth2." + registration + ".client-secret");
         String redirectUri = env.getProperty("oauth2." + registration + ".redirect-uri");
@@ -128,6 +129,7 @@ public class OAuth2Service {
                                 redirectUri,
                                 "authorization_code")
                         .getAccessToken();
+                log.info("구글 accessToken: " + accessToken);
                 break;
             case "kakao":
                 accessToken = kakaoOAuthApi
@@ -144,15 +146,15 @@ public class OAuth2Service {
                                 "authorization_code",
                                 URLEncoder.encode(state, StandardCharsets.UTF_8))
                         .getAccessToken();
-                log.info("accessToken: " + accessToken);
                 break;
         }
-
+        log.info("accessToken: " + accessToken);
         return accessToken;
     }
 
     /* 리다이렉트 URL을 통해서 리소스 가져옴 */
     private ResourceDto getUserResource(String accessToken, String registration) {
+        log.info("유저 리소스 가져오는 로직 호출");
         ResourceDto resourceDto = null;
 
         switch (registration) {

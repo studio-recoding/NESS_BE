@@ -58,6 +58,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://localhost:8080");
+        configuration.addAllowedOrigin("https://nessplanning.com");
+        configuration.addAllowedOrigin("https://nessplanning.com:3000");
         configuration.addAllowedOriginPattern("https://*.nessplanning.com");
         configuration.addAllowedOriginPattern("https://*.nessplanning.com:8080");
         configuration.addAllowedOriginPattern("https://*.nessplanning.com:3000");

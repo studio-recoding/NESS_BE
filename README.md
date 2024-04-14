@@ -16,7 +16,6 @@
 - java version: "17.0.6" 2023-01-17 LTS
 - Spring boot version: 3.2.2
 - Project: Gradle-Groovy
-- IntelliJ IDEA or eclipse
 
 ### 2) Clone
 Clone this repository to your local computer using:

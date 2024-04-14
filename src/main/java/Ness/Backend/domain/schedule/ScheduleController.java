@@ -2,6 +2,7 @@ package Ness.Backend.domain.schedule;
 
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
+import Ness.Backend.domain.schedule.dto.request.PostScheduleTimeDto;
 import Ness.Backend.domain.schedule.dto.response.GetOneMonthSchedulesDto;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +38,13 @@ public class ScheduleController {
     public ResponseEntity<GetOneMonthSchedulesDto> getUserSchedule(@AuthUser Member member, @RequestParam String month){
         GetOneMonthSchedulesDto oneUserMonthSchedules = scheduleService.getOneMonthUserSchedule(member.getId(), month);
         return new ResponseEntity<>(oneUserMonthSchedules, HttpStatusCode.valueOf(200));
+    }
+
+    @PostMapping("/time")
+    @Operation(summary = "특정 스케쥴의 시간을 바꾸는 API입니다.", description = "&month=2024-01 와 같은 형식으로 데이터가 전달됩니다.")
+    public ResponseEntity<?> postUserScheduleTime(@AuthUser Member member, @RequestBody PostScheduleTimeDto postScheduleTimeDto){
+        scheduleService.changeScheduleTime(member.getId(), postScheduleTimeDto);
+        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("/new")

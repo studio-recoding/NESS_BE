@@ -22,4 +22,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             @Param("memberId") Long memberId,
             @Param("year") int year,
             @Param("month") int month);
+
+    //스케쥴 ID로 특정 스케쥴 찾아주기
+    Schedule findScheduleById(Long scheduleId);
 }

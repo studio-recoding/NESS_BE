@@ -4,6 +4,7 @@ import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
+import Ness.Backend.domain.schedule.dto.request.PostScheduleTimeDto;
 import Ness.Backend.domain.schedule.dto.response.GetOneMonthSchedulesDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
@@ -24,12 +25,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
+@Transactional
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final MemberRepository memberRepository;
     private final FastApiScheduleApi fastApiScheduleApi;
 
+    @Transactional(readOnly = true)
     public GetOneMonthSchedulesDto getOneMonthUserSchedule(Long id, String date){
         log.info("getOneMonthUserSchedule called by "+ id);
         // 년도, 월, 일 추출
@@ -42,13 +44,13 @@ public class ScheduleService {
         // ScheduleListResponseDto에 매핑
         List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
                 .map(schedule -> GetScheduleDto.builder()
+                        .id(schedule.getId())
                         .category(schedule.getCategory().getName())
                         .categoryNum(schedule.getCategory().getId())
                         .info(schedule.getInfo())
                         .startTime(schedule.getStartTime())
                         .endTime(schedule.getEndTime())
                         .details(GetScheduleDetailDto.builder()
-                                .id(schedule.getId())
                                 .person(schedule.getPerson())
                                 .location(schedule.getLocation())
                                 .build())
@@ -57,7 +59,11 @@ public class ScheduleService {
         return new GetOneMonthSchedulesDto(getScheduleDtos);
     }
 
-    @Transactional
+    public void changeScheduleTime(Long id, PostScheduleTimeDto postScheduleTimeDto){
+        Schedule schedule = scheduleRepository.findScheduleById(postScheduleTimeDto.getId());
+        schedule.changeTime(postScheduleTimeDto.getStartTime(), postScheduleTimeDto.getEndTime());
+    }
+
     public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
         log.info("postNewUserSchedule called by "+ id);
         Member memberEntity = memberRepository.findMemberById(id);

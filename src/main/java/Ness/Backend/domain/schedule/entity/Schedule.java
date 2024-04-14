@@ -54,4 +54,9 @@ public class Schedule {
         this.chat = chat;
     }
 
+    public void changeTime(ZonedDateTime startTime, ZonedDateTime endTime){
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
 }

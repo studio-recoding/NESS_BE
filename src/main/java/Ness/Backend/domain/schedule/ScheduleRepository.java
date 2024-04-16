@@ -23,6 +23,15 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             @Param("year") int year,
             @Param("month") int month);
 
+    //TODO: 현재는 가장 첫번째 행 데이터를 가져옴->기준을 만들 필요 있음
+    @Query( value = "SELECT * FROM schedule " +
+            "WHERE member_id = :memberId " +
+            "AND DATE(start_time) = CURDATE() " +
+            "ORDER BY start_time ASC",
+            nativeQuery = true)
+    Schedule findTodayOneScheduleByMember_Id(
+            @Param("memberId") Long memberId);
+
     //스케쥴 ID로 특정 스케쥴 찾아주기
     Schedule findScheduleById(Long scheduleId);
 }

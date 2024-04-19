@@ -27,7 +27,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query( value = "SELECT * FROM schedule " +
             "WHERE member_id = :memberId " +
             "AND DATE(start_time) = CURDATE() " +
-            "ORDER BY start_time ASC",
+            "ORDER BY start_time ASC LIMIT 1",
             nativeQuery = true)
     Schedule findTodayOneScheduleByMember_Id(
             @Param("memberId") Long memberId);

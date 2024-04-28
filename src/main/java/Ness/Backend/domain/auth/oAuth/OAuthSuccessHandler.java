@@ -14,9 +14,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
+/*OAuth 인증에 성공하면 시큐리티가 접근 시켜주는 클래스*/
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -42,13 +42,21 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 
     private String setRedirectUrl(String url) {
         String redirect_url = null;
+        /* 백엔드 개발 환경
         if (url.equals("localhost")) {
-            redirect_url = "http://localhost:3000/login/oauth/google";
+            redirect_url = "http://localhost:8080/oauth/google/success";
+            log.info("OAuth in localhost");
         }
-        if (url.equals("nessplanning.com")) {
-            redirect_url = "https://www.nessplanning.com/login/oauth/google";
+         */
+        /* 리엑트 개발 환경 */
+        if (url.equals("localhost")) {
+            redirect_url = "http://localhost:3000/oauth/google/success/ing";
         }
 
+        /* 리엑트 프로덕션 환경 */
+        if (url.equals("www.nessplanning.com")) {
+            redirect_url = "https://www.nessplanning.com/oauth/google/success/ing";
+        }
         return redirect_url;
     }
 }

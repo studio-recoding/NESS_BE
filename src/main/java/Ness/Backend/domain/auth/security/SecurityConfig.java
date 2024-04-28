@@ -34,7 +34,6 @@ public class SecurityConfig {
     private final OAuth2CustomUserService oAuth2CustomUserService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final RefreshTokenService refreshTokenService;
-    private final OAuthSuccessHandler oAuthSuccessHandler;
 
     /* 회원가입: 패스워드 암호화를 위해 사용 */
     @Bean
@@ -46,6 +45,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public OAuthSuccessHandler oAuthSuccessHandler(){
+        return new OAuthSuccessHandler(jwtTokenProvider());
     }
 
     /* 로그인: 사용자 정보(memberRepository 내용)를 토대로 토큰을 생성하거나 검증 */
@@ -94,7 +98,7 @@ public class SecurityConfig {
                 .oauth2Login((oauth2) -> oauth2 //oauth가 성공하면 보내줄 포인트
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(oAuth2CustomUserService))
-                        .successHandler(oAuthSuccessHandler))
+                        .successHandler(oAuthSuccessHandler()))
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         //.requestMatchers("/signup/**", "/login/**").permitAll() // 회원가입 및 로그인 경로는 인증 생략

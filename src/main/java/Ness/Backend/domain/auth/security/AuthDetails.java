@@ -71,7 +71,8 @@ public class AuthDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return String.valueOf(attributes.get("id"));
+        return String.valueOf(attributes.get("email"));
+        //return String.valueOf(attributes.get("id"));
     }
 
     public AuthDetails(Member member, Map<String, Object> attributes, Collection<GrantedAuthority> authorities) {

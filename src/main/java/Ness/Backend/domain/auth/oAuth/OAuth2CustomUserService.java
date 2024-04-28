@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,32 +34,51 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+        }
 
         /*공급자 정보인 registrationId(구글, 카카오, 네이버)*/
         String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
+        log.info(registrationId);
 
         /*사용자 정보 엔드포인트인 userInfoEndpoint*/
         ClientRegistration.ProviderDetails.UserInfoEndpoint userInfoEndpoint = oAuth2UserRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint();
 
-        /*oauth 속 개인정보*/
-        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
-        log.info((String) properties.get("email"));
+        String id = null;
+        String email = null;
+        String picture = null;
+        String nickname = null;
+        String name = null;
+
+        if (Objects.equals(registrationId, "google")){
+            id = (String) attributes.get("id");
+            email = (String) attributes.get("email");
+            picture = (String) attributes.get("picture");
+            nickname = (String) attributes.get("name");
+            name = (String) attributes.get("name");
+        }
 
         Member member;
-        /*회원 가입 여부 확인 및 RefreshToken update*/
-        if (!memberRepository.existsByEmail(oAuth2User.getName())) {
-            memberService.createMember(
-                    (String) properties.get("email"),
-                    (String) properties.get("id"),
-                    (String) properties.get("picture"), //프로필 URL
-                    (String) properties.get("name"),    // 닉네임
-                    (String) properties.get("name"));   //이름
-            member = memberRepository.findMemberByEmail(oAuth2User.getName());
-        } else {
-            member = memberRepository.findMemberByEmail(oAuth2User.getName());
+        /*이메일로 회원 가입 여부 확인*/
+        if (!memberRepository.existsByEmail(email)) {
+            memberService.createMember(email, id, picture, nickname, name);
         }
+        member = memberRepository.findMemberByEmail(email);
 
         log.info(member.getMemberRole().getRole());
         return new AuthDetails(member, attributes, Collections.singleton(new SimpleGrantedAuthority(member.getMemberRole().getRole())));
     }
+
+//    -------------google response------------
+//    {
+//        "id" : "00000000000000000000",
+//        "email" : "sample@gmail.com",
+//        "verified_email" : true,
+//        "name" : "홍길동",
+//        "given_name" : "길동",
+//        "family_name" : "홍",
+//        "picture" : "https://url 경로",
+//        "locale" : "ko"
+//    }
 }

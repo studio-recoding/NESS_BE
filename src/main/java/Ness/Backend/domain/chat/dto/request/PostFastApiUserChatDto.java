@@ -13,4 +13,7 @@ import lombok.NoArgsConstructor;
 public class PostFastApiUserChatDto {
     @JsonProperty("prompt")
     private String message;
+
+    @JsonProperty("persona")
+    private String persona;
 }

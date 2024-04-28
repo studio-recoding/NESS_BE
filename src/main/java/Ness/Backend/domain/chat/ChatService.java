@@ -83,6 +83,7 @@ public class ChatService {
     public PostFastApiAiChatDto postNewAiChat(Long id, String text){
 
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()
+                .persona("default")
                 .message(text)
                 .build();
 

@@ -16,9 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import java.io.IOException;
+import java.util.Collections;
 
 /* 사용자의 권한 부여
  * 요청에 포함된 JWT 토큰을 검증하고, 토큰에서 추출한 권한 정보를 기반으로 사용자에 대한 권한을 확인
@@ -52,7 +54,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             Member tokenMember = jwtTokenProvider.validJwtToken(jwtToken);
 
             if(tokenMember != null){ //토큰이 정상일 경우
-                AuthDetails authDetails = new AuthDetails(tokenMember);
+                AuthDetails authDetails = new AuthDetails(tokenMember, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
                 /* JWT 토큰 서명이 정상이면 Authentication 객체 생성 */
                 Authentication authentication = new UsernamePasswordAuthenticationToken(authDetails, null, authDetails.getAuthorities());

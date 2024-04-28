@@ -15,6 +15,10 @@ public class AuthDetailService implements UserDetailsService {
     @Override
     public AuthDetails loadUserByUsername(String email) {
         Member member = memberRepository.findMemberByEmail(email);
-        return new AuthDetails(member);
+        if (member != null){
+            return new AuthDetails(member);
+        } else{
+            return null;
+        }
     }
 }

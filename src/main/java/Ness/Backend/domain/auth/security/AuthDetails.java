@@ -6,16 +6,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 @Data
-@RequiredArgsConstructor
-public class AuthDetails implements UserDetails {
+public class AuthDetails implements UserDetails, OAuth2User {
     /* 인증된 사용자에 대한 세부 정보를 다루는 UserDetails의 구현체(Principal 객체) */
-
     private final Member member;
+    private Map<String, Object> attributes;
+    private final Collection<GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -54,5 +56,27 @@ public class AuthDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public AuthDetails(Member member, Collection<GrantedAuthority> authorities) {
+        this.member = member;
+        this.authorities = authorities;
+    }
+
+    /* OAuth */
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return String.valueOf(attributes.get("id"));
+    }
+
+    public AuthDetails(Member member, Map<String, Object> attributes, Collection<GrantedAuthority> authorities) {
+        this.member = member;
+        this.attributes = attributes;
+        this.authorities = authorities;
     }
 }

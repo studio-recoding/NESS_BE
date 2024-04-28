@@ -4,6 +4,9 @@ import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
 import Ness.Backend.domain.auth.jwt.JwtAuthenticationFilter;
 import Ness.Backend.domain.auth.jwt.JwtAuthorizationFilter;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
+import Ness.Backend.domain.auth.oAuth.OAuth2CustomUserService;
+import Ness.Backend.domain.auth.oAuth.OAuth2Service;
+import Ness.Backend.domain.auth.oAuth.OAuthSuccessHandler;
 import Ness.Backend.domain.member.MemberRepository;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +24,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.Duration;
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -29,8 +31,10 @@ import java.util.Arrays;
 public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final AuthDetailService authDetailService;
+    private final OAuth2CustomUserService oAuth2CustomUserService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final RefreshTokenService refreshTokenService;
+    private final OAuthSuccessHandler oAuthSuccessHandler;
 
     /* 회원가입: 패스워드 암호화를 위해 사용 */
     @Bean
@@ -87,12 +91,10 @@ public class SecurityConfig {
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션을 생성하지 않음->토큰 기반 인증 필요
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider(), refreshTokenService))  //사용자 인증
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(),  jwtTokenProvider(), authDetailService)) //사용자 권한 부여
-                /*
-                .exceptionHandling((exceptionHandling) ->
-
-                        exceptionHandling.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                ) //인가(Authorization)가 실패시 실행, 항상 JwtAuthenticationFilter 뒤에 설정되어 있어야 함.
-                 */
+                .oauth2Login((oauth2) -> oauth2 //oauth가 성공하면 보내줄 포인트
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                                .userService(oAuth2CustomUserService))
+                        .successHandler(oAuthSuccessHandler))
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         //.requestMatchers("/signup/**", "/login/**").permitAll() // 회원가입 및 로그인 경로는 인증 생략

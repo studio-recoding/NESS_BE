@@ -45,24 +45,35 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
         /*사용자 정보 엔드포인트인 userInfoEndpoint*/
         ClientRegistration.ProviderDetails.UserInfoEndpoint userInfoEndpoint = oAuth2UserRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint();
 
-        String id = null;
+        String password = null;
         String email = null;
         String picture = null;
         String nickname = null;
         String name = null;
 
         if (Objects.equals(registrationId, "google")){
-            id = (String) attributes.get("id");
+            password = (String) attributes.get("id");
             email = (String) attributes.get("email");
             picture = (String) attributes.get("picture");
             nickname = (String) attributes.get("name");
             name = (String) attributes.get("name");
         }
 
+        if (Objects.equals(registrationId, "kakao")){
+            Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+
+            password = String.valueOf(attributes.get("id"));
+            email = (String) kakaoAccount.get("email");
+            picture = (String) properties.get("profile_image");
+            nickname = (String) properties.get("nickname");
+            name = (String) properties.get("nickname");
+        }
+
         Member member;
         /*이메일로 회원 가입 여부 확인*/
         if (!memberRepository.existsByEmail(email)) {
-            memberService.createMember(email, id, picture, nickname, name);
+            memberService.createMember(email, password, picture, nickname, name);
         }
         member = memberRepository.findMemberByEmail(email);
 
@@ -80,5 +91,17 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
 //        "family_name" : "홍",
 //        "picture" : "https://url 경로",
 //        "locale" : "ko"
+//    }
+
+//    -------------kakao response------------
+//    {
+//        "id":00000000000000000000,
+//            "properties":{
+//                "nickname":"홍길동",
+//                "profile_image":"https://url 경로"
+//            },
+//        "kakao_account":{
+//        "email":"414catherine@gmail.com"
+//        }
 //    }
 }

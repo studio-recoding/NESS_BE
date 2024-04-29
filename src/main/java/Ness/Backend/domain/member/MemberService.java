@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
-    //private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     public void deleteMember(Member member) {
         profileRepository.delete(member.getProfile());
         /* 소프트 삭제 */
@@ -25,8 +25,7 @@ public class MemberService {
     public Member createMember(String email, String password, String picture, String nickname, String name) {
         Member member = Member.builder()
                 .email(email)
-                //.password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
-                .password(password)
+                .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
                 .build();
 
         Profile profile = Profile.builder()

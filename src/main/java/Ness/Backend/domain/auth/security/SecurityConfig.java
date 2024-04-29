@@ -5,7 +5,6 @@ import Ness.Backend.domain.auth.jwt.JwtAuthenticationFilter;
 import Ness.Backend.domain.auth.jwt.JwtAuthorizationFilter;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.auth.oAuth.OAuth2CustomUserService;
-import Ness.Backend.domain.auth.oAuth.OAuth2Service;
 import Ness.Backend.domain.auth.oAuth.OAuthSuccessHandler;
 import Ness.Backend.domain.member.MemberRepository;
 import jakarta.servlet.DispatcherType;
@@ -34,12 +33,6 @@ public class SecurityConfig {
     private final OAuth2CustomUserService oAuth2CustomUserService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final RefreshTokenService refreshTokenService;
-
-    /* 회원가입: 패스워드 암호화를 위해 사용 */
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
 
     /* 로그인: 사용자의 자격 증명을 검증 및 권한 부여 */
     @Bean

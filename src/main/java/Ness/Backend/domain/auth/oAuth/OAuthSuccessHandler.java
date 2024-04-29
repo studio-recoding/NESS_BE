@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -46,12 +45,12 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         /* 백엔드 개발 환경
         if (url.equals("localhost")) {
             redirect_url = "http://localhost:8080/oauth/google/success";
-            log.info("OAuth in localhost");
+            log.info("OAuth in localhost"); //api.nessplanning.com
         }
          */
-        /* 리엑트 개발 환경 */
-        if (url.equals("localhost")) {
-            log.info("localhost");
+        /* 백엔드 프로덕션 환경 */
+        if (url.equals("api.nessplanning.com")) {
+            log.info("api.nessplanning.com");
             redirect_url = "http://localhost:3000/oauth/google/success/ing";
         }
 

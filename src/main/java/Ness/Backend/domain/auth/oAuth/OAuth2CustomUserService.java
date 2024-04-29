@@ -5,7 +5,6 @@ import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.MemberService;
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.domain.profile.entity.Profile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,6 +23,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Service
 public class OAuth2CustomUserService extends DefaultOAuth2UserService {
+    private static final String DEFAULT_STRING = "default";
+
     private final MemberRepository memberRepository;
     private final MemberService memberService;
 
@@ -34,22 +35,18 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-        }
 
         /*공급자 정보인 registrationId(구글, 카카오, 네이버)*/
         String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
-        log.info(registrationId);
 
         /*사용자 정보 엔드포인트인 userInfoEndpoint*/
         ClientRegistration.ProviderDetails.UserInfoEndpoint userInfoEndpoint = oAuth2UserRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint();
 
-        String password = null;
-        String email = null;
-        String picture = null;
-        String nickname = null;
-        String name = null;
+        String password = DEFAULT_STRING;
+        String email = DEFAULT_STRING;
+        String picture = DEFAULT_STRING;
+        String nickname = DEFAULT_STRING;
+        String name = DEFAULT_STRING;
 
         if (Objects.equals(registrationId, "google")){
             password = (String) attributes.get("id");
@@ -70,14 +67,23 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
             name = (String) properties.get("nickname");
         }
 
+        if (Objects.equals(registrationId, "naver")){
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+
+            password = String.valueOf(response.get("id"));
+            email = (String) response.get("email");
+            picture = (String) response.get("profile_image");
+            nickname = (String) response.get("nickname");
+            name = (String) response.get("name");
+        }
+
         Member member;
         /*이메일로 회원 가입 여부 확인*/
-        if (!memberRepository.existsByEmail(email)) {
+        if (!memberRepository.existsByEmail(email) && !Objects.equals(password, DEFAULT_STRING)) {
             memberService.createMember(email, password, picture, nickname, name);
         }
         member = memberRepository.findMemberByEmail(email);
 
-        log.info(member.getMemberRole().getRole());
         return new AuthDetails(member, attributes, Collections.singleton(new SimpleGrantedAuthority(member.getMemberRole().getRole())));
     }
 
@@ -101,7 +107,17 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
 //                "profile_image":"https://url 경로"
 //            },
 //        "kakao_account":{
-//        "email":"414catherine@gmail.com"
+//        "email":"sample@gmail.com",
 //        }
+//    }
+
+//    -------------naver response------------
+//    {
+//        "response": {
+//                "email": "sample@gmail.com",
+//                "nickname": "홍길동",
+//                "profile_image": "https://url 경로"
+//                "id": "00000000000000000000",
+//                "name": "홍길동",
 //    }
 }

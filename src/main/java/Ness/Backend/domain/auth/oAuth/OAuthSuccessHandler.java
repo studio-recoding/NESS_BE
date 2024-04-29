@@ -41,6 +41,7 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
     }
 
     private String setRedirectUrl(String url) {
+        log.info(url);
         String redirect_url = null;
         /* 백엔드 개발 환경
         if (url.equals("localhost")) {
@@ -50,11 +51,13 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
          */
         /* 리엑트 개발 환경 */
         if (url.equals("localhost")) {
+            log.info("localhost");
             redirect_url = "http://localhost:3000/oauth/google/success/ing";
         }
 
         /* 리엑트 프로덕션 환경 */
         if (url.equals("www.nessplanning.com")) {
+            log.info("www.nessplanning.com");
             redirect_url = "https://www.nessplanning.com/oauth/google/success/ing";
         }
         return redirect_url;

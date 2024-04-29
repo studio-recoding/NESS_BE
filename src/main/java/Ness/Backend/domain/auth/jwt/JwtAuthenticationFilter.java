@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -67,14 +68,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         /* 가장 흔한 방식인 Bearer Token을 사용해 응답 */
         response.addHeader("Authorization", "Bearer " + jwtToken.getJwtAccessToken());
         response.addHeader("Refresh-Token", "Bearer " + jwtToken.getJwtRefreshToken());
-
-        //TODO: JwtToken 과 함께 리다이렉트
-        /*
-        String targetUrl = UriComponentsBuilder.fromUriString(setRedirectUrl(request.getServerName()))
-                .queryParam("jwtAccessToken", jwtToken.getJwtAccessToken())
-                .queryParam("jwtRefreshToken", jwtToken.getJwtRefreshToken())
-                .build().toUriString();
-         */
     }
 
     /*

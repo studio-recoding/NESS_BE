@@ -69,20 +69,4 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader("Authorization", "Bearer " + jwtToken.getJwtAccessToken());
         response.addHeader("Refresh-Token", "Bearer " + jwtToken.getJwtRefreshToken());
     }
-
-    /*
-    private String setRedirectUrl(String url) {
-        String redirect_url = null;
-        if (url.equals("localhost")) {
-            redirect_url = "http://localhost:8080/oauth/google/success";
-        }
-        if (url.equals("ness.site")) {
-            redirect_url = "http://localhost:3000/oauth/google/success/ing";
-        }
-        if (url.equals("ness.com")) {
-            redirect_url = "https://www.teampple.com/oauth/google/success/ing";
-        }
-        return redirect_url;
-    }
-     */
 }

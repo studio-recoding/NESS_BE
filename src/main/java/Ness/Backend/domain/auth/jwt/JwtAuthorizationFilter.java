@@ -30,7 +30,6 @@ import java.util.Collections;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private JwtTokenProvider jwtTokenProvider;
-
     private AuthDetailService authDetailService;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDetailService authDetailService) {

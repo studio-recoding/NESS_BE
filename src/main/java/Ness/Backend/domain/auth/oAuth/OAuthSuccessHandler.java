@@ -40,25 +40,18 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
     }
 
     private String setRedirectUrl(String url) {
-        log.info(url);
         String redirect_url = null;
-        /* 백엔드 개발 환경
+
+        /* 백엔드 개발 환경 */
         if (url.equals("localhost")) {
             redirect_url = "http://localhost:8080/oauth/google/success";
-            log.info("OAuth in localhost"); //api.nessplanning.com
         }
-         */
-        /* 백엔드 프로덕션 환경 */
+        /* 프론트 개발 환경 */
         if (url.equals("api.nessplanning.com")) {
-            log.info("api.nessplanning.com");
             redirect_url = "http://localhost:3000/oauth/google/success/ing";
         }
-
-        /* 리엑트 프로덕션 환경 */
-        if (url.equals("www.nessplanning.com")) {
-            log.info("www.nessplanning.com");
-            redirect_url = "https://www.nessplanning.com/oauth/google/success/ing";
-        }
+        //TODO: 프론트 프로덕션 환경만 지원하는 백엔드 구축
+        
         return redirect_url;
     }
 }

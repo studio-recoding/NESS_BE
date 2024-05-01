@@ -2,6 +2,11 @@ package Ness.Backend.domain.schedule;
 
 import Ness.Backend.domain.category.CategoryRepository;
 import Ness.Backend.domain.category.entity.Category;
+import Ness.Backend.domain.chat.ChatRepository;
+import Ness.Backend.domain.chat.ChatService;
+import Ness.Backend.domain.chat.dto.response.GetChatListDto;
+import Ness.Backend.domain.chat.entity.Chat;
+import Ness.Backend.domain.chat.entity.ChatType;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
@@ -31,6 +36,8 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
+    private final ChatRepository chatRepository;
+    private final ChatService chatService;
     private final FastApiScheduleApi fastApiScheduleApi;
 
     @Transactional(readOnly = true)
@@ -80,6 +87,37 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findScheduleById(id);
         scheduleRepository.delete(schedule);
     }
+
+    @Transactional
+    public GetChatListDto postNewAiSchedule(Long memberId, Boolean idAccepted, Long chatId, PostScheduleDto postScheduleDto){
+        Member member = memberRepository.findMemberById(memberId);
+
+        if(idAccepted = Boolean.TRUE){
+            /* 사용자가 Accept 했으면 스케쥴 생성하기 */
+            Chat chat = chatRepository.findChatById(chatId);
+
+            Schedule newSchedule = Schedule.builder()
+                    .info(postScheduleDto.getInfo())
+                    .location(postScheduleDto.getLocation())
+                    .person(postScheduleDto.getPerson())
+                    .startTime(postScheduleDto.getStartTime())
+                    .endTime(postScheduleDto.getEndTime())
+                    .member(member)
+                    //.category() //이 연관관계들은 나중에 넣어야 함
+                    .chat(chat)
+                    .build();
+            scheduleRepository.save(newSchedule);
+
+            chatService.createNewChat(memberId, "일정을 추가해드렸습니다:)", ChatType.AI, 2, member);
+
+        } else {
+            chatService.createNewChat(memberId, "일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 2, member);
+        }
+
+        // 모든 채팅 내역 반환
+        return chatService.getOneWeekUserChat(memberId);
+    }
+
 
     public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
         log.info("postNewUserSchedule called by "+ id);

@@ -21,4 +21,6 @@ public interface ChatRepository extends JpaRepository<Chat, Long>{
             nativeQuery = true)
     List<Chat> findOneWeekUserChatsByMember_Id(
             @Param("memberId") Long memberId);
+
+    Chat findChatById(Long memberId);
 }

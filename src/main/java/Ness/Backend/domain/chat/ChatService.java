@@ -77,13 +77,13 @@ public class ChatService {
         chatRepository.save(newUserChat);
 
         PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText());
-        String parsedAnswer = parseAiChat(AiDto.getAnswer());
+        //String parsedAnswer = parseAiChat(AiDto.getAnswer());
 
         //AI 챗 답변 저장
         Chat newAiChat = Chat.builder()
                 .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul"))
                         .atZone(ZoneId.of("Asia/Seoul")))
-                .text(parsedAnswer)
+                .text(AiDto.getAnswer())
                 .chatType(ChatType.AI)
                 .caseNumber(AiDto.getCaseNumber()) //AI는 받아온 값으로 저장
                 .member(memberEntity)
@@ -93,10 +93,10 @@ public class ChatService {
         return getOneWeekUserChat(id);
     }
 
-    /* ChatGPT가 답변의 앞뒤에 \를 포함시키므로, 제거 필요 */
+    /* ChatGPT가 답변의 앞뒤에 \를 포함시키므로, 제거 필요
     public String parseAiChat(String text){
         return text.replace("\"", "");
-    }
+    }*/
 
     public PostFastApiAiChatDto postNewAiChat(Long id, String text){
 

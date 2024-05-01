@@ -75,6 +75,12 @@ public class ScheduleService {
         return schedule.getId();
     }
 
+    @Transactional
+    public void deleteSchedule(Long id){
+        Schedule schedule = scheduleRepository.findScheduleById(id);
+        scheduleRepository.delete(schedule);
+    }
+
     public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
         log.info("postNewUserSchedule called by "+ id);
         Member memberEntity = memberRepository.findMemberById(id);

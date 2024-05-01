@@ -28,15 +28,22 @@ public class ScheduleController {
 
     @PostMapping("")
     @Operation(summary = "새로운 스케쥴 생성", description = "새로운 스케쥴 내역 저장하는 API 입니다.")
-    public ResponseEntity<Long> postUserSchedule(@AuthUser Member member, @RequestBody PostScheduleDto postScheduleDto){
+    public ResponseEntity<Long> postOneSchedule(@AuthUser Member member, @RequestBody PostScheduleDto postScheduleDto){
         Long userId  = scheduleService.postNewUserSchedule(member.getId(), postScheduleDto);
         return new ResponseEntity<>(userId, HttpStatusCode.valueOf(201));
     }
 
     @PutMapping("")
     @Operation(summary = "하나의 스케쥴 변경", description = "하나의 스케쥴의 정보를 변경하는 API로 스케쥴, 위치, 사람, 시간 모두 PUT으로 처리합니다.")
-    public ResponseEntity<Long> putUserSchedule(@AuthUser Member member, @RequestBody PutScheduleDto putScheduleDto){
+    public ResponseEntity<Long> putOneSchedule(@AuthUser Member member, @RequestBody PutScheduleDto putScheduleDto){
         Long userId = scheduleService.changeSchedule(member.getId(), putScheduleDto);
         return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
+    }
+
+    @DeleteMapping("")
+    @Operation(summary = "하나의 스케쥴 삭제", description = "하나의 스케쥴의 정보를 변경하는 API로 스케쥴, 위치, 사람, 시간 모두 PUT으로 처리합니다.")
+    public ResponseEntity<Long> deleteOneSchedule(@AuthUser Member member, @RequestParam Long id){
+        scheduleService.deleteSchedule(id);
+        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
     }
 }

@@ -1,5 +1,6 @@
 package Ness.Backend.domain.schedule.entity;
 
+import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.member.entity.Member;
 import jakarta.persistence.*;
@@ -54,9 +55,12 @@ public class Schedule {
         this.chat = chat;
     }
 
-    public void changeTime(ZonedDateTime startTime, ZonedDateTime endTime){
+    public void changeSchedule(String info, String location, String person, ZonedDateTime startTime, ZonedDateTime endTime, Category category){
+        this.info = info;
+        this.location = location;
+        this.person = person;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.category = category;
     }
-
 }

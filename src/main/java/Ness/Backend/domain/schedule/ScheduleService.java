@@ -1,10 +1,12 @@
 package Ness.Backend.domain.schedule;
 
+import Ness.Backend.domain.category.CategoryRepository;
+import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
-import Ness.Backend.domain.schedule.dto.request.PostScheduleTimeDto;
+import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
 import Ness.Backend.domain.schedule.dto.response.GetOneMonthSchedulesDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
@@ -28,6 +30,7 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final MemberRepository memberRepository;
+    private final CategoryRepository categoryRepository;
     private final FastApiScheduleApi fastApiScheduleApi;
 
     @Transactional(readOnly = true)
@@ -58,9 +61,24 @@ public class ScheduleService {
         return new GetOneMonthSchedulesDto(getScheduleDtos);
     }
 
-    public void changeScheduleTime(Long id, PostScheduleTimeDto postScheduleTimeDto){
-        Schedule schedule = scheduleRepository.findScheduleById(postScheduleTimeDto.getId());
-        schedule.changeTime(postScheduleTimeDto.getStartTime(), postScheduleTimeDto.getEndTime());
+    @Transactional
+    public Long changeSchedule(Long id, PutScheduleDto putScheduleDto){
+        Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
+        Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
+        schedule.changeSchedule(
+                putScheduleDto.getInfo(),
+                putScheduleDto.getLocation(),
+                putScheduleDto.getPerson(),
+                putScheduleDto.getStartTime(),
+                putScheduleDto.getEndTime(),
+                category);
+        return schedule.getId();
+    }
+
+    @Transactional
+    public void deleteSchedule(Long id){
+        Schedule schedule = scheduleRepository.findScheduleById(id);
+        scheduleRepository.delete(schedule);
     }
 
     public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){

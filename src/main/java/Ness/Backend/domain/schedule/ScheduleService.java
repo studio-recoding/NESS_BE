@@ -6,7 +6,6 @@ import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
-import Ness.Backend.domain.schedule.dto.request.PostScheduleTimeDto;
 import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
 import Ness.Backend.domain.schedule.dto.response.GetOneMonthSchedulesDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
@@ -60,11 +59,6 @@ public class ScheduleService {
                         .build())
                 .toList();
         return new GetOneMonthSchedulesDto(getScheduleDtos);
-    }
-
-    public void changeScheduleTime(Long id, PostScheduleTimeDto postScheduleTimeDto){
-        Schedule schedule = scheduleRepository.findScheduleById(postScheduleTimeDto.getId());
-        schedule.changeTime(postScheduleTimeDto.getStartTime(), postScheduleTimeDto.getEndTime());
     }
 
     @Transactional

@@ -21,6 +21,8 @@ public class Profile {
 
     private String name;
 
+    private Boolean isEmailActive;
+
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -29,11 +31,16 @@ public class Profile {
         this.nickname = nickname;
     }
 
+    public void updateMailActive(Boolean isEmailActive){
+        this.isEmailActive = isEmailActive;
+    }
+
     @Builder
-    public Profile(String pictureUrl, String nickname, String name, Member member){
+    public Profile(String pictureUrl, String nickname, String name, Member member, Boolean isEmailActive){
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;
         this.name = name;
         this.member = member;
+        this.isEmailActive = isEmailActive;
     }
 }

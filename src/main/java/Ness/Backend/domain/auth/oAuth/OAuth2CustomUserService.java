@@ -80,7 +80,8 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
         Member member;
         /*이메일로 회원 가입 여부 확인*/
         if (!memberRepository.existsByEmail(email) && !Objects.equals(password, DEFAULT_STRING)) {
-            memberService.createMember(email, password, picture, nickname, name);
+            // 이메일 알림 기능은 디폴트로 false
+            memberService.createMember(email, password, picture, nickname, name, false);
         }
         member = memberRepository.findMemberByEmail(email);
 

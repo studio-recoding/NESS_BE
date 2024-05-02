@@ -31,8 +31,7 @@ public class EmailService {
     }
 
     // 매일 오전 자정에 스케쥴링
-    //@Scheduled(cron = "0 0 12 * * *")
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(cron = "0 0 12 * * *")
     public void scheduleEmailCron(){
         log.info("스케쥴링 활성화");
         List<Member> activeMembers = memberRepository.findMembersByProfileIsEmailActive(true);

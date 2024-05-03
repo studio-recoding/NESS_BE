@@ -23,6 +23,20 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             @Param("year") int year,
             @Param("month") int month);
 
+    // 특정 맴버의 한달 치 스케쥴 반환
+    @Query( value = "SELECT * FROM schedule " +
+            "WHERE member_id = :memberId " +
+            "AND YEAR(start_time) = :year " +
+            "AND MONTH(start_time) = :month " +
+            "AND DAY(start_time) = :day " +
+            "ORDER BY start_time ASC",
+            nativeQuery = true)
+    List<Schedule> findOneDaySchedulesByMember_Id(
+            @Param("memberId") Long memberId,
+            @Param("year") int year,
+            @Param("month") int month,
+            @Param("day") int day);
+
     //TODO: 현재는 가장 첫번째 행 데이터를 가져옴->기준을 만들 필요 있음
     @Query( value = "SELECT * FROM schedule " +
             "WHERE member_id = :memberId " +

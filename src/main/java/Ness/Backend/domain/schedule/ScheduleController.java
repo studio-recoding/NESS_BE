@@ -4,7 +4,7 @@ import Ness.Backend.domain.chat.dto.response.GetChatListDto;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
-import Ness.Backend.domain.schedule.dto.response.GetOneMonthSchedulesDto;
+import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,9 +22,9 @@ public class ScheduleController {
 
     @GetMapping("")
     @Operation(summary = "특정 사용자의 한달치 스케쥴 내역", description = "&month=2024-01 와 같은 형식으로 데이터가 전달됩니다.")
-    public ResponseEntity<GetOneMonthSchedulesDto> getUserSchedule(@AuthUser Member member, @RequestParam String month){
-        GetOneMonthSchedulesDto oneUserMonthSchedules = scheduleService.getOneMonthUserSchedule(member.getId(), month);
-        return new ResponseEntity<>(oneUserMonthSchedules, HttpStatusCode.valueOf(200));
+    public ResponseEntity<GetScheduleListDto> getUserSchedule(@AuthUser Member member, @RequestParam String month){
+        GetScheduleListDto oneUserOneMonthSchedules = scheduleService.getOneMonthUserSchedule(member.getId(), month);
+        return new ResponseEntity<>(oneUserOneMonthSchedules, HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("")
@@ -35,14 +35,18 @@ public class ScheduleController {
     }
 
     @PutMapping("")
-    @Operation(summary = "하나의 스케쥴 변경", description = "하나의 스케쥴의 정보를 변경하는 API로 스케쥴, 위치, 사람, 시간 모두 PUT으로 처리합니다.")
-    public ResponseEntity<Long> putOneSchedule(@AuthUser Member member, @RequestBody PutScheduleDto putScheduleDto){
-        Long userId = scheduleService.changeSchedule(member.getId(), putScheduleDto);
-        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(200));
+    @Operation(
+            summary = "하나의 스케쥴 변경",
+            description =
+                    "하나의 스케쥴의 정보를 변경하는 API로 스케쥴, 위치, 사람, 시간 모두 PUT으로 처리합니다." +
+                    "&day=2024-01-01과 같은 형식으로 데이터가 전달됩니다.")
+    public ResponseEntity<GetScheduleListDto> putOneSchedule(@AuthUser Member member, @RequestParam String day, @RequestBody PutScheduleDto putScheduleDto){
+        GetScheduleListDto oneUserOneDaySchedules = scheduleService.changeSchedule(member.getId(), putScheduleDto, day);
+        return new ResponseEntity<>(oneUserOneDaySchedules, HttpStatusCode.valueOf(200));
     }
 
     @DeleteMapping("")
-    @Operation(summary = "하나의 스케쥴 삭제", description = "하나의 스케쥴의 정보를 변경하는 API로 스케쥴, 위치, 사람, 시간 모두 PUT으로 처리합니다.")
+    @Operation(summary = "하나의 스케쥴 삭제", description = "하나의 스케쥴을 삭제하는 API 입니다.")
     public ResponseEntity<Long> deleteOneSchedule(@AuthUser Member member, @RequestParam Long id){
         scheduleService.deleteSchedule(id);
         return new ResponseEntity<>(HttpStatusCode.valueOf(200));
@@ -51,7 +55,7 @@ public class ScheduleController {
     @PostMapping("/ai")
     @Operation(summary = "AI에 의해서 생성된 새로운 스케쥴", description = "프론트가 보내주는 AI에 의해서 생성된 새로운 스케쥴을 Accept/Deny합니다.")
     public ResponseEntity<GetChatListDto> PostAiSchedule(@AuthUser Member member, @RequestParam Boolean isAccepted, @RequestParam Long chatId, @RequestBody PostScheduleDto postScheduleDto){
-        GetChatListDto oneUserChats = scheduleService.postNewAiSchedule(member.getId(), isAccepted, chatId, postScheduleDto);
+        GetChatListDto oneUserChats = scheduleService.postAiScheduleAccept(member.getId(), isAccepted, chatId, postScheduleDto);
         return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
     }
 }

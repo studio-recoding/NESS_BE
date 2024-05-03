@@ -35,7 +35,7 @@
             <img
                     th:if="${image != null}" th:src="${image}"
                     src="https://ness-static-s3.s3.ap-northeast-2.amazonaws.com/email_sample.png"
-                    style="object-fit: cover;"
+                    style="object-fit: cover; width: 490px;"
                     alt="email-image"
             />
         </td>
@@ -43,7 +43,7 @@
     <tr>
         <td colspan="2" style="text-align: center;">
             <p
-                    th:text="|${text}|"
+                    th:utext="|${#strings.replace(text, '&#10;','&lt;br /&gt;')}|"
                     style="font-size: 16px; font-weight: 300; padding-left: 5px; padding-right: 5px; text-align: left; color: #140f33;">
                 오늘 정말 수고 많았어요! 당신의 노력과 열정에 정말 감탄해요.
                 하루 종일 바쁘게 움직이면서도 절대 포기하지 않고 최선을 다하고 있는 모습이 정말 멋져요.

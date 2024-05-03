@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PostFastApiAiEmailDto {
     @JsonProperty("text")
-    private int text;
+    private String text;
 
     // DALL-E에서 생성한 이미지 링크
     @JsonProperty("image")

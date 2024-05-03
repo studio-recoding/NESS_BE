@@ -2,7 +2,6 @@ package Ness.Backend.domain.profile.email;
 
 import Ness.Backend.domain.profile.email.dto.request.PostFastApiUserEmailDto;
 import Ness.Backend.domain.profile.email.dto.response.PostFastApiAiEmailDto;
-import Ness.Backend.domain.report.dto.response.PostFastApiAiTagListDto;
 import Ness.Backend.global.fastApi.FastApiEmailApi;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +31,11 @@ public class AsyncEmailService {
     private final FastApiEmailApi fastApiEmailApi;
     @Async
     public void sendEmailNotice(Long memberId, String email){
-        log.info(email);
+        log.info("Trying to send Email to " + email);
         try {
             PostFastApiAiEmailDto aiDto = postTodayAiAnalysis(memberId, getToday());
             String image = aiDto.getImage();
-            String text = aiDto.toString();
+            String text = aiDto.getText().replace("<br>", "\n");
 
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -44,9 +43,9 @@ public class AsyncEmailService {
             mimeMessageHelper.setSubject("End of Today with NESS"); // 메일 제목
             mimeMessageHelper.setText(setContext(getTodayDate(), image, text), true);
             javaMailSender.send(mimeMessage);
-            log.info("Succeeded to send Email");
+            log.info("Succeeded to send Email to " + email);
         } catch (Exception e) {
-            log.info("Failed to send Email, Error log: ", e);
+            log.info("Failed to send Email to " + email + ", Error log: ", e);
             throw new RuntimeException(e);
         }
     }

@@ -12,7 +12,7 @@ import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
-import Ness.Backend.domain.schedule.dto.response.GetOneMonthSchedulesDto;
+import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
@@ -41,15 +41,43 @@ public class ScheduleService {
     private final FastApiScheduleApi fastApiScheduleApi;
 
     @Transactional(readOnly = true)
-    public GetOneMonthSchedulesDto getOneMonthUserSchedule(Long id, String date){
-        log.info("getOneMonthUserSchedule called by "+ id);
+    public GetScheduleListDto getOneMonthUserSchedule(Long memberId, String date){
+        log.info("getOneMonthUserSchedule called by "+ memberId);
         // 년도, 월, 일 추출
         String[] parts = date.split("-");
         int year = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]);
 
-        List<Schedule> scheduleList = scheduleRepository.findOneMonthSchedulesByMember_Id(id, year, month);
-        
+        return makeScheduleListDto(
+                scheduleRepository
+                        .findOneMonthSchedulesByMember_Id(memberId, year, month));
+    }
+
+    /* 사용자가 직접 변경한 스케쥴 */
+    @Transactional
+    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto, String date){
+        // 년도, 월, 일 추출
+        String[] parts = date.split("-");
+        int year = Integer.parseInt(parts[0]);
+        int month = Integer.parseInt(parts[1]);
+        int day = Integer.parseInt(parts[2]);
+
+        Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
+        Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
+        schedule.changeSchedule(
+                putScheduleDto.getInfo(),
+                putScheduleDto.getLocation(),
+                putScheduleDto.getPerson(),
+                putScheduleDto.getStartTime(),
+                putScheduleDto.getEndTime(),
+                category);
+
+        return makeScheduleListDto(
+                scheduleRepository
+                .findOneDaySchedulesByMember_Id(memberId, year, month, day));
+    }
+
+    public GetScheduleListDto makeScheduleListDto(List<Schedule> scheduleList){
         // ScheduleListResponseDto에 매핑
         List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
                 .map(schedule -> GetScheduleDto.builder()
@@ -65,21 +93,7 @@ public class ScheduleService {
                                 .build())
                         .build())
                 .toList();
-        return new GetOneMonthSchedulesDto(getScheduleDtos);
-    }
-
-    @Transactional
-    public Long changeSchedule(Long id, PutScheduleDto putScheduleDto){
-        Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
-        Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
-        schedule.changeSchedule(
-                putScheduleDto.getInfo(),
-                putScheduleDto.getLocation(),
-                putScheduleDto.getPerson(),
-                putScheduleDto.getStartTime(),
-                putScheduleDto.getEndTime(),
-                category);
-        return schedule.getId();
+        return new GetScheduleListDto(getScheduleDtos);
     }
 
     @Transactional
@@ -88,11 +102,12 @@ public class ScheduleService {
         scheduleRepository.delete(schedule);
     }
 
+    /* 사용자가 AI가 생성한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
     @Transactional
-    public GetChatListDto postNewAiSchedule(Long memberId, Boolean idAccepted, Long chatId, PostScheduleDto postScheduleDto){
+    public GetChatListDto postAiScheduleAccept(Long memberId, Boolean idAccepted, Long chatId, PostScheduleDto postScheduleDto){
         Member member = memberRepository.findMemberById(memberId);
 
-        if(idAccepted = Boolean.TRUE){
+        if(idAccepted){
             /* 사용자가 Accept 했으면 스케쥴 생성하기 */
             Chat chat = chatRepository.findChatById(chatId);
 
@@ -106,6 +121,7 @@ public class ScheduleService {
                     //.category() //이 연관관계들은 나중에 넣어야 함
                     .chat(chat)
                     .build();
+
             scheduleRepository.save(newSchedule);
 
             chatService.createNewChat(memberId, "일정을 추가해드렸습니다:)", ChatType.AI, 2, member);
@@ -119,6 +135,7 @@ public class ScheduleService {
     }
 
 
+    /* 사용자가 직접 생성한 스케쥴을 RDB & VectorDB에 저장 */
     public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
         log.info("postNewUserSchedule called by "+ id);
         Member memberEntity = memberRepository.findMemberById(id);

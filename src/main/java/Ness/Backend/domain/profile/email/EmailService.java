@@ -29,7 +29,7 @@ public class EmailService {
         profile.updateMailActive(isActive); // 이메일 활성화 여부 변경
     }
 
-    // 매일 오전 자정에 스케쥴링
+    // 매일 오전 자정에 스케쥴링(서버 시간 서울)
     @Scheduled(cron = "0 0 12 * * *")
     public void scheduleEmailCron(){
         log.info("스케쥴링 활성화");

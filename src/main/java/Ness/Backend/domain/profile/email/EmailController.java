@@ -24,7 +24,7 @@ public class EmailController {
     @PostMapping("/test")
     @Operation(summary = "이메일 기능 테스트 API", description = "사용자가 어떤 이메일이 오는지 궁금할 때 테스트할 수 있는 API 입ㄴ디ㅏ.")
     public ResponseEntity<?> sendOverview(@AuthUser Member member){
-        emailService.sendEmailTest(member.getEmail());
+        emailService.sendEmailTest(member.getId(), member.getEmail());
         return new ResponseEntity<>(HttpStatusCode.valueOf(200));
     }
 }

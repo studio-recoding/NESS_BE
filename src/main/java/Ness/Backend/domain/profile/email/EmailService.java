@@ -37,12 +37,11 @@ public class EmailService {
         List<Member> activeMembers = memberRepository.findMembersByProfileIsEmailActive(true);
 
         for (Member member : activeMembers) {
-            String email = member.getEmail();
-            asyncEmailService.sendEmailNotice(email);
+            asyncEmailService.sendEmailNotice(member.getId(), member.getEmail());
         }
     }
 
-    public void sendEmailTest(String email){
-        asyncEmailService.sendEmailNotice(email);
+    public void sendEmailTest(Long memberId, String email){
+        asyncEmailService.sendEmailNotice(memberId, email);
     }
 }

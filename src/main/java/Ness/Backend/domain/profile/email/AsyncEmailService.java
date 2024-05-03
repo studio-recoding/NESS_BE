@@ -28,20 +28,28 @@ public class AsyncEmailService {
     @Async
     public void sendEmailNotice(String email){
         log.info(email);
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
+            // getTodayAiAnalysis();
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setTo(email); // 메일 수신자
             mimeMessageHelper.setSubject("End of Today with NESS"); // 메일 제목
             mimeMessageHelper.setText(setContext(getTodayDate()), true);
             javaMailSender.send(mimeMessage);
-
             log.info("Succeeded to send Email");
         } catch (Exception e) {
-            log.info("Failed to send Email");
+            log.info("Failed to send Email, Error log: ", e);
             throw new RuntimeException(e);
         }
     }
+
+    // TODO: AI 백엔드에서 오늘 일정 분석 가져오기
+    /*
+    public String getTodayAiAnalysis(){
+        String answer;
+        return answer;
+    }
+     */
 
     public String getTodayDate(){
         ZonedDateTime todayDate = LocalDateTime.now(ZoneId.of("Asia/Seoul")).atZone(ZoneId.of("Asia/Seoul"));

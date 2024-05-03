@@ -11,7 +11,8 @@
 </head>
 <body>
 <div style="margin:0px; width:100%; background-color:#F2F0FF; padding:0px; padding-top:8px;">
-<table style="width: 512px; align-content: center; position: relative; overflow: hidden; background: #fff;
+<table
+        style="width: 512px; align-content: center; position: relative; overflow: hidden; background: #fff;
         margin: 0px auto; max-width:512px; background-color:#ffffff; padding:0px">
     <tr>
         <td style="height: 49px;">
@@ -19,9 +20,9 @@
                     src="https://ness-static-s3.s3.ap-northeast-2.amazonaws.com/ness_logo.png"
                     style="width: 40px; height: 40px; vertical-align: middle;"
             />
-            <p style="font-size: 20px; font-weight: 700; text-align: left; color: #140f33; display: inline-block; vertical-align: middle; margin-left: 10px;"
-               th:text="|${date}, 오늘 하루도 수고한 당신에게|">
-                오늘 하루도 수고한 당신에게
+            <p
+                    style="font-size: 20px; font-weight: 700; text-align: left; color: #140f33; display: inline-block; vertical-align: middle; margin-left: 10px;"
+                    th:text="|${date}, 오늘 하루도 수고한 당신에게|">오늘 하루도 수고한 당신에게
             </p>
         </td>
     </tr>
@@ -34,23 +35,20 @@
             <img
                     th:if="${image != null}" th:src="${image}"
                     src="https://ness-static-s3.s3.ap-northeast-2.amazonaws.com/email_sample.png"
-                    style="object-fit: cover;"
+                    style="object-fit: cover; width: 490px;"
                     alt="email-image"
             />
         </td>
     </tr>
     <tr>
         <td colspan="2" style="text-align: center;">
-            <p style="font-size: 16px; font-weight: 300; padding-left: 5px; padding-right: 5px; text-align: left; color: #140f33;">
-            <span>오늘 정말 수고 많았어요! 너무 고생했어요! 당신의 노력과 열정에 정말 감탄해요. 하루 종일
-              바쁘게 움직이면서도 절대 포기하지 않고 최선을 다하고 있는 모습이 정말 멋져요. 함께 있는
-              모든 순간이 너무 즐거워요! 이런 당신이 있어서 정말 행복해요. 앞으로도 함께 화이팅해요!
-              함께 하는 모든 순간이 특별하고 의미있어요. 오늘도 정말 고마워요! 오늘도 정말 고맙습니다.
-              함께한 하루가 뜻깊게 기억될 것입니다.</span><br />
-                <span>내일은 개발, 토익 공부하기 등의 활동이 있습니다. 이를 바탕으로 백엔드 공부를 더
-              공부하시는 건 어떨까요? 토익 공부도 체계적으로 진행해보시면 좋겠어요. 또한, 미리 발표
-              준비를 하는 것도 좋은 것 같아요.
-            </span>
+            <p
+                    th:utext="|${#strings.replace(text, '&#10;','&lt;br /&gt;')}|"
+                    style="font-size: 16px; font-weight: 300; padding-left: 5px; padding-right: 5px; text-align: left; color: #140f33;">
+                오늘 정말 수고 많았어요! 당신의 노력과 열정에 정말 감탄해요.
+                하루 종일 바쁘게 움직이면서도 절대 포기하지 않고 최선을 다하고 있는 모습이 정말 멋져요.
+                오늘 저희가 함께한 시간은 뜻깊게 기억될 거에요.
+                내일을 위해서 오늘은 충분한 휴식을 취하고, 재충전 후 다시 만나요.
             </p>
         </td>
     </tr>

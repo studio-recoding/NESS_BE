@@ -6,7 +6,6 @@ import Ness.Backend.domain.profile.ProfileRepository;
 import Ness.Backend.domain.profile.entity.Profile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,19 +29,18 @@ public class EmailService {
         profile.updateMailActive(isActive); // 이메일 활성화 여부 변경
     }
 
-    // 매일 오전 자정에 스케쥴링
+    // 매일 오전 자정에 스케쥴링(서버 시간 서울)
     @Scheduled(cron = "0 0 12 * * *")
     public void scheduleEmailCron(){
         log.info("스케쥴링 활성화");
         List<Member> activeMembers = memberRepository.findMembersByProfileIsEmailActive(true);
 
         for (Member member : activeMembers) {
-            String email = member.getEmail();
-            asyncEmailService.sendEmailNotice(email);
+            asyncEmailService.sendEmailNotice(member.getId(), member.getEmail());
         }
     }
 
-    public void sendEmailTest(String email){
-        asyncEmailService.sendEmailNotice(email);
+    public void sendEmailTest(Long memberId, String email){
+        asyncEmailService.sendEmailNotice(memberId, email);
     }
 }

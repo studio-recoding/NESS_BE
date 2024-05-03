@@ -1,5 +1,6 @@
 package Ness.Backend.domain.schedule;
 
+import Ness.Backend.domain.chat.dto.response.GetChatListDto;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
@@ -45,5 +46,12 @@ public class ScheduleController {
     public ResponseEntity<Long> deleteOneSchedule(@AuthUser Member member, @RequestParam Long id){
         scheduleService.deleteSchedule(id);
         return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    }
+
+    @PostMapping("/ai")
+    @Operation(summary = "AI에 의해서 생성된 새로운 스케쥴", description = "프론트가 보내주는 AI에 의해서 생성된 새로운 스케쥴을 Accept/Deny합니다.")
+    public ResponseEntity<GetChatListDto> PostAiSchedule(@AuthUser Member member, @RequestParam Boolean isAccepted, @RequestParam Long chatId, @RequestBody PostScheduleDto postScheduleDto){
+        GetChatListDto oneUserChats = scheduleService.postNewAiSchedule(member.getId(), isAccepted, chatId, postScheduleDto);
+        return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
     }
 }

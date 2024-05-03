@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -27,6 +28,18 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
     private final FastApiChatApi fastApiChatApi;
+
+    public void createNewChat(Long memberId, String text, ChatType chatType, int caseNumber, Member member){
+        Chat chat = Chat.builder()
+                .createdDate(createdZonedDate())
+                .text(text)
+                .chatType(chatType)
+                .caseNumber(caseNumber)
+                .member(member)
+                .build();
+
+        chatRepository.save(chat);
+    }
 
     public GetChatListDto getOneWeekUserChat(Long id){
         List<Chat> chatList = chatRepository.findOneWeekUserChatsByMember_Id(id);
@@ -44,12 +57,17 @@ public class ChatService {
         return new GetChatListDto(getChatDtos);
     }
 
+    public ZonedDateTime createdZonedDate(){
+        return LocalDateTime
+                .now(ZoneId.of("Asia/Seoul"))
+                .atZone(ZoneId.of("Asia/Seoul"));
+    }
+
     public GetChatListDto postNewUserChat(Long id, PostUserChatDto postUserChatDto){
         Member memberEntity = memberRepository.findMemberById(id);
         //새로운 유저 채팅 저장
         Chat newUserChat = Chat.builder()
-                .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul"))
-                        .atZone(ZoneId.of("Asia/Seoul")))
+                .createdDate(createdZonedDate())
                 .text(postUserChatDto.getText())
                 .chatType(postUserChatDto.getChatType())
                 .caseNumber(0) //유저는 디폴트로 case
@@ -59,13 +77,13 @@ public class ChatService {
         chatRepository.save(newUserChat);
 
         PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText());
-        String parsedAnswer = parseAiChat(AiDto.getAnswer());
+        //String parsedAnswer = parseAiChat(AiDto.getAnswer());
 
         //AI 챗 답변 저장
         Chat newAiChat = Chat.builder()
                 .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul"))
                         .atZone(ZoneId.of("Asia/Seoul")))
-                .text(parsedAnswer)
+                .text(AiDto.getAnswer())
                 .chatType(ChatType.AI)
                 .caseNumber(AiDto.getCaseNumber()) //AI는 받아온 값으로 저장
                 .member(memberEntity)
@@ -75,10 +93,10 @@ public class ChatService {
         return getOneWeekUserChat(id);
     }
 
-    /* ChatGPT가 답변의 앞뒤에 \를 포함시키므로, 제거 필요 */
+    /* ChatGPT가 답변의 앞뒤에 \를 포함시키므로, 제거 필요
     public String parseAiChat(String text){
         return text.replace("\"", "");
-    }
+    }*/
 
     public PostFastApiAiChatDto postNewAiChat(Long id, String text){
 

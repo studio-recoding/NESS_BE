@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class GetReportRecommendDto {
+public class GetReportRecommendActivityDto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +22,7 @@ public class GetReportRecommendDto {
     private String recommendText;
 
     @Builder
-    public GetReportRecommendDto(Long id, String createdDate, String recommendText){
+    public GetReportRecommendActivityDto(Long id, String createdDate, String recommendText){
         this.id = id;
         this.createdDate = createdDate;
         this.recommendText = recommendText;

@@ -3,8 +3,7 @@ package Ness.Backend.domain.main;
 import Ness.Backend.domain.main.dto.response.GetMainDto;
 import Ness.Backend.domain.report.ReportRecommendRepository;
 import Ness.Backend.domain.report.ReportService;
-import Ness.Backend.domain.report.dto.response.GetReportRecommendDto;
-import Ness.Backend.domain.report.entity.ReportRecommend;
+import Ness.Backend.domain.report.dto.response.GetReportRecommendActivityDto;
 import Ness.Backend.domain.schedule.ScheduleRepository;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
@@ -24,12 +23,12 @@ public class MainService {
 
     public GetMainDto getMain(Long id){
         Schedule schedule = scheduleRepository.findTodayOneScheduleByMember_Id(id);
-        GetReportRecommendDto getReportRecommendDto = reportService.getRecommend(id);
+        GetReportRecommendActivityDto getReportRecommendActivityDto = reportService.getRecommend(id);
 
         return Optional.ofNullable(schedule)
                 .map(s -> GetMainDto.builder()
-                        .recommendId(getReportRecommendDto.getId())
-                        .recommendText(getReportRecommendDto.getRecommendText())
+                        .recommendId(getReportRecommendActivityDto.getId())
+                        .recommendText(getReportRecommendActivityDto.getRecommendText())
                         .scheduleId(s.getId())
                         .category(s.getCategory().getName())
                         .categoryNum(s.getCategory().getId())
@@ -42,8 +41,8 @@ public class MainService {
                                 .build())
                         .build())
                 .orElse(GetMainDto.builder()
-                        .recommendId(getReportRecommendDto.getId())
-                        .recommendText(getReportRecommendDto.getRecommendText())
+                        .recommendId(getReportRecommendActivityDto.getId())
+                        .recommendText(getReportRecommendActivityDto.getRecommendText())
                         .scheduleId(null)
                         .category(null)
                         .categoryNum(null)

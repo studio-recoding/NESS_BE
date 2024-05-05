@@ -32,6 +32,7 @@ public class ReportService {
     private final FastApiMemoryApi fastApiMemoryApi;
     private final MemberRepository memberRepository;
 
+    /* 메모리 가져오는 로직 */
     public GetReportMemoryListDto getMemory(Long id){
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
@@ -57,10 +58,35 @@ public class ReportService {
         List<ReportMemory> reportMemories = reportMemoryRepository.findTwoWeekUserMemoryByMember_Id(id);
         return createReportMemoryListDto(reportMemories);
     }
-    public PostFastApiAiTagListDto getAiTag(Long id){
-         return postNewAiTag(id, getToday());
+
+    public GetReportMemoryListDto createReportMemoryListDto(List<ReportMemory> reportMemories) {
+        //ReportMemoryListResponseDto에 매핑
+        List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
+                .map(memory -> GetReportMemoryDto.builder()
+                        .id(memory.getId())
+                        .createdDate(memory.getCreatedDate().toString())
+                        .memory(memory.getMemory())
+                        .build())
+                .toList();
+
+        return new GetReportMemoryListDto(getReportMemoryDtos);
     }
 
+    public String postNewAiMemory(Long id, ZonedDateTime today){
+        PostFastApiUserMemoryDto userDto = PostFastApiUserMemoryDto.builder()
+                .member_id(id.intValue())
+                .user_persona("")
+                .schedule_datetime_start(today)
+                .schedule_datetime_end(today)
+                .build();
+
+        //Fast API에 전송하기
+        PostFastApiAiMemoryDto aiDto = fastApiMemoryApi.creatFastApiMemory(userDto);
+
+        return aiDto.getMemory();
+    }
+
+    /* 테그 가져오는 로직 */
     public GetReportTagListDto getTag(Long id){
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
@@ -87,7 +113,37 @@ public class ReportService {
         }
     }
 
-    public GetReportRecommendDto getRecommend(Long id){
+    public GetReportTagListDto createReportTagListDto(List<ReportTag> reportTags){
+        List<GetReportTagDto> getReportTagDtos = reportTags.stream()
+                .map(tag -> GetReportTagDto.builder()
+                        .id(tag.getId())
+                        .createdDate(tag.getCreatedDate().toString())
+                        .tagTitle(tag.getTagTitle())
+                        .tagDesc(tag.getTagDesc())
+                        .build())
+                .toList();
+
+        return new GetReportTagListDto(getReportTagDtos);
+    }
+
+    public PostFastApiAiTagListDto getAiTag(Long id){
+        return postNewAiTag(id, getToday());
+    }
+
+    public PostFastApiAiTagListDto postNewAiTag(Long id, ZonedDateTime today){
+        PostFastApiUserTagDto userDto = PostFastApiUserTagDto.builder()
+                .member_id(id.intValue())
+                .user_persona("")
+                .schedule_datetime_start(today)
+                .schedule_datetime_end(today)
+                .build();
+
+        //Fast API에 전송하고 값 받아오기
+        return fastApiTagApi.creatFastApiTag(userDto);
+    }
+
+    /* 한 줄 추천 가져오는 로직 */
+    public GetReportRecommendActivityDto getRecommend(Long id){
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
 
@@ -115,72 +171,12 @@ public class ReportService {
         }
     }
 
-    public ZonedDateTime getToday(){
-        return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-    }
-
-    public GetReportTagListDto createReportTagListDto(List<ReportTag> reportTags){
-        List<GetReportTagDto> getReportTagDtos = reportTags.stream()
-                .map(tag -> GetReportTagDto.builder()
-                        .id(tag.getId())
-                        .createdDate(tag.getCreatedDate().toString())
-                        .tagTitle(tag.getTagTitle())
-                        .tagDesc(tag.getTagDesc())
-                        .build())
-                .toList();
-
-        return new GetReportTagListDto(getReportTagDtos);
-    }
-
-    public GetReportMemoryListDto createReportMemoryListDto(List<ReportMemory> reportMemories) {
-        //ReportMemoryListResponseDto에 매핑
-        List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
-                .map(memory -> GetReportMemoryDto.builder()
-                        .id(memory.getId())
-                        .createdDate(memory.getCreatedDate().toString())
-                        .memory(memory.getMemory())
-                        .build())
-                .toList();
-
-        return new GetReportMemoryListDto(getReportMemoryDtos);
-    }
-
-    public GetReportRecommendDto createReportRecommendDto(Long id, String date, String text){
-        return GetReportRecommendDto.builder()
+    public GetReportRecommendActivityDto createReportRecommendDto(Long id, String date, String text){
+        return GetReportRecommendActivityDto.builder()
                 .id(id)
                 .createdDate(date)
                 .recommendText(text)
                 .build();
-    }
-
-    public PostFastApiAiTagListDto postNewAiTag(Long id, ZonedDateTime today){
-        PostFastApiUserTagDto userDto = PostFastApiUserTagDto.builder()
-                .member_id(id.intValue())
-                .user_persona("")
-                .schedule_datetime_start(today)
-                .schedule_datetime_end(today)
-                .build();
-
-        //Fast API에 전송하고 값 받아오기
-        return fastApiTagApi.creatFastApiTag(userDto);
-    }
-
-    public String postNewAiMemory(Long id, ZonedDateTime today){
-        PostFastApiUserMemoryDto userDto = PostFastApiUserMemoryDto.builder()
-                .member_id(id.intValue())
-                .user_persona("")
-                .schedule_datetime_start(today)
-                .schedule_datetime_end(today)
-                .build();
-
-        //Fast API에 전송하기
-        PostFastApiAiMemoryDto aiDto = fastApiMemoryApi.creatFastApiMemory(userDto);
-
-        return aiDto.getMemory();
-    }
-
-    public String parseAiRecommend(String text){
-        return text.replace("\"", "");
     }
 
     public String postNewAiRecommend(Long id, ZonedDateTime today){
@@ -192,8 +188,17 @@ public class ReportService {
                 .build();
 
         //Fast API에 전송하기
-        PostFastApiAiRecommendDto aiDto = fastApiRecommendApi.creatFastApiRecommend(userDto);
+        PostFastApiAiRecommendActivityDto aiDto = fastApiRecommendApi.creatFastApiRecommend(userDto);
 
         return aiDto.getAnswer();
     }
+
+    public String parseAiRecommend(String text){
+        return text.replace("\"", "");
+    }
+
+    public ZonedDateTime getToday(){
+        return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+    }
+
 }

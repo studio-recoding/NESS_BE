@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
+@Entity
 @Data
 @NoArgsConstructor
 public class ReportActivity {

@@ -3,7 +3,7 @@ package Ness.Backend.domain.report;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserMemoryDto;
-import Ness.Backend.domain.report.dto.request.PostFastApiUserRecommendDto;
+import Ness.Backend.domain.report.dto.request.PostFastApiUserRecommendActivityDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserTagDto;
 import Ness.Backend.domain.report.dto.response.*;
 import Ness.Backend.domain.report.entity.ReportActivity;
@@ -145,22 +145,20 @@ public class ReportService {
     }
 
     /* 한 줄 추천 및 엑티비티 가져오는 로직 */
-    public GetReportRecommendActivityDto getRecommendActivity(Long id){
+    public PostFastApiAiRecommendActivityDto getRecommendActivity(Long memberId){
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
-
-        ReportRecommend reportRecommend = reportRecommendRepository.findTodayReportRecommendByMember_Id(id);
+        ReportRecommend reportRecommend = reportRecommendRepository.findTodayReportRecommendByMember_Id(memberId);
 
         if(reportRecommend == null){
             //새로운 한 줄 추천 및 엑티비티 생성하기
-            PostFastApiAiRecommendActivityDto aiDto = postNewAiRecommend(id, now);
-            String parsedAnswer = parseAiRecommend(aiDto.getAnswer());
-
-            Member memberEntity = memberRepository.findMemberById(id);
+            PostFastApiAiRecommendActivityDto aiDto = postNewAiRecommend(memberId, now);
+            aiDto.setAnswer(parseAiRecommend(aiDto.getAnswer()));
+            Member memberEntity = memberRepository.findMemberById(memberId);
 
             ReportRecommend newRecommend = ReportRecommend.builder()
                     .createdDate(now)
-                    .recommendText(parsedAnswer)
+                    .recommendText(aiDto.getAnswer())
                     .member(memberEntity)
                     .build();
             
@@ -177,23 +175,29 @@ public class ReportService {
                         .build();
                 reportActivityRepository.save(reportActivity);
             }
-            return createReportRecommendActivityDto(newRecommend.getId(), newRecommend.getCreatedDate().toString(), newRecommend.getRecommendText());
-        }
-        return createReportRecommendActivityDto(reportRecommend.getId(), reportRecommend.getCreatedDate().toString(), reportRecommend.getRecommendText());
-    }
+            return aiDto;
+        } else{
+            List<ReportActivity> reportActivities = reportActivityRepository.findTodayReportActivityByMember_Id(memberId);
 
-    public GetReportRecommendActivityDto createReportRecommendActivityDto(Long id, String date, String text){
-        return GetReportRecommendActivityDto.builder()
-                .id(id)
-                .createdDate(date)
-                .recommendText(text)
-                .build();
+            List<PostFastApiAiActivityDto> postFastApiAiActivityDtos = reportActivities.stream()
+                    .map(activity -> PostFastApiAiActivityDto.builder()
+                            .activity(activity.getActivityText())
+                            .imageTag(activity.getImageTag())
+                            .build())
+                    .toList();
+
+            PostFastApiAiRecommendActivityDto userDto = PostFastApiAiRecommendActivityDto.builder()
+                    .answer(reportRecommend.getRecommendText())
+                    .activityList(postFastApiAiActivityDtos)
+                    .build();
+            return userDto;
+        }
     }
 
     public PostFastApiAiRecommendActivityDto postNewAiRecommend(Long id, ZonedDateTime today){
-        PostFastApiUserRecommendDto userDto = PostFastApiUserRecommendDto.builder()
+        PostFastApiUserRecommendActivityDto userDto = PostFastApiUserRecommendActivityDto.builder()
                 .member_id(id.intValue())
-                .user_persona("")
+                .user_persona("") // 빈 문자열은 default
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();

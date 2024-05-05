@@ -16,12 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainController {
     private final MainService mainService;
 
-    @GetMapping("/dev")
-    public ResponseEntity<?> getMain(){
-        GetMainDto getMainDto = mainService.getMain(1L);
-        return new ResponseEntity<>(getMainDto, HttpStatusCode.valueOf(200));
-    }
-
     @GetMapping("")
     public ResponseEntity<?> getMain(@AuthUser Member member){
         GetMainDto getMainDto = mainService.getMain(member.getId());

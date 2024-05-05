@@ -23,7 +23,7 @@ public class MainService {
 
     public GetMainDto getMain(Long id){
         Schedule schedule = scheduleRepository.findTodayOneScheduleByMember_Id(id);
-        GetReportRecommendActivityDto getReportRecommendActivityDto = reportService.getRecommend(id);
+        GetReportRecommendActivityDto getReportRecommendActivityDto = reportService.getRecommendActivity(id);
 
         return Optional.ofNullable(schedule)
                 .map(s -> GetMainDto.builder()

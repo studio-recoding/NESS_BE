@@ -6,6 +6,7 @@ import Ness.Backend.domain.report.dto.request.PostFastApiUserMemoryDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserRecommendDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserTagDto;
 import Ness.Backend.domain.report.dto.response.*;
+import Ness.Backend.domain.report.entity.ReportActivity;
 import Ness.Backend.domain.report.entity.ReportMemory;
 import Ness.Backend.domain.report.entity.ReportRecommend;
 import Ness.Backend.domain.report.entity.ReportTag;
@@ -27,6 +28,7 @@ public class ReportService {
     private final ReportMemoryRepository reportMemoryRepository;
     private final ReportTagRepository reportTagRepository;
     private final ReportRecommendRepository reportRecommendRepository;
+    private final ReportActivityRepository reportActivityRepository;
     private final FastApiRecommendApi fastApiRecommendApi;
     private final FastApiTagApi fastApiTagApi;
     private final FastApiMemoryApi fastApiMemoryApi;
@@ -142,17 +144,17 @@ public class ReportService {
         return fastApiTagApi.creatFastApiTag(userDto);
     }
 
-    /* 한 줄 추천 가져오는 로직 */
-    public GetReportRecommendActivityDto getRecommend(Long id){
+    /* 한 줄 추천 및 엑티비티 가져오는 로직 */
+    public GetReportRecommendActivityDto getRecommendActivity(Long id){
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
 
         ReportRecommend reportRecommend = reportRecommendRepository.findTodayReportRecommendByMember_Id(id);
 
         if(reportRecommend == null){
-            //새로운 한 줄 추천 생성하기
-            String answer = postNewAiRecommend(id, now);
-            String parsedAnswer = parseAiRecommend(answer);
+            //새로운 한 줄 추천 및 엑티비티 생성하기
+            PostFastApiAiRecommendActivityDto aiDto = postNewAiRecommend(id, now);
+            String parsedAnswer = parseAiRecommend(aiDto.getAnswer());
 
             Member memberEntity = memberRepository.findMemberById(id);
 
@@ -165,13 +167,22 @@ public class ReportService {
             //새롭게 생성된 한 줄 추천 저장하기
             reportRecommendRepository.save(newRecommend);
 
-            return createReportRecommendDto(newRecommend.getId(), newRecommend.getCreatedDate().toString(), newRecommend.getRecommendText());
-        } else{
-            return createReportRecommendDto(reportRecommend.getId(), reportRecommend.getCreatedDate().toString(), reportRecommend.getRecommendText());
+            //새롭게 생성된 활동 저장하기
+            for (PostFastApiAiActivityDto activity : aiDto.getActivityList()) {
+                ReportActivity reportActivity = ReportActivity.builder()
+                        .activityText(activity.getActivity())
+                        .imageTag(activity.getImageTag())
+                        .createdDate(now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0))
+                        .member(memberEntity)
+                        .build();
+                reportActivityRepository.save(reportActivity);
+            }
+            return createReportRecommendActivityDto(newRecommend.getId(), newRecommend.getCreatedDate().toString(), newRecommend.getRecommendText());
         }
+        return createReportRecommendActivityDto(reportRecommend.getId(), reportRecommend.getCreatedDate().toString(), reportRecommend.getRecommendText());
     }
 
-    public GetReportRecommendActivityDto createReportRecommendDto(Long id, String date, String text){
+    public GetReportRecommendActivityDto createReportRecommendActivityDto(Long id, String date, String text){
         return GetReportRecommendActivityDto.builder()
                 .id(id)
                 .createdDate(date)
@@ -179,7 +190,7 @@ public class ReportService {
                 .build();
     }
 
-    public String postNewAiRecommend(Long id, ZonedDateTime today){
+    public PostFastApiAiRecommendActivityDto postNewAiRecommend(Long id, ZonedDateTime today){
         PostFastApiUserRecommendDto userDto = PostFastApiUserRecommendDto.builder()
                 .member_id(id.intValue())
                 .user_persona("")
@@ -188,9 +199,7 @@ public class ReportService {
                 .build();
 
         //Fast API에 전송하기
-        PostFastApiAiRecommendActivityDto aiDto = fastApiRecommendApi.creatFastApiRecommend(userDto);
-
-        return aiDto.getAnswer();
+        return fastApiRecommendApi.creatFastApiRecommend(userDto);
     }
 
     public String parseAiRecommend(String text){

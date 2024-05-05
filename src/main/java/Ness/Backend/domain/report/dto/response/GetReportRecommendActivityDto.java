@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class GetReportRecommendActivityDto {
     @Id
@@ -21,10 +23,13 @@ public class GetReportRecommendActivityDto {
     @JsonProperty("recommend")
     private String recommendText;
 
+    private List<GetReportActivityDto> activityList;
+
     @Builder
-    public GetReportRecommendActivityDto(Long id, String createdDate, String recommendText){
+    public GetReportRecommendActivityDto(Long id, String createdDate, String recommendText, List<GetReportActivityDto> activityList){
         this.id = id;
         this.createdDate = createdDate;
         this.recommendText = recommendText;
+        this.activityList = activityList;
     }
 }

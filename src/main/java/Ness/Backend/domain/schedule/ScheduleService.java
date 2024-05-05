@@ -142,7 +142,6 @@ public class ScheduleService {
         Member memberEntity = memberRepository.findMemberById(id);
         Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
 
-
         //새로운 채팅 생성
         Schedule newSchedule = Schedule.builder()
                 .info(postScheduleDto.getInfo())

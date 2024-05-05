@@ -14,10 +14,6 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 public class PostScheduleDto {
-    @Schema(description = "스케쥴의 DB 기본키", example = "1")
-    @JsonProperty("id")
-    private Long id;
-
     @Schema(description = "스케쥴 텍스트 내용", example = "AI 공부")
     @JsonProperty("title")
     private String info;

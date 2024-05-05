@@ -37,6 +37,6 @@ public class PutScheduleDto {
     @JsonProperty("end")
     private ZonedDateTime endTime;
 
-    @Schema(description = "스케쥴 카테고리 DB 넘버", example = "공부")
+    @Schema(description = "스케쥴 카테고리 DB 넘버", example = "0")
     private Long categoryNum;
 }

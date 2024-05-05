@@ -53,7 +53,7 @@ public class ScheduleService {
                         .findOneMonthSchedulesByMember_Id(memberId, year, month));
     }
 
-    /* 사용자가 직접 변경한 스케쥴 */
+    /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
     @Transactional
     public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto, String date){
         // 년도, 월, 일 추출
@@ -106,6 +106,7 @@ public class ScheduleService {
     @Transactional
     public GetChatListDto postAiScheduleAccept(Long memberId, Boolean idAccepted, Long chatId, PostScheduleDto postScheduleDto){
         Member member = memberRepository.findMemberById(memberId);
+        Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
 
         if(idAccepted){
             /* 사용자가 Accept 했으면 스케쥴 생성하기 */
@@ -118,7 +119,7 @@ public class ScheduleService {
                     .startTime(postScheduleDto.getStartTime())
                     .endTime(postScheduleDto.getEndTime())
                     .member(member)
-                    //.category() //이 연관관계들은 나중에 넣어야 함
+                    .category(category)
                     .chat(chat)
                     .build();
 
@@ -139,6 +140,7 @@ public class ScheduleService {
     public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
         log.info("postNewUserSchedule called by "+ id);
         Member memberEntity = memberRepository.findMemberById(id);
+        Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
 
         //새로운 채팅 생성
         Schedule newSchedule = Schedule.builder()
@@ -148,8 +150,8 @@ public class ScheduleService {
                 .startTime(postScheduleDto.getStartTime())
                 .endTime(postScheduleDto.getEndTime())
                 .member(memberEntity)
-                //.category() //이 연관관계들은 나중에 넣어야 함
-                //.chat()
+                .category(category)
+                //.chat() //사용자가 직접 생성했으므로 연관관계 없음
                 .build();
 
         scheduleRepository.save(newSchedule);
@@ -160,16 +162,17 @@ public class ScheduleService {
                 postScheduleDto.getPerson(),
                 postScheduleDto.getStartTime(),
                 postScheduleDto.getEndTime(),
-                "카테고리 없음",
+                postScheduleDto.getCategoryNum(),
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
 
         return newSchedule.getId(); // 저장한 Chat 확인용
     }
 
+    /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */
     public void postNewAiSchedule(String info, String location, String person,
                                   ZonedDateTime startTime, ZonedDateTime endTime,
-                                  String category, Long memberId, Long scheduleId){
+                                  Long category, Long memberId, Long scheduleId){
 
         PostFastApiScheduleDto dto = PostFastApiScheduleDto.builder()
                 .info(info)
@@ -177,7 +180,7 @@ public class ScheduleService {
                 .person(person)
                 .startTime(startTime)
                 .endTime(endTime)
-                .category(category) //일단은 null 처리하기
+                .category(category)
                 .member_id(memberId)
                 .schedule_id(scheduleId)
                 .build();

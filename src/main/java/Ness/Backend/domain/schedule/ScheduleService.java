@@ -174,6 +174,10 @@ public class ScheduleService {
                                   ZonedDateTime startTime, ZonedDateTime endTime,
                                   Long category, Long memberId, Long scheduleId){
 
+        if(endTime == null){
+            endTime = startTime;
+        }
+
         PostFastApiScheduleDto dto = PostFastApiScheduleDto.builder()
                 .info(info)
                 .location(location)

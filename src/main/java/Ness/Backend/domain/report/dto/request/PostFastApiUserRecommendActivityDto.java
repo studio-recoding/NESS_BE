@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostFastApiUserRecommendDto {
+public class PostFastApiUserRecommendActivityDto {
     @JsonProperty("member_id")
     private int member_id;
 

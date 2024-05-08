@@ -1,8 +1,6 @@
 package Ness.Backend.domain.report;
 
-import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.report.entity.ReportMemory;
-import Ness.Backend.domain.report.entity.ReportRecommend;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -170,7 +170,7 @@ public class ReportService {
                 ReportActivity reportActivity = ReportActivity.builder()
                         .activityText(activity.getActivity())
                         .imageTag(activity.getImageTag())
-                        .createdDate(now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0))
+                        .createdDate(now)
                         .member(memberEntity)
                         .build();
                 reportActivityRepository.save(reportActivity);

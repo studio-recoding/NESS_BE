@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -65,10 +66,12 @@ public class ScheduleService {
     /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
     public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto, String date){
         // 년도, 월, 일 추출
+        /*
         String[] parts = date.split("-");
         int year = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]);
         int day = Integer.parseInt(parts[2]);
+         */
 
         Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
         Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
@@ -82,7 +85,7 @@ public class ScheduleService {
 
         return makeScheduleListDto(
                 scheduleRepository
-                .findOneDaySchedulesByMember_IdWithString(memberId, year, month, day));
+                .findOneDaySchedulesByMember_Id(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"))));
     }
 
     /* 사용자가 직접 삭제한 스케쥴 */
@@ -90,7 +93,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findScheduleById(memberId);
         scheduleRepository.delete(schedule);
 
-        return getOneDayUserSchedule(memberId, schedule.getStartTime());
+        return getOneDayUserSchedule(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 사용자가 AI가 생성한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
@@ -155,7 +158,7 @@ public class ScheduleService {
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
 
-        return getOneDayUserSchedule(memberId, newSchedule.getStartTime());
+        return getOneDayUserSchedule(memberId, newSchedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"));
     }
 
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */

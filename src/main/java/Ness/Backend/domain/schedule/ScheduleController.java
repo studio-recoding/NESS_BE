@@ -29,9 +29,9 @@ public class ScheduleController {
 
     @PostMapping("")
     @Operation(summary = "새로운 스케쥴 생성", description = "새로운 스케쥴 내역 저장하는 API 입니다.")
-    public ResponseEntity<Long> postOneSchedule(@AuthUser Member member, @RequestBody PostScheduleDto postScheduleDto){
-        Long userId  = scheduleService.postNewUserSchedule(member.getId(), postScheduleDto);
-        return new ResponseEntity<>(userId, HttpStatusCode.valueOf(201));
+    public ResponseEntity<GetScheduleListDto> postOneSchedule(@AuthUser Member member, @RequestBody PostScheduleDto postScheduleDto){
+        GetScheduleListDto oneUserOneDaySchedules = scheduleService.postNewUserSchedule(member.getId(), postScheduleDto);
+        return new ResponseEntity<>(oneUserOneDaySchedules, HttpStatusCode.valueOf(201));
     }
 
     @PutMapping("")
@@ -47,9 +47,9 @@ public class ScheduleController {
 
     @DeleteMapping("")
     @Operation(summary = "하나의 스케쥴 삭제", description = "하나의 스케쥴을 삭제하는 API 입니다.")
-    public ResponseEntity<Long> deleteOneSchedule(@AuthUser Member member, @RequestParam Long id){
-        scheduleService.deleteSchedule(id);
-        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    public ResponseEntity<GetScheduleListDto> deleteOneSchedule(@AuthUser Member member, @RequestParam Long id){
+        GetScheduleListDto oneUserOneDaySchedules = scheduleService.deleteSchedule(id);
+        return new ResponseEntity<>(oneUserOneDaySchedules, HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("/ai")

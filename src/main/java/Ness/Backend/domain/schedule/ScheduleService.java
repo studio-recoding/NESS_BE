@@ -40,6 +40,7 @@ public class ScheduleService {
     private final ChatService chatService;
     private final FastApiScheduleApi fastApiScheduleApi;
 
+    // 한 달치 스케쥴 가져오는 로직
     @Transactional(readOnly = true)
     public GetScheduleListDto getOneMonthUserSchedule(Long memberId, String date){
         log.info("getOneMonthUserSchedule called by "+ memberId);
@@ -53,8 +54,15 @@ public class ScheduleService {
                         .findOneMonthSchedulesByMember_Id(memberId, year, month));
     }
 
+    // 하루치 스케쥴 가져오는 로직(Create, Delete에서 사용)
+    @Transactional(readOnly = true)
+    public GetScheduleListDto getOneDayUserSchedule(Long memberId, ZonedDateTime date){
+        return makeScheduleListDto(
+                scheduleRepository
+                        .findOneDaySchedulesByMember_Id(memberId, date));
+    }
+
     /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
-    @Transactional
     public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto, String date){
         // 년도, 월, 일 추출
         String[] parts = date.split("-");
@@ -74,36 +82,18 @@ public class ScheduleService {
 
         return makeScheduleListDto(
                 scheduleRepository
-                .findOneDaySchedulesByMember_Id(memberId, year, month, day));
+                .findOneDaySchedulesByMember_IdWithString(memberId, year, month, day));
     }
 
-    public GetScheduleListDto makeScheduleListDto(List<Schedule> scheduleList){
-        // ScheduleListResponseDto에 매핑
-        List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
-                .map(schedule -> GetScheduleDto.builder()
-                        .id(schedule.getId())
-                        .category(schedule.getCategory().getName())
-                        .categoryNum(schedule.getCategory().getId())
-                        .info(schedule.getInfo())
-                        .startTime(schedule.getStartTime())
-                        .endTime(schedule.getEndTime())
-                        .details(GetScheduleDetailDto.builder()
-                                .person(schedule.getPerson())
-                                .location(schedule.getLocation())
-                                .build())
-                        .build())
-                .toList();
-        return new GetScheduleListDto(getScheduleDtos);
-    }
-
-    @Transactional
-    public void deleteSchedule(Long id){
-        Schedule schedule = scheduleRepository.findScheduleById(id);
+    /* 사용자가 직접 삭제한 스케쥴 */
+    public GetScheduleListDto deleteSchedule(Long memberId){
+        Schedule schedule = scheduleRepository.findScheduleById(memberId);
         scheduleRepository.delete(schedule);
+
+        return getOneDayUserSchedule(memberId, schedule.getStartTime());
     }
 
     /* 사용자가 AI가 생성한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
-    @Transactional
     public GetChatListDto postAiScheduleAccept(Long memberId, Boolean idAccepted, Long chatId, PostScheduleDto postScheduleDto){
         Member member = memberRepository.findMemberById(memberId);
         Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
@@ -137,9 +127,8 @@ public class ScheduleService {
 
 
     /* 사용자가 직접 생성한 스케쥴을 RDB & VectorDB에 저장 */
-    public Long postNewUserSchedule(Long id, PostScheduleDto postScheduleDto){
-        log.info("postNewUserSchedule called by "+ id);
-        Member memberEntity = memberRepository.findMemberById(id);
+    public GetScheduleListDto postNewUserSchedule(Long memberId, PostScheduleDto postScheduleDto){
+        Member memberEntity = memberRepository.findMemberById(memberId);
         Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
 
         //새로운 채팅 생성
@@ -166,7 +155,7 @@ public class ScheduleService {
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
 
-        return newSchedule.getId(); // 저장한 Chat 확인용
+        return getOneDayUserSchedule(memberId, newSchedule.getStartTime());
     }
 
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */
@@ -195,5 +184,25 @@ public class ScheduleService {
         } else {
             log.error("Failed to save data in Vector DB");
         }
+    }
+
+    /* 리스트 DTO 만들어서 반환하는 로직 */
+    public GetScheduleListDto makeScheduleListDto(List<Schedule> scheduleList){
+        // ScheduleListResponseDto에 매핑
+        List<GetScheduleDto> getScheduleDtos = scheduleList.stream()
+                .map(schedule -> GetScheduleDto.builder()
+                        .id(schedule.getId())
+                        .category(schedule.getCategory().getName())
+                        .categoryNum(schedule.getCategory().getId())
+                        .info(schedule.getInfo())
+                        .startTime(schedule.getStartTime())
+                        .endTime(schedule.getEndTime())
+                        .details(GetScheduleDetailDto.builder()
+                                .person(schedule.getPerson())
+                                .location(schedule.getLocation())
+                                .build())
+                        .build())
+                .toList();
+        return new GetScheduleListDto(getScheduleDtos);
     }
 }

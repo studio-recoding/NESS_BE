@@ -158,7 +158,7 @@ public class ScheduleService {
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
 
-        return getOneDayUserSchedule(memberId, newSchedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return getOneDayUserSchedule(memberId, newSchedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */

@@ -65,14 +65,6 @@ public class ScheduleService {
 
     /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
     public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto, String date){
-        // 년도, 월, 일 추출
-        /*
-        String[] parts = date.split("-");
-        int year = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        int day = Integer.parseInt(parts[2]);
-         */
-
         Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
         Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
         schedule.changeSchedule(
@@ -83,9 +75,7 @@ public class ScheduleService {
                 putScheduleDto.getEndTime(),
                 category);
 
-        return makeScheduleListDto(
-                scheduleRepository
-                .findOneDaySchedulesByMember_Id(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"))));
+        return getOneDayUserSchedule(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 사용자가 직접 삭제한 스케쥴 */

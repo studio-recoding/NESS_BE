@@ -24,24 +24,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             @Param("year") int year,
             @Param("month") int month);
 
-    // 특정 맴버의 하루 치 스케쥴 반환(String 사용)
-    @Query( value = "SELECT * FROM schedule " +
-            "WHERE member_id = :memberId " +
-            "AND YEAR(start_time) = :year " +
-            "AND MONTH(start_time) = :month " +
-            "AND DAY(start_time) = :day " +
-            "ORDER BY start_time ASC",
-            nativeQuery = true)
-    List<Schedule> findOneDaySchedulesByMember_IdWithString(
-            @Param("memberId") Long memberId,
-            @Param("year") int year,
-            @Param("month") int month,
-            @Param("day") int day);
-
     // 특정 맴버의 하루 치 스케쥴 반환(ZoneDateTime 사용)
     @Query( value = "SELECT * FROM schedule " +
             "WHERE member_id = :memberId " +
-            "AND DATE(start_time) = DATE(:date) " +
+            "AND DATE(CONVERT_TZ(start_time, '+00:00', '+09:00')) = DATE(CONVERT_TZ(:date, '+00:00', '+09:00')) " +
             "ORDER BY start_time ASC",
             nativeQuery = true)
     List<Schedule> findOneDaySchedulesByMember_Id(

@@ -29,6 +29,7 @@ public class ChatService {
     private final MemberRepository memberRepository;
     private final FastApiChatApi fastApiChatApi;
 
+    /* 새로운 채팅 생성 및 RDB에 저장 */
     public void createNewChat(Long memberId, String text, ChatType chatType, int caseNumber, Member member){
         Chat chat = Chat.builder()
                 .createdDate(createdZonedDate())
@@ -41,6 +42,7 @@ public class ChatService {
         chatRepository.save(chat);
     }
 
+    /* 일주일 치 채팅 데이터 가져오기*/
     public GetChatListDto getOneWeekUserChat(Long id){
         List<Chat> chatList = chatRepository.findOneWeekUserChatsByMember_Id(id);
 
@@ -57,12 +59,7 @@ public class ChatService {
         return new GetChatListDto(getChatDtos);
     }
 
-    public ZonedDateTime createdZonedDate(){
-        return LocalDateTime
-                .now(ZoneId.of("Asia/Seoul"))
-                .atZone(ZoneId.of("Asia/Seoul"));
-    }
-
+    /* 유저의 채팅을 AI에 전송한 후, 답변 및 유저 채팅을 RDB에 저장 */
     public GetChatListDto postNewUserChat(Long id, PostUserChatDto postUserChatDto){
         Member memberEntity = memberRepository.findMemberById(id);
         //새로운 유저 채팅 저장
@@ -77,7 +74,6 @@ public class ChatService {
         chatRepository.save(newUserChat);
 
         PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText());
-        //String parsedAnswer = parseAiChat(AiDto.getAnswer());
 
         //AI 챗 답변 저장
         Chat newAiChat = Chat.builder()
@@ -93,11 +89,7 @@ public class ChatService {
         return getOneWeekUserChat(id);
     }
 
-    /* ChatGPT가 답변의 앞뒤에 \를 포함시키므로, 제거 필요
-    public String parseAiChat(String text){
-        return text.replace("\"", "");
-    }*/
-
+    /* AI에 채팅 전송하는 로직 */
     public PostFastApiAiChatDto postNewAiChat(Long id, String text){
 
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()
@@ -109,5 +101,11 @@ public class ChatService {
         PostFastApiAiChatDto aiDto = fastApiChatApi.creatFastApiChat(userDto);
 
         return aiDto;
+    }
+
+    public ZonedDateTime createdZonedDate(){
+        return LocalDateTime
+                .now(ZoneId.of("Asia/Seoul"))
+                .atZone(ZoneId.of("Asia/Seoul"));
     }
 }

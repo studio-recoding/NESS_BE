@@ -1,7 +1,7 @@
 package Ness.Backend.domain.chat;
 
-import Ness.Backend.domain.chat.dto.request.PostUserChatDto;
 import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
+import Ness.Backend.domain.chat.dto.request.PostUserChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatListDto;
 import Ness.Backend.domain.chat.dto.response.PostFastApiAiChatDto;
@@ -30,7 +30,7 @@ public class ChatService {
     private final FastApiChatApi fastApiChatApi;
 
     /* 새로운 채팅 생성 및 RDB에 저장 */
-    public void createNewChat(Long memberId, String text, ChatType chatType, int caseNumber, Member member){
+    public void createNewChat(String text, ChatType chatType, int caseNumber, Member member){
         Chat chat = Chat.builder()
                 .createdDate(createdZonedDate())
                 .text(text)
@@ -67,13 +67,13 @@ public class ChatService {
                 .createdDate(createdZonedDate())
                 .text(postUserChatDto.getText())
                 .chatType(postUserChatDto.getChatType())
-                .caseNumber(0) //유저는 디폴트로 case
+                .caseNumber(0) //유저는 디폴트로 case 0
                 .member(memberEntity)
                 .build();
 
         chatRepository.save(newUserChat);
 
-        PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText());
+        PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText(), postUserChatDto.getChatType());
 
         //AI 챗 답변 저장
         Chat newAiChat = Chat.builder()
@@ -90,10 +90,11 @@ public class ChatService {
     }
 
     /* AI에 채팅 전송하는 로직 */
-    public PostFastApiAiChatDto postNewAiChat(Long id, String text){
+    public PostFastApiAiChatDto postNewAiChat(Long id, String text, ChatType chatType){
 
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()
                 .persona("default")
+                .chatType(chatType) // 유저가 키보드로 친 채팅인지, 아니면 STT를 썼는지 구분
                 .message(text)
                 .build();
 

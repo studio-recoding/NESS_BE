@@ -1,9 +1,7 @@
 package Ness.Backend.domain.chat;
 
 import Ness.Backend.domain.chat.dto.request.PostUserChatDto;
-import Ness.Backend.domain.chat.dto.response.GetAiChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatListDto;
-import Ness.Backend.domain.chat.dto.response.PostFastApiAiChatDto;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;

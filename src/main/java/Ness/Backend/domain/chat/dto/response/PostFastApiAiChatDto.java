@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/* ChatGPT에게서 받아오는 답변 */
 public class PostFastApiAiChatDto {
     @JsonProperty("ness")
     private String answer;

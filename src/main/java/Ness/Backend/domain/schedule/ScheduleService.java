@@ -108,10 +108,10 @@ public class ScheduleService {
 
             scheduleRepository.save(newSchedule);
 
-            chatService.createNewChat(memberId, "일정을 추가해드렸습니다:)", ChatType.AI, 1, member);
+            chatService.createNewChat("일정을 추가해드렸습니다:)", ChatType.AI, 1, member);
 
         } else {
-            chatService.createNewChat(memberId, "일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
+            chatService.createNewChat("일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
         }
 
         // 모든 채팅 내역 반환

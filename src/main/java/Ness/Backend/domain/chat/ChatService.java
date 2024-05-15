@@ -1,7 +1,7 @@
 package Ness.Backend.domain.chat;
 
-import Ness.Backend.domain.chat.dto.request.PostUserChatDto;
 import Ness.Backend.domain.chat.dto.request.PostFastApiUserChatDto;
+import Ness.Backend.domain.chat.dto.request.PostUserChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatDto;
 import Ness.Backend.domain.chat.dto.response.GetChatListDto;
 import Ness.Backend.domain.chat.dto.response.PostFastApiAiChatDto;
@@ -29,7 +29,8 @@ public class ChatService {
     private final MemberRepository memberRepository;
     private final FastApiChatApi fastApiChatApi;
 
-    public void createNewChat(Long memberId, String text, ChatType chatType, int caseNumber, Member member){
+    /* 새로운 채팅 생성 및 RDB에 저장 */
+    public void createNewChat(String text, ChatType chatType, int caseNumber, Member member){
         Chat chat = Chat.builder()
                 .createdDate(createdZonedDate())
                 .text(text)
@@ -41,6 +42,7 @@ public class ChatService {
         chatRepository.save(chat);
     }
 
+    /* 일주일 치 채팅 데이터 가져오기*/
     public GetChatListDto getOneWeekUserChat(Long id){
         List<Chat> chatList = chatRepository.findOneWeekUserChatsByMember_Id(id);
 
@@ -57,12 +59,7 @@ public class ChatService {
         return new GetChatListDto(getChatDtos);
     }
 
-    public ZonedDateTime createdZonedDate(){
-        return LocalDateTime
-                .now(ZoneId.of("Asia/Seoul"))
-                .atZone(ZoneId.of("Asia/Seoul"));
-    }
-
+    /* 유저의 채팅을 AI에 전송한 후, 답변 및 유저 채팅을 RDB에 저장 */
     public GetChatListDto postNewUserChat(Long id, PostUserChatDto postUserChatDto){
         Member memberEntity = memberRepository.findMemberById(id);
         //새로운 유저 채팅 저장
@@ -70,14 +67,13 @@ public class ChatService {
                 .createdDate(createdZonedDate())
                 .text(postUserChatDto.getText())
                 .chatType(postUserChatDto.getChatType())
-                .caseNumber(0) //유저는 디폴트로 case
+                .caseNumber(0) //유저는 디폴트로 case 0
                 .member(memberEntity)
                 .build();
 
         chatRepository.save(newUserChat);
 
-        PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText());
-        //String parsedAnswer = parseAiChat(AiDto.getAnswer());
+        PostFastApiAiChatDto AiDto = postNewAiChat(id, postUserChatDto.getText(), postUserChatDto.getChatType());
 
         //AI 챗 답변 저장
         Chat newAiChat = Chat.builder()
@@ -93,15 +89,12 @@ public class ChatService {
         return getOneWeekUserChat(id);
     }
 
-    /* ChatGPT가 답변의 앞뒤에 \를 포함시키므로, 제거 필요
-    public String parseAiChat(String text){
-        return text.replace("\"", "");
-    }*/
-
-    public PostFastApiAiChatDto postNewAiChat(Long id, String text){
+    /* AI에 채팅 전송하는 로직 */
+    public PostFastApiAiChatDto postNewAiChat(Long id, String text, ChatType chatType){
 
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()
                 .persona("default")
+                .chatType(chatType) // 유저가 키보드로 친 채팅인지, 아니면 STT를 썼는지 구분
                 .message(text)
                 .build();
 
@@ -109,5 +102,11 @@ public class ChatService {
         PostFastApiAiChatDto aiDto = fastApiChatApi.creatFastApiChat(userDto);
 
         return aiDto;
+    }
+
+    public ZonedDateTime createdZonedDate(){
+        return LocalDateTime
+                .now(ZoneId.of("Asia/Seoul"))
+                .atZone(ZoneId.of("Asia/Seoul"));
     }
 }

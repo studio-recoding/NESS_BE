@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 public class ReportTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "report_tag_id")
     private Long id;
 
     private String tagTitle;

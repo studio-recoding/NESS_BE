@@ -43,7 +43,7 @@ public class Member {
     private List<Chat> chats = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<ReportTag> reportTags = new ArrayList<>();
+    private List<ReportTag> re = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<ReportMemory> reportMemories = new ArrayList<>();

@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 public class ReportActivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "report_activity_id")
     private Long id;
 
     private ZonedDateTime createdDate;

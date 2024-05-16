@@ -25,10 +25,10 @@ jobs:
       ## Copy properties files
       - name: Make application.yml
         run: |
-          echo "PROFILE_PROD" > ./src/main/resources/application.yml
+          echo "$PROFILE_PROD" > ./src/main/resources/application.yml
         # Make env file
         env:
-          PROPERTIES_PROD: ${{ secrets.PROFILE_PROD }}
+          PROFILE_PROD: ${{ secrets.PROFILE_PROD }}
 
       ## Copy properties files
       - name: Make application-prod.yml

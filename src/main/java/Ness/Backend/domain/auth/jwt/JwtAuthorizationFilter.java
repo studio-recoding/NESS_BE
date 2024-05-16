@@ -16,9 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
+import java.util.Collections;
 
 /* 사용자의 권한 부여
  * 요청에 포함된 JWT 토큰을 검증하고, 토큰에서 추출한 권한 정보를 기반으로 사용자에 대한 권한을 확인
@@ -26,7 +30,6 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private JwtTokenProvider jwtTokenProvider;
-
     private AuthDetailService authDetailService;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDetailService authDetailService) {
@@ -52,7 +55,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             Member tokenMember = jwtTokenProvider.validJwtToken(jwtToken);
 
             if(tokenMember != null){ //토큰이 정상일 경우
-                AuthDetails authDetails = new AuthDetails(tokenMember);
+                AuthDetails authDetails = new AuthDetails(tokenMember, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
                 /* JWT 토큰 서명이 정상이면 Authentication 객체 생성 */
                 Authentication authentication = new UsernamePasswordAuthenticationToken(authDetails, null, authDetails.getAuthorities());
@@ -64,17 +67,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
 
         } catch (TokenExpiredException e){
-            log.error("EXPIRED_TOKEN");
-            request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
+            log.error(e + " EXPIRED_TOKEN");
+            //request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
             setResponse(response, ErrorCode.EXPIRED_TOKEN);
         } catch (SignatureVerificationException e){
-            log.error("INVALID_TOKEN_SIGNATURE");
-            request.setAttribute("exception", ErrorCode.INVALID_TOKEN_SIGNATURE.getCode());
+            log.error(e + " INVALID_TOKEN_SIGNATURE");
             setResponse(response, ErrorCode.INVALID_TOKEN_SIGNATURE);
-        } catch (Exception e){
-            log.error("TOKEN_EXCEPTION");
-            request.setAttribute("exception", ErrorCode.TOKEN_ERROR.getCode());
-            setResponse(response, ErrorCode.TOKEN_ERROR);
         }
     }
 }

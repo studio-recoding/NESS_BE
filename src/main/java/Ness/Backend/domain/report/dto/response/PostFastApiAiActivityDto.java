@@ -1,4 +1,4 @@
-package Ness.Backend.domain.schedule.dto.response;
+package Ness.Backend.domain.report.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GetOneMonthSchedulesDto {
-    private List<GetScheduleDto> scheduleList;
+public class PostFastApiAiActivityDto {
+    @JsonProperty("activity")
+    private String activity;
+
+    @JsonProperty("imageTag")
+    private String imageTag;
 }

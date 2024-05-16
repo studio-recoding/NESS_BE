@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style>
+        body {
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+        }
+    </style>
+</head>
+<body>
+<div style="margin:0px; width:100%; background-color:#F2F0FF; padding:0px; padding-top:8px;">
+<table
+        style="width: 512px; align-content: center; position: relative; overflow: hidden; background: #fff;
+        margin: 0px auto; max-width:512px; background-color:#ffffff; padding:0px">
+    <tr>
+        <td style="height: 49px;">
+            <img
+                    src="https://ness-static-s3.s3.ap-northeast-2.amazonaws.com/ness_logo.png"
+                    style="width: 40px; height: 40px; vertical-align: middle;"
+            />
+            <p
+                    style="font-size: 20px; font-weight: 700; text-align: left; color: #140f33; display: inline-block; vertical-align: middle; margin-left: 10px;"
+                    th:text="|${date}, 오늘 하루도 수고한 당신에게|">오늘 하루도 수고한 당신에게
+            </p>
+        </td>
+    </tr>
+    <!--구분선-->
+    <tr>
+        <td colspan="2" style="height: 1px; background-color: #3E426A; margin-bottom: 10px;"></td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align: center; padding-top: 15px; padding-left: 5px; padding-right: 5px;">
+            <img
+                    th:if="${image != null}" th:src="${image}"
+                    src="https://ness-static-s3.s3.ap-northeast-2.amazonaws.com/email_sample.png"
+                    style="object-fit: cover; width: 490px;"
+                    alt="email-image"
+            />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align: center;">
+            <p
+                    th:utext="|${#strings.replace(text, '&#10;','&lt;br /&gt;')}|"
+                    style="font-size: 16px; font-weight: 300; padding-left: 5px; padding-right: 5px; text-align: left; color: #140f33;">
+                오늘 정말 수고 많았어요! 당신의 노력과 열정에 정말 감탄해요.
+                하루 종일 바쁘게 움직이면서도 절대 포기하지 않고 최선을 다하고 있는 모습이 정말 멋져요.
+                오늘 저희가 함께한 시간은 뜻깊게 기억될 거에요.
+                내일을 위해서 오늘은 충분한 휴식을 취하고, 재충전 후 다시 만나요.
+            </p>
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" style="height: 1px; background-color: #3E426A; margin-bottom: 10px;"></td>
+    </tr>
+    <tr>
+        <td colspan="2" style="font-size: 14px; font-weight: 300; text-align: center; color: #686868; padding-top: 5px;">
+            © 2024 Re:coding Service, All rights reserved.
+        </td>
+    </tr>
+</table>
+</div>
+</body>
+</html>

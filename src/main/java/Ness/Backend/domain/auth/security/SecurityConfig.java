@@ -4,6 +4,8 @@ import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
 import Ness.Backend.domain.auth.jwt.JwtAuthenticationFilter;
 import Ness.Backend.domain.auth.jwt.JwtAuthorizationFilter;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
+import Ness.Backend.domain.auth.oAuth.OAuth2CustomUserService;
+import Ness.Backend.domain.auth.oAuth.OAuthSuccessHandler;
 import Ness.Backend.domain.member.MemberRepository;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
@@ -28,19 +30,19 @@ import java.time.Duration;
 public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final AuthDetailService authDetailService;
+    private final OAuth2CustomUserService oAuth2CustomUserService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final RefreshTokenService refreshTokenService;
-
-    /* 회원가입: 패스워드 암호화를 위해 사용 */
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
 
     /* 로그인: 사용자의 자격 증명을 검증 및 권한 부여 */
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public OAuthSuccessHandler oAuthSuccessHandler(){
+        return new OAuthSuccessHandler(jwtTokenProvider());
     }
 
     /* 로그인: 사용자 정보(memberRepository 내용)를 토대로 토큰을 생성하거나 검증 */
@@ -55,9 +57,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        //configuration.addAllowedOrigin("*"); // 모든 오리진 허용-주의! 나중에 FE와 BE에 대해서만 열어주기
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://localhost:8080");
+        configuration.addAllowedOrigin("https://nessplanning.com");
+        configuration.addAllowedOrigin("https://nessplanning.com:3000");
+        configuration.addAllowedOriginPattern("https://*.nessplanning.com");
+        configuration.addAllowedOriginPattern("https://*.nessplanning.com:8080");
+        configuration.addAllowedOriginPattern("https://*.nessplanning.com:3000");
+        configuration.addAllowedOriginPattern("https://api.nessplanning.com:8080");
         configuration.addAllowedMethod("*"); //모든 Method 허용(POST, GET, ...)
         configuration.addAllowedHeader("*"); //모든 Header 허용
         configuration.setMaxAge(Duration.ofSeconds(3600)); //브라우저가 응답을 캐싱해도 되는 시간(1시간)
@@ -81,12 +88,10 @@ public class SecurityConfig {
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션을 생성하지 않음->토큰 기반 인증 필요
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider(), refreshTokenService))  //사용자 인증
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(),  jwtTokenProvider(), authDetailService)) //사용자 권한 부여
-                /*
-                .exceptionHandling((exceptionHandling) ->
-
-                        exceptionHandling.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                ) //인가(Authorization)가 실패시 실행, 항상 JwtAuthenticationFilter 뒤에 설정되어 있어야 함.
-                 */
+                .oauth2Login((oauth2) -> oauth2 //oauth가 성공하면 보내줄 포인트
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                                .userService(oAuth2CustomUserService))
+                        .successHandler(oAuthSuccessHandler()))
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         //.requestMatchers("/signup/**", "/login/**").permitAll() // 회원가입 및 로그인 경로는 인증 생략

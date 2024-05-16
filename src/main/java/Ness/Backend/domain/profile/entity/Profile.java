@@ -21,6 +21,12 @@ public class Profile {
 
     private String name;
 
+    private Boolean isEmailActive;
+
+    //유저 페르소나를 구분해주는 타입 값
+    @Enumerated(EnumType.STRING)
+    private PersonaType personaType;
+
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -29,11 +35,21 @@ public class Profile {
         this.nickname = nickname;
     }
 
+    public void updateMailActive(Boolean isEmailActive){
+        this.isEmailActive = isEmailActive;
+    }
+
+    public void updatePersona(PersonaType personaType){
+        this.personaType = personaType;
+    }
+
     @Builder
-    public Profile(String pictureUrl, String nickname, String name, Member member){
+    public Profile(String pictureUrl, String nickname, String name, Member member, Boolean isEmailActive, PersonaType personaType){
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;
         this.name = name;
         this.member = member;
+        this.isEmailActive = isEmailActive;
+        this.personaType = personaType;
     }
 }

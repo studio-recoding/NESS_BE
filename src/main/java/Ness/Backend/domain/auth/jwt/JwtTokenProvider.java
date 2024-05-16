@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 
 import java.time.LocalDateTime;
@@ -69,7 +70,7 @@ public class JwtTokenProvider {
                 .withHeader(headerMap)
                 .withIssuer("re:coding")
                 .withIssuedAt(now)
-                .withSubject(authKey) //토큰의 사용자를 식별하는 고유 주제
+                .withSubject(authKey) //토큰의 사용자를 식별하는 고유 주제(이메일)
                 .withExpiresAt(accessTokenExpireDate) //토큰의 만료 시간
                 .withClaim(AUTHORITIES_KEY, authKey) //토큰에 포함되는 정보인 Claim 설정
                 .sign(this.getSign());

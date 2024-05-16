@@ -17,7 +17,6 @@
 - Spring boot version: 3.2.2
 - Project: Gradle-Groovy
 - IntelliJ IDEA or eclipse
-- MySQL Workbrench
 
 ### 2) Clone
 Clone this repository to your local computer using:

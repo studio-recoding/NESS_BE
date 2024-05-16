@@ -1,5 +1,6 @@
 package Ness.Backend.domain.chat.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -20,11 +21,15 @@ public class GetChatDto {
     @Schema(description = "발화자 구분", example = "AI")
     private String chatType;
 
+    @JsonProperty("case")
+    private int caseNumber;
+
     @Builder
-    public GetChatDto(Long id, String createdDate, String text, String chatType){
+    public GetChatDto(Long id, String createdDate, String text, String chatType, int caseNumber){
         this.id = id;
         this.createdDate = createdDate;
         this.text = text;
         this.chatType = chatType;
+        this.caseNumber = caseNumber;
     }
 }

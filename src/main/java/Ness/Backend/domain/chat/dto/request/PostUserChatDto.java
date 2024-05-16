@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/* 프론트가 보내주는 유저의 채팅 */
 public class PostUserChatDto {
     @Schema(description = "채팅 내용", example = "오늘 내가 공부한 내역을 보여줘.")
     private String text;
 
-    @Schema(description = "발화자 구분", example = "AI")
+    @Schema(description = "발화자 구분", example = "AI/USER/STT")
     private ChatType chatType;
 }

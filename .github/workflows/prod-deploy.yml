@@ -107,5 +107,5 @@ jobs:
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker rm $(sudo docker ps -a -q)
             sudo docker rmi $(sudo docker images -q)
-            docker pull jeonhaeseung/ness-server-prod:prod
-            docker run -d --name backend-server -p 8080:8080 --restart unless-stopped jeonhaeseung/ness-server-prod:prod
+            docker pull jeonhaeseung/ness-server-prod:main
+            docker run -d --name backend-server -p 8080:8080 --restart unless-stopped jeonhaeseung/ness-server-prod:main

@@ -1,6 +1,9 @@
 package Ness.Backend.domain.profile.dto.response;
 
 
+import Ness.Backend.domain.profile.entity.PersonaType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -22,11 +25,21 @@ public class GetProfileDto {
     @Schema(description = "사용자의 이름", example = "홍길동")
     private String name;
 
+    @Schema(description = "사용자가 설정한 페르소나", example = "NESS")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private PersonaType persona;
+
+    @Schema(description = "사용자가 설정한 이메일 알림 여부", example = "NESS")
+    @JsonProperty("isEmailActive")
+    private boolean isEmailActive;
+
     @Builder
-    public GetProfileDto(Long id, String pictureUrl, String nickname, String name){
+    public GetProfileDto(Long id, String pictureUrl, String nickname, String name, PersonaType persona, boolean isEmailActive){
         this.id = id;
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;
         this.name = name;
+        this.persona = persona;
+        this.isEmailActive = isEmailActive;
     }
 }

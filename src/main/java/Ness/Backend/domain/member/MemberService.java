@@ -2,6 +2,7 @@ package Ness.Backend.domain.member;
 
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.profile.ProfileRepository;
+import Ness.Backend.domain.profile.entity.PersonaType;
 import Ness.Backend.domain.profile.entity.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,6 +35,7 @@ public class MemberService {
                 .name(name)
                 .member(member)
                 .isEmailActive(isEmailActive)
+                .personaType(PersonaType.NESS) //디폴트로 NESS를 저장해줌, 나중에 개인 페이지에서 변경 가능
                 .build();
 
         profileRepository.save(profile);

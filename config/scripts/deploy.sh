@@ -10,6 +10,7 @@ then
   sudo systemctl start docker
   sudo systemctl enable docker
   sudo usermod -a -G docker $(whoami)
+  g
 fi
 
 if ! type docker-compose > /dev/null

@@ -64,6 +64,7 @@ public class SecurityConfig {
         configuration.addAllowedOriginPattern("https://*.nessplanning.com");
         configuration.addAllowedOriginPattern("https://*.nessplanning.com:8080");
         configuration.addAllowedOriginPattern("https://*.nessplanning.com:3000");
+        configuration.addAllowedOriginPattern("https://www.nessplanning.com");
         configuration.addAllowedOriginPattern("https://api.nessplanning.com:8080");
         configuration.addAllowedMethod("*"); //모든 Method 허용(POST, GET, ...)
         configuration.addAllowedHeader("*"); //모든 Header 허용

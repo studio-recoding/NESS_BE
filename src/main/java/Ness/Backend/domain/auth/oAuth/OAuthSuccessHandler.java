@@ -54,8 +54,9 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
             redirect_url = "http://localhost:8080/oauth/google/success";
         }
         /* 프론트 개발 또는 프로덕션 환경 */
-        if (url.equals(backServerName)) {
+        else {
             log.info("backServerName: " + backServerName);
+            log.info("url: " + url);
             log.info("frontRedirectUrl: " + frontRedirectUrl);
             redirect_url = frontRedirectUrl + "/oauth/google/success/ing";
         }

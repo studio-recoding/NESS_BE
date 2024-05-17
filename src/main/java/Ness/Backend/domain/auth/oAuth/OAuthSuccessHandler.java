@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,6 +19,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("frontend.redirect-url")
+    private String frontRedirectUrl;
+
+    @Value("backend.server-name")
+    private String backServerName;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -46,12 +53,12 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         if (url.equals("localhost")) {
             redirect_url = "http://localhost:8080/oauth/google/success";
         }
-        /* 프론트 개발 환경 */
-        if (url.equals("api.nessplanning.com")) {
-            redirect_url = "http://localhost:3000/oauth/google/success/ing";
+        /* 프론트 개발 또는 프로덕션 환경 */
+        if (url.equals(backServerName)) {
+            log.info("backServerName: " + backServerName);
+            log.info("frontRedirectUrl: " + frontRedirectUrl);
+            redirect_url = frontRedirectUrl + "/oauth/google/success/ing";
         }
-        //TODO: 프론트 프로덕션 환경만 지원하는 백엔드 구축
-        
         return redirect_url;
     }
 }

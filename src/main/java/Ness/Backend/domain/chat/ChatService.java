@@ -100,6 +100,9 @@ public class ChatService {
         if (personaType == PersonaType.HARDNESS){
             persona = "hard";
         }
+        if (personaType == PersonaType.CLAMNESS){
+            persona = "easy";
+        }
 
         //TODO: member_id 전달하는 로직 만들어야 하지 않을까?(RAG를 위해)
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()

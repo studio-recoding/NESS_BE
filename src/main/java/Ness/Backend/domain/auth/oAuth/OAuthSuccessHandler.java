@@ -20,10 +20,10 @@ import java.io.IOException;
 public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Value("frontend.redirect-url")
+    @Value("${frontend.redirect-url}")
     private String frontRedirectUrl;
 
-    @Value("backend.server-name")
+    @Value("${backend.server-name}")
     private String backServerName;
 
     @Override
@@ -54,8 +54,9 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
             redirect_url = "http://localhost:8080/oauth/google/success";
         }
         /* 프론트 개발 또는 프로덕션 환경 */
-        if (url.equals(backServerName)) {
+        else {
             log.info("backServerName: " + backServerName);
+            log.info("url: " + url);
             log.info("frontRedirectUrl: " + frontRedirectUrl);
             redirect_url = frontRedirectUrl + "/oauth/google/success/ing";
         }

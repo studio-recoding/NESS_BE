@@ -20,10 +20,10 @@ import java.io.IOException;
 public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Value("frontend.redirect-url")
+    @Value("${frontend.redirect-url}")
     private String frontRedirectUrl;
 
-    @Value("backend.server-name")
+    @Value("${backend.server-name}")
     private String backServerName;
 
     @Override

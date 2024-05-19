@@ -1,6 +1,5 @@
 package Ness.Backend.infra.s3;
 
-import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.infra.s3.dto.GetS3UrlDto;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;

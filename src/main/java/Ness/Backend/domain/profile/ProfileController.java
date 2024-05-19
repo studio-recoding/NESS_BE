@@ -23,7 +23,7 @@ public class ProfileController {
     @GetMapping("")
     @Operation(summary = "프로필 조회 API", description = "사용자의 ID로 프로필을 조회하는 API 입니다.")
     public GetProfileDto userLogin(@AuthUser Member member) {
-        return profileService.getProfile(member.getId());
+        return profileService.getProfile(member.getId(), member.getEmail());
     }
 
     @PatchMapping("/nickname")

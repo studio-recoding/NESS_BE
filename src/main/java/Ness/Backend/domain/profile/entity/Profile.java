@@ -17,6 +17,8 @@ public class Profile {
 
     private String pictureUrl;
 
+    private String pictureKey;
+
     private String nickname;
 
     private String name;
@@ -31,8 +33,11 @@ public class Profile {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public void updateNickname(String nickname){
+    public void updateProfile(String nickname, String pictureKey){
         this.nickname = nickname;
+        if(pictureKey != null){
+            this.pictureKey = pictureKey;
+        }
     }
 
     public void updateMailActive(Boolean isEmailActive){

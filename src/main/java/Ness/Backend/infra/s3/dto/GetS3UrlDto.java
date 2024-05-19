@@ -1,5 +1,6 @@
 package Ness.Backend.infra.s3.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 

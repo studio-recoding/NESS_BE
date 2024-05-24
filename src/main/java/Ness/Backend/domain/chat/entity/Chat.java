@@ -28,10 +28,10 @@ public class Chat {
     @Enumerated(EnumType.STRING)
     private ChatType chatType;
 
-    @OneToOne(mappedBy = "chat")
+    @OneToOne(mappedBy = "chat", fetch = FetchType.LAZY)
     private Schedule schedule;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 

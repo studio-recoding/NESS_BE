@@ -37,7 +37,7 @@ public class Schedule {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
 

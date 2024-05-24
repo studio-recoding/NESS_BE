@@ -1,5 +1,6 @@
 package Ness.Backend.domain.category;
 
+import Ness.Backend.domain.category.dto.reponse.GetCategoryListDto;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.global.auth.AuthUser;
@@ -18,13 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "카테고리 API", description = "사용자의 카테고리 관련 API")
 @RequestMapping("/category")
 public class CategoryController {
-    private final CategoryRepository categoryRepository;
-    //TODO: 만들기
-    /*
+    private final CategoryService categoryService;
     @GetMapping("")
-    @Operation(summary = "특정 사용자의 한달치 스케쥴 내역", description = "&month=2024-01 와 같은 형식으로 데이터가 전달됩니다.")
-    public ResponseEntity<?> getUserSchedule(@AuthUser Member member){
-        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    @Operation(summary = "특정 사용자의 모든 카테고리", description = "모든 카테고리가 리스트로 반환됩니다.")
+    public ResponseEntity<GetCategoryListDto> getUserSchedule(@AuthUser Member member){
+        GetCategoryListDto getCategoryListDto = categoryService.getOneUserCategory(member.getId());
+        return new ResponseEntity<>(getCategoryListDto, HttpStatusCode.valueOf(200));
     }
-     */
 }

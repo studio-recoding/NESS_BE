@@ -23,7 +23,7 @@ public class S3Service {
     // 버킷 이름
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    
+
     @Transactional(readOnly = true)
     public GetS3UrlDto getPostS3Url(Long memberId, String filename) {
         // filename 설정하기(profile 경로 + 멤버ID + 랜덤 값)

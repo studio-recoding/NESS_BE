@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @Builder
 /* AI에게 보내는 유저 채팅 */
 public class PostFastApiUserChatDto {
+    @JsonProperty("member_id")
+    private Long member_id;
+
     @JsonProperty("prompt")
     private String message;
 

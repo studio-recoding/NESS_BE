@@ -1,6 +1,5 @@
 package Ness.Backend.domain.profile;
 
-import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.profile.dto.request.PutProfileDto;
 import Ness.Backend.domain.profile.dto.response.GetProfileDto;
 import Ness.Backend.domain.profile.entity.PersonaType;
@@ -59,6 +58,6 @@ public class ProfileService {
             return profile.getPictureUrl();
         }
         return s3Service.getGetS3Url(memberId,
-                        profile.getPictureKey()).getPreSignedUrl();
+                profile.getPictureKey()).getPreSignedUrl();
     }
 }

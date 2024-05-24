@@ -95,7 +95,7 @@ public class ChatService {
     }
 
     /* AI에 채팅 전송하는 로직 */
-    public PostFastApiAiChatDto postNewAiChat(Long id, String text, ChatType chatType, PersonaType personaType){
+    public PostFastApiAiChatDto postNewAiChat(Long memberId, String text, ChatType chatType, PersonaType personaType){
         String persona = "default";
         if (personaType == PersonaType.HARDNESS){
             persona = "hard";
@@ -109,6 +109,7 @@ public class ChatService {
                 .persona(persona)
                 .chatType(chatType) // 유저가 키보드로 친 채팅인지, 아니면 STT를 썼는지 구분
                 .message(text)
+                .member_id(memberId)
                 .build();
 
         //Fast API에 전송하기

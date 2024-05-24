@@ -1,6 +1,7 @@
 package Ness.Backend.domain.member.entity;
 
 
+import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.profile.entity.Profile;
 import Ness.Backend.domain.report.entity.ReportMemory;
@@ -43,13 +44,16 @@ public class Member {
     private List<Chat> chats = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<ReportTag> re = new ArrayList<>();
+    private List<ReportTag> reportTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<ReportMemory> reportMemories = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<ReportRecommend> reportRecommends = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Category> categories = new ArrayList<>();
 
     @Column(columnDefinition = "boolean default false")
     private boolean isDeleted;

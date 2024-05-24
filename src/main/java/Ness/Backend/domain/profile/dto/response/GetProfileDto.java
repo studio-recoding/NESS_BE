@@ -33,13 +33,18 @@ public class GetProfileDto {
     @JsonProperty("isEmailActive")
     private boolean isEmailActive;
 
+    @Schema(description = "사용자의 이메일", example = "example@gmail.com")
+    @JsonProperty("email")
+    private String email;
+
     @Builder
-    public GetProfileDto(Long id, String pictureUrl, String nickname, String name, PersonaType persona, boolean isEmailActive){
+    public GetProfileDto(Long id, String pictureUrl, String nickname, String name, PersonaType persona, boolean isEmailActive, String email){
         this.id = id;
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;
         this.name = name;
         this.persona = persona;
         this.isEmailActive = isEmailActive;
+        this.email = email;
     }
 }

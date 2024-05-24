@@ -33,14 +33,15 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public GetProfileDto getProfile(Long id) {
-        Profile profile = profileRepository.findProfileByMember_Id(id);
+    public GetProfileDto getProfile(Long memberId, String email) {
+        Profile profile = profileRepository.findProfileByMember_Id(memberId);
         GetProfileDto getProfileDto = GetProfileDto.builder()
                 .id(profile.getId())
                 .pictureUrl(profile.getPictureUrl())
                 .nickname(profile.getNickname())
                 .name(profile.getName())
                 .isEmailActive(profile.getIsEmailActive())
+                .email(email)
                 .persona(profile.getPersonaType())
                 .build();
 

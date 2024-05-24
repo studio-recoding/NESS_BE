@@ -2,7 +2,7 @@ package Ness.Backend.domain.profile;
 
 
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.domain.profile.dto.request.PatchNicknameDto;
+import Ness.Backend.domain.profile.dto.request.PutProfileDto;
 import Ness.Backend.domain.profile.dto.request.PatchPersonaDto;
 import Ness.Backend.domain.profile.dto.response.GetProfileDto;
 import Ness.Backend.global.auth.AuthUser;
@@ -26,10 +26,10 @@ public class ProfileController {
         return profileService.getProfile(member.getId(), member.getEmail());
     }
 
-    @PatchMapping("/nickname")
-    @Operation(summary = "프로필 닉네임 변경 API", description = "사용자의 ID로 프로필 닉네임을 변경하는 API 입니다.")
-    public ResponseEntity<Long> patchNickname(@AuthUser Member member, @RequestBody PatchNicknameDto patchNicknameDto) {
-        Long profileId = profileService.updateNickname(member.getId(), patchNicknameDto.getNickname());
+    @PutMapping("")
+    @Operation(summary = "프로필 변경 API", description = "프로필 닉네임과 사진을 모두 변경하는 API 입니다.")
+    public ResponseEntity<Long> patchProfile(@AuthUser Member member, @RequestBody PutProfileDto putProfileDto) {
+        Long profileId = profileService.updateProfile(member.getId(), putProfileDto);
         return new ResponseEntity<>(profileId, HttpStatusCode.valueOf(200));
     }
 

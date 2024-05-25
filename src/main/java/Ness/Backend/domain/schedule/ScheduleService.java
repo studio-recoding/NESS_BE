@@ -9,16 +9,14 @@ import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.chat.entity.ChatType;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.domain.schedule.dto.request.DeleteFastApiScheduleDto;
-import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
-import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
-import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
+import Ness.Backend.domain.schedule.dto.request.*;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
 import Ness.Backend.global.fastApi.FastApiDeleteScheduleApi;
 import Ness.Backend.global.fastApi.FastApiPostScheduleApi;
+import Ness.Backend.global.fastApi.FastApiPutScheduleApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +41,7 @@ public class ScheduleService {
     private final ChatService chatService;
     private final FastApiPostScheduleApi fastApiPostScheduleApi;
     private final FastApiDeleteScheduleApi fastApiDeleteScheduleApi;
+    private final FastApiPutScheduleApi fastApiPutScheduleApi;
 
     // 한 달치 스케쥴 가져오는 로직
     @Transactional(readOnly = true)
@@ -67,9 +66,11 @@ public class ScheduleService {
     }
 
     /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
-    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto, String date){
+    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto){
         Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
         Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
+        
+        //RDB에서 변경
         schedule.changeSchedule(
                 putScheduleDto.getInfo(),
                 putScheduleDto.getLocation(),
@@ -78,7 +79,33 @@ public class ScheduleService {
                 putScheduleDto.getEndTime(),
                 category);
 
-        return getOneDayUserSchedule(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
+        //VectorDB에서 변경
+        ZonedDateTime endTime = putScheduleDto.getEndTime();
+        if(endTime == null){
+            endTime =  putScheduleDto.getStartTime();
+        }
+
+        PutFastApiScheduleDto dto = PutFastApiScheduleDto.builder()
+                .info(putScheduleDto.getInfo())
+                .location(putScheduleDto.getLocation())
+                .person(putScheduleDto.getPerson())
+                .startTime(putScheduleDto.getStartTime())
+                .endTime(endTime)
+                .category(category.getName())
+                .category_id(category.getId())
+                .member_id(memberId)
+                .schedule_id(putScheduleDto.getId())
+                .build();
+
+        ResponseEntity<JsonNode> responseNode = fastApiPutScheduleApi.putFastApiSchedule(dto);
+
+        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
+            log.info("Succeed to put data in Vector DB");
+        } else {
+            log.error("Failed to put data in Vector DB");
+        }
+
+        return getOneDayUserSchedule(memberId, putScheduleDto.getOriginalTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 사용자가 직접 삭제한 스케쥴 */

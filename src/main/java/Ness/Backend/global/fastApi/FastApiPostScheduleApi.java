@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @FeignClient(
-        name = "FastApiSchedule",
+        name = "FastApiPostSchedule",
         url = "${spring.cloud.openfeign.client.config.fastapi.url}")
 public interface FastApiPostScheduleApi {
     @PostMapping(value = "/chromadb/add_schedule")

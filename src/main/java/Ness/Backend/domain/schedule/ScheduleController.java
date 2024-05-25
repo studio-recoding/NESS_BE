@@ -40,8 +40,8 @@ public class ScheduleController {
             description =
                     "하나의 스케쥴의 정보를 변경하는 API로 스케쥴, 위치, 사람, 시간 모두 PUT으로 처리합니다." +
                     "&day=2024-01-01과 같은 형식으로 데이터가 전달됩니다.")
-    public ResponseEntity<GetScheduleListDto> putOneSchedule(@AuthUser Member member, @RequestParam String day, @RequestBody PutScheduleDto putScheduleDto){
-        GetScheduleListDto oneUserOneDaySchedules = scheduleService.changeSchedule(member.getId(), putScheduleDto, day);
+    public ResponseEntity<GetScheduleListDto> putOneSchedule(@AuthUser Member member, @RequestBody PutScheduleDto putScheduleDto){
+        GetScheduleListDto oneUserOneDaySchedules = scheduleService.changeSchedule(member.getId(), putScheduleDto);
         return new ResponseEntity<>(oneUserOneDaySchedules, HttpStatusCode.valueOf(200));
     }
 

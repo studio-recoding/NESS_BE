@@ -48,7 +48,7 @@ public class ScheduleController {
     @DeleteMapping("")
     @Operation(summary = "하나의 스케쥴 삭제", description = "하나의 스케쥴을 삭제하는 API 입니다.")
     public ResponseEntity<GetScheduleListDto> deleteOneSchedule(@AuthUser Member member, @RequestParam Long id){
-        GetScheduleListDto oneUserOneDaySchedules = scheduleService.deleteSchedule(id);
+        GetScheduleListDto oneUserOneDaySchedules = scheduleService.deleteSchedule(member.getId(), id);
         return new ResponseEntity<>(oneUserOneDaySchedules, HttpStatusCode.valueOf(200));
     }
 

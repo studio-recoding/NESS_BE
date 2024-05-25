@@ -9,6 +9,7 @@ import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.chat.entity.ChatType;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.domain.schedule.dto.request.DeleteFastApiScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
 import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
@@ -16,7 +17,8 @@ import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
-import Ness.Backend.global.fastApi.FastApiScheduleApi;
+import Ness.Backend.global.fastApi.FastApiDeleteScheduleApi;
+import Ness.Backend.global.fastApi.FastApiPostScheduleApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +41,8 @@ public class ScheduleService {
     private final CategoryRepository categoryRepository;
     private final ChatRepository chatRepository;
     private final ChatService chatService;
-    private final FastApiScheduleApi fastApiScheduleApi;
+    private final FastApiPostScheduleApi fastApiPostScheduleApi;
+    private final FastApiDeleteScheduleApi fastApiDeleteScheduleApi;
 
     // 한 달치 스케쥴 가져오는 로직
     @Transactional(readOnly = true)
@@ -79,11 +82,27 @@ public class ScheduleService {
     }
 
     /* 사용자가 직접 삭제한 스케쥴 */
-    public GetScheduleListDto deleteSchedule(Long memberId){
-        Schedule schedule = scheduleRepository.findScheduleById(memberId);
+    public GetScheduleListDto deleteSchedule(Long memberId, Long scheduleId){
+        Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
+        ZonedDateTime scheduleTime = schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
+        //VectorDB에서 삭제
+        DeleteFastApiScheduleDto dto = DeleteFastApiScheduleDto.builder()
+                .member_id(memberId)
+                .schedule_id(scheduleId)
+                .build();
+
+        ResponseEntity<JsonNode> responseNode = fastApiDeleteScheduleApi.deleteFastApiSchedule(dto);
+        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(204)) {
+            log.info("Succeed to delete data in Vector DB");
+        } else {
+            log.error("Failed to delete data in Vector DB");
+        }
+
+        //RDB에서 삭제
         scheduleRepository.delete(schedule);
 
-        return getOneDayUserSchedule(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
+        return getOneDayUserSchedule(memberId, scheduleTime);
     }
 
     /* 사용자가 AI가 생성한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
@@ -174,7 +193,7 @@ public class ScheduleService {
                 .schedule_id(scheduleId)
                 .build();
 
-        ResponseEntity<JsonNode> responseNode = fastApiScheduleApi.creatFastApiSchedule(dto);
+        ResponseEntity<JsonNode> responseNode = fastApiPostScheduleApi.creatFastApiSchedule(dto);
         if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
             log.info("Succeed to save data in Vector DB");
         } else {

@@ -104,7 +104,6 @@ public class ChatService {
             persona = "easy";
         }
 
-        //TODO: member_id 전달하는 로직 만들어야 하지 않을까?(RAG를 위해)
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()
                 .persona(persona)
                 .chatType(chatType) // 유저가 키보드로 친 채팅인지, 아니면 STT를 썼는지 구분

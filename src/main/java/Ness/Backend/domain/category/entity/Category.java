@@ -1,7 +1,6 @@
 package Ness.Backend.domain.category.entity;
 
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.domain.member.entity.MemberRole;
 import Ness.Backend.domain.schedule.entity.Schedule;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter

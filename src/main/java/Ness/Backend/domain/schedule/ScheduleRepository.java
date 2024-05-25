@@ -15,8 +15,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     // 특정 맴버의 한달 치 스케쥴 반환
     @Query( value = "SELECT * FROM schedule " +
                     "WHERE member_id = :memberId " +
-                    "AND YEAR(CONVERT_TZ(start_time, '+00:00', '+09:00')) = CONVERT_TZ(:year, '+00:00', '+09:00')" +
-                    "AND MONTH(CONVERT_TZ(start_time, '+00:00', '+09:00')) = CONVERT_TZ(:month, '+00:00', '+09:00')" +
+                    "AND YEAR(CONVERT_TZ(start_time, '+00:00', '+09:00')) = :year " +
+                    "AND MONTH(CONVERT_TZ(start_time, '+00:00', '+09:00')) = :month " +
                     "ORDER BY start_time ASC",
             nativeQuery = true)
     List<Schedule> findOneMonthSchedulesByMember_Id(

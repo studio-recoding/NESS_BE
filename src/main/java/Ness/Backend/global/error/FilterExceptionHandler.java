@@ -8,6 +8,6 @@ public class FilterExceptionHandler {
     public static void setResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().print(ApiResponse.jsonOf(errorCode));
+        response.getWriter().print(ErrorResponse.jsonOf(errorCode));
     }
 }

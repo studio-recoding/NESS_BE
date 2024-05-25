@@ -1,14 +1,17 @@
-package Ness.Backend.domain.category.dto.reponse;
+package Ness.Backend.domain.category.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class GetCategoryDto {
-    @JsonProperty("categoryNum")
+@AllArgsConstructor
+@Builder
+public class PutCategoryDto {
+    @JsonProperty("id")
     private Long id;
 
     @JsonProperty("category")
@@ -16,11 +19,4 @@ public class GetCategoryDto {
 
     @JsonProperty("categoryColor")
     private String color;
-
-    @Builder
-    public GetCategoryDto(Long id, String name, String color){
-        this.id = id;
-        this.name = name;
-        this.color = color;
-    }
 }

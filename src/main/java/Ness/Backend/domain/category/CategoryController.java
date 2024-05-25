@@ -2,6 +2,7 @@ package Ness.Backend.domain.category;
 
 import Ness.Backend.domain.category.dto.reponse.GetCategoryListDto;
 import Ness.Backend.domain.category.dto.request.PostCategoryDto;
+import Ness.Backend.domain.category.dto.request.PutCategoryDto;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,9 +26,16 @@ public class CategoryController {
     }
 
     @PostMapping("")
-    @Operation(summary = "사용자가 만든 카테고리", description = "사용자가 만든 카테고리를 저장합니다.")
+    @Operation(summary = "사용자가 만든 카테고리 저장", description = "사용자가 만든 카테고리를 저장합니다.")
     public ResponseEntity<?> postUserCategory(@AuthUser Member member, @RequestBody PostCategoryDto postCategoryDto){
         categoryService.postUserCategory(member.getId(), postCategoryDto);
+        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    }
+
+    @PutMapping("")
+    @Operation(summary = "사용자가 만든 카테고리 수정", description = "사용자가 만든 카테고리를 수정합니다.")
+    public ResponseEntity<?> putUserCategory(@AuthUser Member member, @RequestBody PutCategoryDto putCategoryDto){
+        categoryService.putUserCategory(member.getId(), putCategoryDto);
         return new ResponseEntity<>(HttpStatusCode.valueOf(200));
     }
 }

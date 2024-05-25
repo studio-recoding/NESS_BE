@@ -1,6 +1,7 @@
 package Ness.Backend.domain.schedule.dto.request;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -39,4 +40,7 @@ public class PutScheduleDto {
 
     @Schema(description = "스케쥴 카테고리 DB 넘버", example = "0")
     private Long categoryNum;
+
+    @JsonProperty("originalTime")
+    private ZonedDateTime originalTime;
 }

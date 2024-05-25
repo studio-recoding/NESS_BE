@@ -1,5 +1,6 @@
 package Ness.Backend.domain.profile.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,6 @@ public class PutProfileDto {
     private String nickname;
 
     @Schema(description = "업데이트할 사용자 프로필 키 경로", example = "untitle.png")
+    @JsonProperty("imageUrl")
     private String key;
 }

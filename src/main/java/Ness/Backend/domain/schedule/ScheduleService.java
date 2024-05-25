@@ -9,14 +9,14 @@ import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.chat.entity.ChatType;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.domain.schedule.dto.request.PostFastApiScheduleDto;
-import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
-import Ness.Backend.domain.schedule.dto.request.PutScheduleDto;
+import Ness.Backend.domain.schedule.dto.request.*;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
-import Ness.Backend.global.fastApi.FastApiScheduleApi;
+import Ness.Backend.global.fastApi.FastApiDeleteScheduleApi;
+import Ness.Backend.global.fastApi.FastApiPostScheduleApi;
+import Ness.Backend.global.fastApi.FastApiPutScheduleApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,9 @@ public class ScheduleService {
     private final CategoryRepository categoryRepository;
     private final ChatRepository chatRepository;
     private final ChatService chatService;
-    private final FastApiScheduleApi fastApiScheduleApi;
+    private final FastApiPostScheduleApi fastApiPostScheduleApi;
+    private final FastApiDeleteScheduleApi fastApiDeleteScheduleApi;
+    private final FastApiPutScheduleApi fastApiPutScheduleApi;
 
     // 한 달치 스케쥴 가져오는 로직
     @Transactional(readOnly = true)
@@ -64,9 +66,11 @@ public class ScheduleService {
     }
 
     /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
-    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto, String date){
+    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto){
         Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
         Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
+        
+        //RDB에서 변경
         schedule.changeSchedule(
                 putScheduleDto.getInfo(),
                 putScheduleDto.getLocation(),
@@ -75,15 +79,57 @@ public class ScheduleService {
                 putScheduleDto.getEndTime(),
                 category);
 
-        return getOneDayUserSchedule(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
+        //VectorDB에서 변경
+        ZonedDateTime endTime = putScheduleDto.getEndTime();
+        if(endTime == null){
+            endTime =  putScheduleDto.getStartTime();
+        }
+
+        PutFastApiScheduleDto dto = PutFastApiScheduleDto.builder()
+                .info(putScheduleDto.getInfo())
+                .location(putScheduleDto.getLocation())
+                .person(putScheduleDto.getPerson())
+                .startTime(putScheduleDto.getStartTime())
+                .endTime(endTime)
+                .category(category.getName())
+                .category_id(category.getId())
+                .member_id(memberId)
+                .schedule_id(putScheduleDto.getId())
+                .build();
+
+        ResponseEntity<JsonNode> responseNode = fastApiPutScheduleApi.putFastApiSchedule(dto);
+
+        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
+            log.info("Succeed to put data in Vector DB");
+        } else {
+            log.error("Failed to put data in Vector DB");
+        }
+
+        return getOneDayUserSchedule(memberId, putScheduleDto.getOriginalTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 사용자가 직접 삭제한 스케쥴 */
-    public GetScheduleListDto deleteSchedule(Long memberId){
-        Schedule schedule = scheduleRepository.findScheduleById(memberId);
+    public GetScheduleListDto deleteSchedule(Long memberId, Long scheduleId){
+        Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
+        ZonedDateTime scheduleTime = schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
+        //VectorDB에서 삭제
+        DeleteFastApiScheduleDto dto = DeleteFastApiScheduleDto.builder()
+                .member_id(memberId)
+                .schedule_id(scheduleId)
+                .build();
+
+        ResponseEntity<JsonNode> responseNode = fastApiDeleteScheduleApi.deleteFastApiSchedule(dto);
+        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(204)) {
+            log.info("Succeed to delete data in Vector DB");
+        } else {
+            log.error("Failed to delete data in Vector DB");
+        }
+
+        //RDB에서 삭제
         scheduleRepository.delete(schedule);
 
-        return getOneDayUserSchedule(memberId, schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
+        return getOneDayUserSchedule(memberId, scheduleTime);
     }
 
     /* 사용자가 AI가 생성한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
@@ -144,17 +190,19 @@ public class ScheduleService {
                 postScheduleDto.getPerson(),
                 postScheduleDto.getStartTime(),
                 postScheduleDto.getEndTime(),
-                postScheduleDto.getCategoryNum(),
+                category.getName(),
+                category.getId(),
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
 
+        log.info("Succeed to save user created schedule data in RDB & VectorDB");
         return getOneDayUserSchedule(memberId, newSchedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */
     public void postNewAiSchedule(String info, String location, String person,
                                   ZonedDateTime startTime, ZonedDateTime endTime,
-                                  Long category, Long memberId, Long scheduleId){
+                                  String category, Long category_id, Long memberId, Long scheduleId){
 
         if(endTime == null){
             endTime = startTime;
@@ -167,11 +215,12 @@ public class ScheduleService {
                 .startTime(startTime)
                 .endTime(endTime)
                 .category(category)
+                .category_id(category_id)
                 .member_id(memberId)
                 .schedule_id(scheduleId)
                 .build();
 
-        ResponseEntity<JsonNode> responseNode = fastApiScheduleApi.creatFastApiSchedule(dto);
+        ResponseEntity<JsonNode> responseNode = fastApiPostScheduleApi.creatFastApiSchedule(dto);
         if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
             log.info("Succeed to save data in Vector DB");
         } else {

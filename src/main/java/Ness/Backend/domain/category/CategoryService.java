@@ -6,6 +6,7 @@ import Ness.Backend.domain.category.dto.request.PostCategoryDto;
 import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.global.error.exception.DuplicateCategoryException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class CategoryService {
 
     /* 카테고리 새롭게 만들기(유저에 의해서만 직접 생성) */
     @Transactional
-    public Long postUserCategory(Long memberId, PostCategoryDto postCategoryDto){
+    public void postUserCategory(Long memberId, PostCategoryDto postCategoryDto){
         List<Category> categoryList = categoryRepository.findCategoriesByName(postCategoryDto.getName());
         if(categoryList == null){
             //중복되지 않은 카테고리일 경우는 그대로 저장해주기
@@ -47,14 +48,9 @@ public class CategoryService {
                     .build();
 
             categoryRepository.save(category);
-
-            return category.getId();
-        }/*
-        else {
-
         }
-        */
-
-        return 1L;
+        else {
+            throw new DuplicateCategoryException();
+        }
     }
 }

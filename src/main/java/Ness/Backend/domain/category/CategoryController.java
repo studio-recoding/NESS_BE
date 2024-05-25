@@ -26,8 +26,8 @@ public class CategoryController {
 
     @PostMapping("")
     @Operation(summary = "사용자가 만든 카테고리", description = "사용자가 만든 카테고리를 저장합니다.")
-    public ResponseEntity<Long> postUserCategory(@AuthUser Member member, @RequestBody PostCategoryDto postCategoryDto){
-        Long categoryId = categoryService.postUserCategory(member.getId(), postCategoryDto);
-        return new ResponseEntity<>(categoryId, HttpStatusCode.valueOf(200));
+    public ResponseEntity<?> postUserCategory(@AuthUser Member member, @RequestBody PostCategoryDto postCategoryDto){
+        categoryService.postUserCategory(member.getId(), postCategoryDto);
+        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
     }
 }

@@ -50,16 +50,6 @@ public class ApiResponse<T> {
     }
 
 
-    public static JSONObject jsonOf(ErrorCode errorCode) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.put("success", false);
-        jsonObject.put("message", errorCode.getMessage());
-        jsonObject.put("status", errorCode.getHttpStatus().value());
-        jsonObject.put("code", errorCode.getCode());
-        return jsonObject;
-    }
-
     public static <T> ApiResponse<T> onFailure(ErrorCode errorCode, String message) {
         return ApiResponse.<T>builder()
                 .code(errorCode.getHttpStatus().value())

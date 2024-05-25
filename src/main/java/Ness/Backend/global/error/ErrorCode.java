@@ -29,7 +29,10 @@ public enum ErrorCode {
     INVALID_TOKEN(BAD_REQUEST, "AUTH009", "유효하지 않은 토큰입니다."),
     INVALID_TOKEN_SIGNATURE(BAD_REQUEST, "AUTH010", "유효하지 않은 시그니처를 가진 토큰입니다. 온전한 토큰이 맞는지 확인해주세요."),
     TOKEN_ERROR(BAD_REQUEST, "AUTH011", "기타 토큰 에러입니다."),
-    INVALID_PRINCIPAL(BAD_REQUEST, "AUTH012", "인증정보가 존재하지 않습니다.");
+    INVALID_PRINCIPAL(BAD_REQUEST, "AUTH012", "인증정보가 존재하지 않습니다."),
+
+    /* 카테고리 관련 */
+    INVALID_CATEGORY_NAME(CONFLICT, "CATE001", "해당 카테고리명이 이미 존재합니다. 카테고리명은 중복될 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

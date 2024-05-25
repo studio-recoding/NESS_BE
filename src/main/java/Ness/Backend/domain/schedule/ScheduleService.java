@@ -144,17 +144,19 @@ public class ScheduleService {
                 postScheduleDto.getPerson(),
                 postScheduleDto.getStartTime(),
                 postScheduleDto.getEndTime(),
-                postScheduleDto.getCategoryNum(),
+                category.getName(),
+                category.getId(),
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
 
+        log.info("Succeed to save user created schedule data in RDB & VectorDB");
         return getOneDayUserSchedule(memberId, newSchedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */
     public void postNewAiSchedule(String info, String location, String person,
                                   ZonedDateTime startTime, ZonedDateTime endTime,
-                                  Long category, Long memberId, Long scheduleId){
+                                  String category, Long category_id, Long memberId, Long scheduleId){
 
         if(endTime == null){
             endTime = startTime;
@@ -167,6 +169,7 @@ public class ScheduleService {
                 .startTime(startTime)
                 .endTime(endTime)
                 .category(category)
+                .category_id(category_id)
                 .member_id(memberId)
                 .schedule_id(scheduleId)
                 .build();

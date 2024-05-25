@@ -39,5 +39,8 @@ public class PostFastApiScheduleDto {
     private ZonedDateTime endTime;
 
     @JsonProperty("category")
-    private Long category;
+    private String category;
+
+    @JsonProperty("category_id")
+    private Long category_id;
 }

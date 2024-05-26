@@ -186,6 +186,7 @@ public class ReportService {
             List<ReportActivity> reportActivities = reportActivityRepository.findTodayReportActivityByMember_Id(memberId);
 
             List<PostFastApiAiActivityDto> postFastApiAiActivityDtos = reportActivities.stream()
+                    .limit(3) // 처음 세 개의 원소만 선택
                     .map(activity -> PostFastApiAiActivityDto.builder()
                             .activity(activity.getActivityText())
                             .imageTag(activity.getImageTag())

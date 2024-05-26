@@ -63,4 +63,8 @@ public class Schedule {
         this.endTime = endTime;
         this.category = category;
     }
+
+    public void changeCategory(Category category){
+        this.category = category;
+    }
 }

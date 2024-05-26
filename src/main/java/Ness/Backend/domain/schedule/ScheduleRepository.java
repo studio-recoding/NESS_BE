@@ -36,4 +36,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     //스케쥴 ID로 특정 스케쥴 찾아주기
     Schedule findScheduleById(Long scheduleId);
+
+    List<Schedule> findSchedulesByCategory_Id(Long categoryId);
 }

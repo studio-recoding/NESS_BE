@@ -16,6 +16,6 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleBusinessException(final BaseException baseException, HttpServletRequest httpServletRequest) {
         log.error("handleBusinessException", baseException);
         final ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(httpServletRequest);
-        return new ResponseEntity<>(ErrorResponse.onFailure(baseException.getErrorCode()),null, baseException.getErrorCode().getHttpStatus());
+        return new ResponseEntity<>(ErrorResponse.onFailure(baseException.getErrorCode(), baseException.getMessage()),null, baseException.getErrorCode().getHttpStatus());
     }
 }

@@ -24,6 +24,9 @@ public class Category {
     //카테고리별 색상
     private String color;
 
+    //디폴트로는 false
+    private boolean isDefaultNone = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -37,9 +40,10 @@ public class Category {
     }
 
     @Builder
-    public Category(Member member, String name, String color){
+    public Category(Member member, String name, String color, boolean isDefaultNone){
         this.member = member;
         this.name = name;
         this.color = color;
+        this.isDefaultNone = isDefaultNone;
     }
 }

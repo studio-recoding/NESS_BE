@@ -46,6 +46,7 @@ public class MemberService {
                 .member(member)
                 .name("\uD83C\uDF40미분류")
                 .color("#D9D9D9")
+                .isDefaultNone(true)
                 .build();
 
         profileRepository.save(profile);

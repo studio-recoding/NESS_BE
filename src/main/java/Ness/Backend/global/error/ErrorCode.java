@@ -33,6 +33,7 @@ public enum ErrorCode {
 
     /* 카테고리 관련 */
     INVALID_CATEGORY_NAME(CONFLICT, "CATE001", "해당 카테고리명이 이미 존재합니다. 카테고리명은 중복될 수 없습니다."),
+    INVALID_CATEGORY_DELETE(BAD_REQUEST, "CATE002", "미분류 카테고리는 삭제 불가능합니다."),
 
     /* 리포트 관련 */
     MISMATCH_REPORT_RECOMMEND(BAD_REQUEST, "RPT001", "한 줄 추천이 존재하지 않습니다.");

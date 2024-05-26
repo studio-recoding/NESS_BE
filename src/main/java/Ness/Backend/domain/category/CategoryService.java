@@ -7,6 +7,7 @@ import Ness.Backend.domain.category.dto.request.PutCategoryDto;
 import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.global.error.exception.DefaultCategoryException;
 import Ness.Backend.global.error.exception.DuplicateCategoryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +76,11 @@ public class CategoryService {
     /* 카테고리 삭제하기 */
     public void deleteUserCategory(Long memberId, Long categoryId){
         Category category = categoryRepository.findCategoryById(categoryId);
-        categoryRepository.delete(category);
+        if(category.isDefaultNone()){
+            //디폴트 미분류 카테고리는 삭제 불가
+            throw new DefaultCategoryException();
+        } else{
+            categoryRepository.delete(category);
+        }
     }
 }

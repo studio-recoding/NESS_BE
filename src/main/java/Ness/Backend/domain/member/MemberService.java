@@ -42,15 +42,48 @@ public class MemberService {
                 .build();
 
         //디폴트 미분류 카테고리가 있어야 함, 맴버 생성시 자동 만들어주기
-        Category category = Category.builder()
+        //회색
+        Category noneCategory = Category.builder()
                 .member(member)
                 .name("\uD83C\uDF40미분류")
                 .color("#D9D9D9")
                 .isDefaultNone(true)
                 .build();
 
+        //초록
+        Category studyCategory = Category.builder()
+                .member(member)
+                .name("\uD83D\uDCD6공부")
+                .color("#00C09E")
+                .build();
+
+        //하늘
+        Category workoutCategory = Category.builder()
+                .member(member)
+                .name("\uD83C\uDFC3\u200D♀\uFE0F운동")
+                .color("#759CFF")
+                .build();
+
+        //핑크
+        Category restCategory = Category.builder()
+                .member(member)
+                .name("\uD83D\uDEDF여가")
+                .color("#FF75C8")
+                .build();
+
+        //주황
+        Category meetingCategory = Category.builder()
+                .member(member)
+                .name("\uD83D\uDC65약속")
+                .color("#FFB775")
+                .build();
+
         profileRepository.save(profile);
-        categoryRepository.save(category);
+        categoryRepository.save(noneCategory);
+        categoryRepository.save(studyCategory);
+        categoryRepository.save(workoutCategory);
+        categoryRepository.save(restCategory);
+        categoryRepository.save(meetingCategory);
         return memberRepository.save(member);
     }
 }

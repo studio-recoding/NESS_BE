@@ -71,4 +71,10 @@ public class CategoryService {
             throw new DuplicateCategoryException();
         }
     }
+
+    /* 카테고리 삭제하기 */
+    public void deleteUserCategory(Long memberId, Long categoryId){
+        Category category = categoryRepository.findCategoryById(categoryId);
+        categoryRepository.delete(category);
+    }
 }

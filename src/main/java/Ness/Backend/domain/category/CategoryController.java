@@ -38,4 +38,11 @@ public class CategoryController {
         categoryService.putUserCategory(member.getId(), putCategoryDto);
         return new ResponseEntity<>(HttpStatusCode.valueOf(200));
     }
+
+    @DeleteMapping("")
+    @Operation(summary = "사용자가 만든 카테고리 삭제", description = "사용자가 만든 카테고리를 삭제합니다.")
+    public ResponseEntity<?> putUserCategory(@AuthUser Member member, @RequestParam Long categoryId){
+        categoryService.deleteUserCategory(member.getId(), categoryId);
+        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    }
 }

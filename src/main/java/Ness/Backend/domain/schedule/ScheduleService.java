@@ -236,6 +236,7 @@ public class ScheduleService {
                         .id(schedule.getId())
                         .category(schedule.getCategory().getName())
                         .categoryNum(schedule.getCategory().getId())
+                        .categoryColor(schedule.getCategory().getColor())
                         .info(schedule.getInfo())
                         .startTime(schedule.getStartTime())
                         .endTime(schedule.getEndTime())

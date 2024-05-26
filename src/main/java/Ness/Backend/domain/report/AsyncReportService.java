@@ -17,7 +17,10 @@ import Ness.Backend.global.fastApi.FastApiRecommendApi;
 import Ness.Backend.global.fastApi.FastApiTagApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -26,7 +29,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ReportService {
+@EnableAsync
+@Transactional
+public class AsyncReportService {
     private final ReportMemoryRepository reportMemoryRepository;
     private final ReportTagRepository reportTagRepository;
     private final ReportRecommendRepository reportRecommendRepository;
@@ -147,6 +152,7 @@ public class ReportService {
     }
 
     /* 한 줄 추천 및 엑티비티 가져오는 로직 */
+    @Async
     public PostFastApiAiRecommendActivityDto getRecommendActivity(Long memberId){
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();

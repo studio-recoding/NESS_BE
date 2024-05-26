@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/report")
 public class ReportController {
-    private final ReportService reportService;
+    private final AsyncReportService asyncReportService;
     @GetMapping("/memory")
     @Operation(summary = "리포트 메모리 조회 API", description = "사용자의 ID로 리포트 메모리를 조회하는 API입니다.")
     public GetReportMemoryListDto getMemory(@AuthUser Member member) {
-        return reportService.getMemory(member.getId());
+        return asyncReportService.getMemory(member.getId());
     }
 
     @GetMapping("/tag")
     @Operation(summary = "리포트 테그 조회 API", description = "사용자의 ID로 리포트 테그를 조회하는 API입니다.")
     public GetReportTagListDto getTag(@AuthUser Member member) {
-        return reportService.getTag(member.getId());
+        return asyncReportService.getTag(member.getId());
     }
 }

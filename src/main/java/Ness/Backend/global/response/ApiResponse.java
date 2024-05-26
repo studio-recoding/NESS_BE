@@ -4,10 +4,6 @@ import Ness.Backend.global.error.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import net.minidev.json.JSONObject;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class ApiResponse<T> {
     @JsonProperty("status")

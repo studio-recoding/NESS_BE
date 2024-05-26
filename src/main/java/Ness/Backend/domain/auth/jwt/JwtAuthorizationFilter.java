@@ -4,8 +4,6 @@ import Ness.Backend.domain.auth.security.AuthDetailService;
 import Ness.Backend.domain.auth.security.AuthDetails;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.error.ErrorCode;
-import static Ness.Backend.global.error.FilterExceptionHandler.setResponse;
-
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
@@ -19,10 +17,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Collections;
+
+import static Ness.Backend.global.error.FilterExceptionHandler.setResponse;
 
 /* 사용자의 권한 부여
  * 요청에 포함된 JWT 토큰을 검증하고, 토큰에서 추출한 권한 정보를 기반으로 사용자에 대한 권한을 확인

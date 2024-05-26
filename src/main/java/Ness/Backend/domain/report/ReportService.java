@@ -10,6 +10,8 @@ import Ness.Backend.domain.report.entity.ReportActivity;
 import Ness.Backend.domain.report.entity.ReportMemory;
 import Ness.Backend.domain.report.entity.ReportRecommend;
 import Ness.Backend.domain.report.entity.ReportTag;
+import Ness.Backend.global.error.ErrorCode;
+import Ness.Backend.global.error.exception.NotFoundException;
 import Ness.Backend.global.fastApi.FastApiMemoryApi;
 import Ness.Backend.global.fastApi.FastApiRecommendApi;
 import Ness.Backend.global.fastApi.FastApiTagApi;
@@ -148,9 +150,9 @@ public class ReportService {
     public PostFastApiAiRecommendActivityDto getRecommendActivity(Long memberId){
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
-        ReportRecommend reportRecommend = reportRecommendRepository.findTodayReportRecommendByMember_Id(memberId);
+        List<ReportRecommend> reportRecommends = reportRecommendRepository.findTodayReportRecommendByMember_Id(memberId);
 
-        if(reportRecommend == null){
+        if(reportRecommends.isEmpty()){
             //새로운 한 줄 추천 및 엑티비티 생성하기
             PostFastApiAiRecommendActivityDto aiDto = postNewAiRecommend(memberId, now);
             aiDto.setAnswer(parseAiRecommend(aiDto.getAnswer()));
@@ -177,9 +179,14 @@ public class ReportService {
             }
             return aiDto;
         } else{
+            ReportRecommend reportRecommend = reportRecommends.stream()
+                    .findFirst()
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.MISMATCH_REPORT_RECOMMEND.getMessage()));
+
             List<ReportActivity> reportActivities = reportActivityRepository.findTodayReportActivityByMember_Id(memberId);
 
             List<PostFastApiAiActivityDto> postFastApiAiActivityDtos = reportActivities.stream()
+                    .limit(3) // 처음 세 개의 원소만 선택
                     .map(activity -> PostFastApiAiActivityDto.builder()
                             .activity(activity.getActivityText())
                             .imageTag(activity.getImageTag())

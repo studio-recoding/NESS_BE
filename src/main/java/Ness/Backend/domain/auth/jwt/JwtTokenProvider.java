@@ -105,7 +105,7 @@ public class JwtTokenProvider {
                 .asString();  //가져온 클레임을 문자열로 변환하여 반환
     }
 
-    /* 토큰에서 expire time 정보 가져오는 메서드 */
+    /* 토큰에서 expire Time 정보 가져오는 메서드 */
     private Date getExpireTimeClaim(String jwtToken) {
         return JWT.require(this.getSign())
                 .acceptExpiresAt(JWT_EXPIRATION_TIME)

@@ -29,6 +29,8 @@ public class Schedule {
 
     private ZonedDateTime endTime;
 
+    private String todo;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -66,5 +68,9 @@ public class Schedule {
 
     public void changeCategory(Category category){
         this.category = category;
+    }
+
+    public void updateTodo(String todo){
+        this.todo = todo;
     }
 }

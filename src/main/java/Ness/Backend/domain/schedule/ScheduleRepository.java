@@ -34,6 +34,17 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
         @Param("memberId") Long memberId,
         @Param("date") ZonedDateTime date);
 
+    // 메인페이지에서 각 일정의 한줄 추천 가져오기 위한 스케쥴 쿼리
+    @Query(value = "SELECT * FROM schedule " +
+            "WHERE member_id = :memberId " +
+            "AND (CONVERT_TZ(start_time, '+00:00', '+09:00')) > CONVERT_TZ(:now, '+00:00', '+09:00') " +
+            "ORDER BY start_time ASC " +
+            "LIMIT 5",
+    nativeQuery = true)
+    List<Schedule> findUpcomingSchedulesByStart_Time(
+            @Param("memberId") Long memberId,
+            @Param("now") ZonedDateTime now);
+
     //스케쥴 ID로 특정 스케쥴 찾아주기
     Schedule findScheduleById(Long scheduleId);
 

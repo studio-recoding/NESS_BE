@@ -14,6 +14,9 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 public class PostFastApiTodoDto {
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("startTime")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private ZonedDateTime startTime;

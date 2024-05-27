@@ -248,4 +248,24 @@ public class ScheduleService {
                 .toList();
         return new GetScheduleListDto(getScheduleDtos);
     }
+
+    public List<GetScheduleDto> makeScheduleWithCommentListDto(List<Schedule> scheduleList){
+        // ScheduleListResponseDto에 매핑
+        return scheduleList.stream()
+                .map(schedule -> GetScheduleDto.builder()
+                        .id(schedule.getId())
+                        .category(schedule.getCategory().getName())
+                        .categoryNum(schedule.getCategory().getId())
+                        .categoryColor(schedule.getCategory().getColor())
+                        .info(schedule.getInfo())
+                        .startTime(schedule.getStartTime())
+                        .endTime(schedule.getEndTime())
+                        .nessComment(schedule.getTodo())
+                        .details(GetScheduleDetailDto.builder()
+                                .person(schedule.getPerson())
+                                .location(schedule.getLocation())
+                                .build())
+                        .build())
+                .toList();
+    }
 }

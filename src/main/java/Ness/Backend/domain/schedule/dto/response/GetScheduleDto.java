@@ -42,10 +42,15 @@ public class GetScheduleDto {
     @JsonProperty("details")
     private GetScheduleDetailDto details;
 
+
+    @Schema(description = "스케줄에 대한 네스의 한줄 코멘트", example = "공대에서 공부하시는군요. 효율적인 학습을 위해 좋은 환경을 만드세요!")
+    @JsonProperty("nessComment")
+    private String nessComment;
+
     @Builder
     public GetScheduleDto(Long id, String category, Long categoryNum, String categoryColor,
                           String info, ZonedDateTime startTime, ZonedDateTime endTime,
-                          GetScheduleDetailDto details){
+                          GetScheduleDetailDto details, String nessComment){
         this.id = id;
         this.category = category;
         this.categoryNum = categoryNum;
@@ -54,5 +59,6 @@ public class GetScheduleDto {
         this.startTime = startTime;
         this.endTime = endTime;
         this.details = details;
+        this.nessComment = nessComment;
     }
 }

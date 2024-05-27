@@ -36,11 +36,13 @@ public class EmailService {
         List<Member> activeMembers = memberRepository.findMembersByProfileIsEmailActive(true);
 
         for (Member member : activeMembers) {
-            asyncEmailService.sendEmailNotice(member.getId(), member.getEmail());
+            Profile profile = profileRepository.findProfileByMember_Id(member.getId());
+            asyncEmailService.sendEmailNotice(member.getId(), member.getEmail(), profile.getPersonaType());
         }
     }
 
     public void sendEmailTest(Long memberId, String email){
-        asyncEmailService.sendEmailNotice(memberId, email);
+        Profile profile = profileRepository.findProfileByMember_Id(memberId);
+        asyncEmailService.sendEmailNotice(memberId, email, profile.getPersonaType());
     }
 }

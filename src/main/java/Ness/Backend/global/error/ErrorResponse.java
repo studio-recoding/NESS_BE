@@ -44,4 +44,12 @@ public class ErrorResponse {
                 .message(errorCode.getMessage())
                 .build();
     }
+
+    public static ErrorResponse onFailure(ErrorCode errorCode, String message) {
+        return ErrorResponse.builder()
+                .status(errorCode.getHttpStatus().value())
+                .code(errorCode.getCode())
+                .message(message)
+                .build();
+    }
 }

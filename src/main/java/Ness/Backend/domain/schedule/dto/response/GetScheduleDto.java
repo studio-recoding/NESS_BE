@@ -34,17 +34,22 @@ public class GetScheduleDto {
     @JsonProperty("categoryNum")
     private Long categoryNum;
 
+    @Schema(description = "스케줄 카테고리 색상", example = "#FFFFFF")
+    @JsonProperty("categoryColor")
+    private String categoryColor;
+
     @Schema(description = "스케줄 디테일", example = "위치, 사람, id 등")
     @JsonProperty("details")
     private GetScheduleDetailDto details;
 
     @Builder
-    public GetScheduleDto(Long id, String category, Long categoryNum,
+    public GetScheduleDto(Long id, String category, Long categoryNum, String categoryColor,
                           String info, ZonedDateTime startTime, ZonedDateTime endTime,
                           GetScheduleDetailDto details){
         this.id = id;
         this.category = category;
         this.categoryNum = categoryNum;
+        this.categoryColor = categoryColor;
         this.info = info;
         this.startTime = startTime;
         this.endTime = endTime;

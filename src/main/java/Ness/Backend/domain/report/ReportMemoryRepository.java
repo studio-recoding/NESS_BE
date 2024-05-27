@@ -12,7 +12,7 @@ public interface ReportMemoryRepository extends JpaRepository<ReportMemory, Long
     // 특정 맴버의 오늘 하루 생성된 데이터만 반환
     @Query( value = "SELECT * FROM report_memory " +
             "WHERE member_id = :memberId " +
-            "AND DATE(created_date) = CURDATE() " +
+            "AND DATE(CONVERT_TZ(created_date, '+00:00', '+09:00')) = CURDATE() " +
             "ORDER BY created_date ASC",
             nativeQuery = true)
     ReportMemory findTodayReportMemoryByMember_Id(

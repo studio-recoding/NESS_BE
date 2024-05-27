@@ -1,7 +1,7 @@
 package Ness.Backend.global.error;
 
-import Ness.Backend.global.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 public class FilterExceptionHandler {

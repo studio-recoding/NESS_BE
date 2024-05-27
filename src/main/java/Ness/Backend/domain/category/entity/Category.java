@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -24,6 +25,9 @@ public class Category {
     //카테고리별 색상
     private String color;
 
+    //디폴트로는 false
+    private boolean isDefaultNone;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -37,9 +41,10 @@ public class Category {
     }
 
     @Builder
-    public Category(Member member, String name, String color){
+    public Category(Member member, String name, String color, boolean isDefaultNone){
         this.member = member;
         this.name = name;
         this.color = color;
+        this.isDefaultNone = Objects.requireNonNullElse(isDefaultNone, false);
     }
 }

@@ -2,8 +2,8 @@ package Ness.Backend.domain.profile;
 
 
 import Ness.Backend.domain.member.entity.Member;
-import Ness.Backend.domain.profile.dto.request.PutProfileDto;
 import Ness.Backend.domain.profile.dto.request.PatchPersonaDto;
+import Ness.Backend.domain.profile.dto.request.PutProfileDto;
 import Ness.Backend.domain.profile.dto.response.GetProfileDto;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;

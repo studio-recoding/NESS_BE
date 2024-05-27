@@ -2,6 +2,7 @@ package Ness.Backend.domain.profile.email;
 
 import Ness.Backend.domain.profile.email.dto.request.PostFastApiUserEmailDto;
 import Ness.Backend.domain.profile.email.dto.response.PostFastApiAiEmailDto;
+import Ness.Backend.domain.profile.entity.PersonaType;
 import Ness.Backend.global.fastApi.FastApiEmailApi;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,17 @@ public class AsyncEmailService {
     private final SpringTemplateEngine templateEngine;
     private final FastApiEmailApi fastApiEmailApi;
     @Async
-    public void sendEmailNotice(Long memberId, String email){
+    public void sendEmailNotice(Long memberId, String email, PersonaType personaType){
         log.info("Trying to send Email to " + email);
+        String persona = "default";
+        if (personaType == PersonaType.HARDNESS){
+            persona = "hard";
+        }
+        if (personaType == PersonaType.CALMNESS){
+            persona = "calm";
+        }
         try {
-            PostFastApiAiEmailDto aiDto = postTodayAiAnalysis(memberId, getToday());
+            PostFastApiAiEmailDto aiDto = postTodayAiAnalysis(memberId, getToday(), persona);
             String image = aiDto.getImage();
             String text = aiDto.getText().replace("<br>", "\n");
 
@@ -50,10 +58,10 @@ public class AsyncEmailService {
         }
     }
 
-    public PostFastApiAiEmailDto postTodayAiAnalysis(Long id, ZonedDateTime today){
+    public PostFastApiAiEmailDto postTodayAiAnalysis(Long id, ZonedDateTime today, String persona){
         PostFastApiUserEmailDto userDto = PostFastApiUserEmailDto.builder()
                 .member_id(id.intValue())
-                .user_persona("")
+                .user_persona(persona)
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();

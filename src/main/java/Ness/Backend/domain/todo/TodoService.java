@@ -53,9 +53,9 @@ public class TodoService {
                                     .name(schedule.getCategory().getName())
                                     .color(schedule.getCategory().getColor())
                                     .build())
-                            .person(schedule.getPerson())
-                            .location(schedule.getLocation())
-                            .info(schedule.getInfo())
+                            .person(schedule.getPerson() != null ? schedule.getPerson() : "")
+                            .location(schedule.getLocation() != null ? schedule.getLocation() : "")
+                            .info(schedule.getInfo() != null ? schedule.getInfo() : "")
                             .build())
                     .toList();
 

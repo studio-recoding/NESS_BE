@@ -100,8 +100,8 @@ public class ChatService {
         if (personaType == PersonaType.HARDNESS){
             persona = "hard";
         }
-        if (personaType == PersonaType.CLAMNESS){
-            persona = "easy";
+        if (personaType == PersonaType.CALMNESS){
+            persona = "calm";
         }
 
         PostFastApiUserChatDto userDto = PostFastApiUserChatDto.builder()

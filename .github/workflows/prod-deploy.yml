@@ -89,6 +89,7 @@ jobs:
         uses: burnett01/rsync-deployments@4.1
         with:
           switches: -avzr --delete
+          path: ./config
           remote_path: ./prod
           remote_host: ${{ secrets.HOST_PROD }}
           remote_user: ${{ secrets.USER_PROD }}

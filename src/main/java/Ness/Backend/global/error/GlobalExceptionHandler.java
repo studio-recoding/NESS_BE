@@ -1,6 +1,7 @@
 package Ness.Backend.global.error;
 
 import Ness.Backend.global.error.exception.BaseException;
+import Ness.Backend.infra.discord.DiscordAlertSender;
 import Ness.Backend.infra.discord.DiscordMessageGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @Slf4j
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
-    private final DiscordMessageGenerator discordMessageGenerator;
+    private final DiscordAlertSender discordAlertSender;
     // 비즈니스 로직 에러 처리
     @ExceptionHandler(BaseException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(final BaseException baseException, HttpServletRequest httpServletRequest) {
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception exception, HttpServletRequest httpServletRequest) {
         log.error("handleException", exception);
-        discordMessageGenerator.sendDiscordAlarm(exception, httpServletRequest);
+        discordAlertSender.sendDiscordAlarm(exception, httpServletRequest);
         final ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(httpServletRequest);
         return new ResponseEntity<>(ErrorResponse.onFailure(ErrorCode._INTERNAL_SERVER_ERROR), null, INTERNAL_SERVER_ERROR);
     }

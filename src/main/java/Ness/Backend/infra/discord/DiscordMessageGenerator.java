@@ -33,6 +33,9 @@ public class DiscordMessageGenerator {
                                     + "### 🔗 요청 엔드포인트\n"
                                     + httpServletRequest.getRequestURI()
                                     + "\n"
+                                    + "### 🧐 요청 클라이언트 IP\n"
+                                    + getRemoteIp(httpServletRequest)
+                                    + "\n"
                                     + "### 🖥️ 에러 발생 서버\n"
                                     + activeProfile
                                     + "\n"
@@ -50,5 +53,10 @@ public class DiscordMessageGenerator {
         StringWriter stringWriter = new StringWriter();
         exception.printStackTrace(new PrintWriter(stringWriter));
         return stringWriter.toString();
+    }
+
+    /* 클라이언트 요청 IP 알아내기 */
+    private String getRemoteIp(HttpServletRequest httpServletRequest){
+        return httpServletRequest.getRemoteAddr();
     }
 }

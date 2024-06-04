@@ -32,7 +32,9 @@ public class MainService {
             PostFastApiAiRecommendActivityDto activityDtos = activityFuture.get();
             return toEntity(scheduleDtos, activityDtos);
 
-        } catch (Exception exception){
+        }
+        // 비동기 에러 발생시 동기 처리를 하더라도 메인 API 제공되도록 로직 설정
+        catch (Exception exception){
             List<GetScheduleDto> scheduleDtos = todoService.getTodo(memberId);
             PostFastApiAiRecommendActivityDto activityDtos = reportService.getRecommendActivity(memberId);
             return toEntity(scheduleDtos, activityDtos);

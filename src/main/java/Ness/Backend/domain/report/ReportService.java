@@ -2,6 +2,9 @@ package Ness.Backend.domain.report;
 
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.domain.profile.ProfileRepository;
+import Ness.Backend.domain.profile.entity.PersonaType;
+import Ness.Backend.domain.profile.entity.Profile;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserMemoryDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserRecommendActivityDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserTagDto;
@@ -37,6 +40,7 @@ public class ReportService {
     private final FastApiTagApi fastApiTagApi;
     private final FastApiMemoryApi fastApiMemoryApi;
     private final MemberRepository memberRepository;
+    private final ProfileRepository profileRepository;
 
     /* 메모리 가져오는 로직 */
     public GetReportMemoryListDto getMemory(Long id){
@@ -81,9 +85,10 @@ public class ReportService {
     }
 
     public String postNewAiMemory(Long id, ZonedDateTime today){
+        String persona = getPersona(id);
         PostFastApiUserMemoryDto userDto = PostFastApiUserMemoryDto.builder()
                 .member_id(id.intValue())
-                .user_persona("")
+                .user_persona(persona)
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();
@@ -141,9 +146,10 @@ public class ReportService {
     }
 
     public PostFastApiAiTagListDto postNewAiTag(Long id, ZonedDateTime today){
+        String persona = getPersona(id);
         PostFastApiUserTagDto userDto = PostFastApiUserTagDto.builder()
                 .member_id(id.intValue())
-                .user_persona("")
+                .user_persona(persona)
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();
@@ -210,9 +216,10 @@ public class ReportService {
     }
 
     public PostFastApiAiRecommendActivityDto postNewAiRecommend(Long id, ZonedDateTime today){
+        String persona = getPersona(id);
         PostFastApiUserRecommendActivityDto userDto = PostFastApiUserRecommendActivityDto.builder()
                 .member_id(id.intValue())
-                .user_persona("") // 빈 문자열은 default
+                .user_persona(persona)
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();
@@ -227,6 +234,21 @@ public class ReportService {
 
     public ZonedDateTime getToday(){
         return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+    }
+
+    public String getPersona(Long memberId){
+        Profile profileEntity = profileRepository.findProfileByMember_Id(memberId);
+        PersonaType personaType = profileEntity.getPersonaType();
+
+        String persona = "default";
+        if (personaType == PersonaType.HARDNESS){
+            persona = "hard";
+        }
+        if (personaType == PersonaType.CALMNESS){
+            persona = "calm";
+        }
+
+        return persona;
     }
 
 }

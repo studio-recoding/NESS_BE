@@ -40,6 +40,8 @@ public class ReportService {
 
     /* 메모리 가져오는 로직 */
     public GetReportMemoryListDto getMemory(Long id){
+        log.info("getMemory called by member: " + id);
+
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
 
@@ -94,6 +96,8 @@ public class ReportService {
 
     /* 테그 가져오는 로직 */
     public GetReportTagListDto getTag(Long id){
+        log.info("getTag called by member: " + id);
+
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
 
@@ -150,6 +154,8 @@ public class ReportService {
 
     /* 한 줄 추천 및 엑티비티 가져오는 로직 */
     public PostFastApiAiRecommendActivityDto getRecommendActivity(Long memberId){
+        log.info("getRecommendActivity called by member: " + memberId);
+
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
         List<ReportRecommend> reportRecommends = reportRecommendRepository.findTodayReportRecommendByMember_Id(memberId);

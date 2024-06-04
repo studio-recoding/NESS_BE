@@ -34,6 +34,8 @@ public class TodoService {
 
     /* 일정 관련 한 줄 추천 가져오는 로직 */
     public List<GetScheduleDto> getTodo(Long memberId){
+        log.info("getTodo called by member: " + memberId);
+
         Profile userProfile = profileRepository.findProfileByMember_Id(memberId);
         // 오늘 날짜 가져오기
         ZonedDateTime now = time.getToday();

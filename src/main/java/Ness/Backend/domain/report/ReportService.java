@@ -2,6 +2,9 @@ package Ness.Backend.domain.report;
 
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
+import Ness.Backend.domain.profile.ProfileRepository;
+import Ness.Backend.domain.profile.entity.PersonaType;
+import Ness.Backend.domain.profile.entity.Profile;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserMemoryDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserRecommendActivityDto;
 import Ness.Backend.domain.report.dto.request.PostFastApiUserTagDto;
@@ -37,19 +40,22 @@ public class ReportService {
     private final FastApiTagApi fastApiTagApi;
     private final FastApiMemoryApi fastApiMemoryApi;
     private final MemberRepository memberRepository;
+    private final ProfileRepository profileRepository;
 
     /* 메모리 가져오는 로직 */
-    public GetReportMemoryListDto getMemory(Long id){
+    public GetReportMemoryListDto getMemory(Long memberId){
+        log.info("getMemory called by member: " + memberId);
+
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
 
-        ReportMemory reportMemory = reportMemoryRepository.findTodayReportMemoryByMember_Id(id);
+        List<ReportMemory> reportMemory = reportMemoryRepository.findTodayReportMemoryByMember_Id(memberId);
 
-        if (reportMemory == null){
+        if (reportMemory.isEmpty()){
             // 오늘치가 없다면 새롭게 생성하기
-            String memory = postNewAiMemory(id, now);
+            String memory = postNewAiMemory(memberId, now);
 
-            Member memberEntity = memberRepository.findMemberById(id);
+            Member memberEntity = memberRepository.findMemberById(memberId);
 
             ReportMemory newMemory = ReportMemory.builder()
                     .createdDate(now)
@@ -61,7 +67,7 @@ public class ReportService {
         }
 
         // 2주치의 데이터 가져오기
-        List<ReportMemory> reportMemories = reportMemoryRepository.findTwoWeekUserMemoryByMember_Id(id);
+        List<ReportMemory> reportMemories = reportMemoryRepository.findTwoWeekUserMemoryByMember_Id(memberId);
         return createReportMemoryListDto(reportMemories);
     }
 
@@ -78,10 +84,11 @@ public class ReportService {
         return new GetReportMemoryListDto(getReportMemoryDtos);
     }
 
-    public String postNewAiMemory(Long id, ZonedDateTime today){
+    public String postNewAiMemory(Long memberId, ZonedDateTime today){
+        String persona = getPersona(memberId);
         PostFastApiUserMemoryDto userDto = PostFastApiUserMemoryDto.builder()
-                .member_id(id.intValue())
-                .user_persona("")
+                .member_id(memberId.intValue())
+                .user_persona(persona)
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();
@@ -93,16 +100,18 @@ public class ReportService {
     }
 
     /* 테그 가져오는 로직 */
-    public GetReportTagListDto getTag(Long id){
+    public GetReportTagListDto getTag(Long memberId){
+        log.info("getTag called by member: " + memberId);
+
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
 
-        List<ReportTag> reportTags = reportTagRepository.findLastMonthReportTagByMember_Id(id);
+        List<ReportTag> reportTags = reportTagRepository.findLastMonthReportTagByMember_Id(memberId);
 
         if (reportTags == null || reportTags.isEmpty()) {
-            PostFastApiAiTagListDto aiDto = postNewAiTag(id, getToday());
+            PostFastApiAiTagListDto aiDto = postNewAiTag(memberId, getToday());
 
-            Member memberEntity = memberRepository.findMemberById(id);
+            Member memberEntity = memberRepository.findMemberById(memberId);
 
             for (PostFastApiAiTagDto tag : aiDto.getTags()) {
                 ReportTag reportTag = ReportTag.builder()
@@ -113,7 +122,7 @@ public class ReportService {
                         .build();
                 reportTagRepository.save(reportTag);
             }
-            return createReportTagListDto(reportTagRepository.findLastMonthReportTagByMember_Id(id));
+            return createReportTagListDto(reportTagRepository.findLastMonthReportTagByMember_Id(memberId));
         } else {
             return createReportTagListDto(reportTags);
         }
@@ -132,14 +141,15 @@ public class ReportService {
         return new GetReportTagListDto(getReportTagDtos);
     }
 
-    public PostFastApiAiTagListDto getAiTag(Long id){
-        return postNewAiTag(id, getToday());
+    public PostFastApiAiTagListDto getAiTag(Long memberId){
+        return postNewAiTag(memberId, getToday());
     }
 
-    public PostFastApiAiTagListDto postNewAiTag(Long id, ZonedDateTime today){
+    public PostFastApiAiTagListDto postNewAiTag(Long memberId, ZonedDateTime today){
+        String persona = getPersona(memberId);
         PostFastApiUserTagDto userDto = PostFastApiUserTagDto.builder()
-                .member_id(id.intValue())
-                .user_persona("")
+                .member_id(memberId.intValue())
+                .user_persona(persona)
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();
@@ -150,11 +160,13 @@ public class ReportService {
 
     /* 한 줄 추천 및 엑티비티 가져오는 로직 */
     public PostFastApiAiRecommendActivityDto getRecommendActivity(Long memberId){
+        log.info("getRecommendActivity called by member: " + memberId);
+
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
         List<ReportRecommend> reportRecommends = reportRecommendRepository.findTodayReportRecommendByMember_Id(memberId);
 
-        if(reportRecommends.isEmpty()){
+        if(reportRecommends == null || reportRecommends.isEmpty()){
             //새로운 한 줄 추천 및 엑티비티 생성하기
             PostFastApiAiRecommendActivityDto aiDto = postNewAiRecommend(memberId, now);
             aiDto.setAnswer(parseAiRecommend(aiDto.getAnswer()));
@@ -203,10 +215,11 @@ public class ReportService {
         }
     }
 
-    public PostFastApiAiRecommendActivityDto postNewAiRecommend(Long id, ZonedDateTime today){
+    public PostFastApiAiRecommendActivityDto postNewAiRecommend(Long memberId, ZonedDateTime today){
+        String persona = getPersona(memberId);
         PostFastApiUserRecommendActivityDto userDto = PostFastApiUserRecommendActivityDto.builder()
-                .member_id(id.intValue())
-                .user_persona("") // 빈 문자열은 default
+                .member_id(memberId.intValue())
+                .user_persona(persona)
                 .schedule_datetime_start(today)
                 .schedule_datetime_end(today)
                 .build();
@@ -221,6 +234,21 @@ public class ReportService {
 
     public ZonedDateTime getToday(){
         return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+    }
+
+    public String getPersona(Long memberId){
+        Profile profileEntity = profileRepository.findProfileByMember_Id(memberId);
+        PersonaType personaType = profileEntity.getPersonaType();
+
+        String persona = "default";
+        if (personaType == PersonaType.HARDNESS){
+            persona = "hard";
+        }
+        if (personaType == PersonaType.CALMNESS){
+            persona = "calm";
+        }
+
+        return persona;
     }
 
 }

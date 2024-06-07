@@ -49,9 +49,9 @@ public class ReportService {
         // 오늘 날짜 가져오기
         ZonedDateTime now = getToday();
 
-        ReportMemory reportMemory = reportMemoryRepository.findTodayReportMemoryByMember_Id(memberId);
+        List<ReportMemory> reportMemory = reportMemoryRepository.findTodayReportMemoryByMember_Id(memberId);
 
-        if (reportMemory == null){
+        if (reportMemory.isEmpty()){
             // 오늘치가 없다면 새롭게 생성하기
             String memory = postNewAiMemory(memberId, now);
 
@@ -166,7 +166,7 @@ public class ReportService {
         ZonedDateTime now = getToday();
         List<ReportRecommend> reportRecommends = reportRecommendRepository.findTodayReportRecommendByMember_Id(memberId);
 
-        if(reportRecommends.isEmpty()){
+        if(reportRecommends == null || reportRecommends.isEmpty()){
             //새로운 한 줄 추천 및 엑티비티 생성하기
             PostFastApiAiRecommendActivityDto aiDto = postNewAiRecommend(memberId, now);
             aiDto.setAnswer(parseAiRecommend(aiDto.getAnswer()));

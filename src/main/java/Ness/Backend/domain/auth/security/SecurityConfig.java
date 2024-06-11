@@ -98,7 +98,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(oAuth2CustomUserService))
                         .successHandler(oAuthSuccessHandler())
-                        .failureHandler(())
+                        .failureHandler(oAuthFailureHandler()))
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         //.requestMatchers("/signup/**", "/login/**").permitAll() // 회원가입 및 로그인 경로는 인증 생략

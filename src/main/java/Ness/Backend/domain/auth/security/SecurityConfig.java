@@ -5,6 +5,7 @@ import Ness.Backend.domain.auth.jwt.JwtAuthenticationFilter;
 import Ness.Backend.domain.auth.jwt.JwtAuthorizationFilter;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.auth.oAuth.OAuth2CustomUserService;
+import Ness.Backend.domain.auth.oAuth.OAuthFailureHandler;
 import Ness.Backend.domain.auth.oAuth.OAuthSuccessHandler;
 import Ness.Backend.domain.member.MemberRepository;
 import jakarta.servlet.DispatcherType;
@@ -42,6 +43,11 @@ public class SecurityConfig {
     @Bean
     public OAuthSuccessHandler oAuthSuccessHandler(){
         return new OAuthSuccessHandler(jwtTokenProvider());
+    }
+
+    @Bean
+    public OAuthFailureHandler oAuthFailureHandler(){
+        return new OAuthFailureHandler();
     }
 
     /* 로그인: 사용자 정보(memberRepository 내용)를 토대로 토큰을 생성하거나 검증 */
@@ -91,7 +97,8 @@ public class SecurityConfig {
                 .oauth2Login((oauth2) -> oauth2 //oauth가 성공하면 보내줄 포인트
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(oAuth2CustomUserService))
-                        .successHandler(oAuthSuccessHandler()))
+                        .successHandler(oAuthSuccessHandler())
+                        .failureHandler(())
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         //.requestMatchers("/signup/**", "/login/**").permitAll() // 회원가입 및 로그인 경로는 인증 생략

@@ -26,11 +26,13 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public Member createMember(String email, String password, String picture, String nickname, String name, Boolean isEmailActive) {
+    public void createMember(String email, String password, String picture, String nickname, String name, Boolean isEmailActive) {
         Member member = Member.builder()
                 .email(email)
                 .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
                 .build();
+
+        memberRepository.save(member);
 
         Profile profile = Profile.builder()
                 .pictureUrl(picture)
@@ -40,6 +42,8 @@ public class MemberService {
                 .isEmailActive(isEmailActive)
                 .personaType(PersonaType.NESS) //디폴트로 NESS를 저장해줌, 나중에 개인 페이지에서 변경 가능
                 .build();
+
+        profileRepository.save(profile);
 
         //디폴트 미분류 카테고리가 있어야 함, 맴버 생성시 자동 만들어주기
         //회색
@@ -78,12 +82,11 @@ public class MemberService {
                 .color("#FFB775")
                 .build();
 
-        profileRepository.save(profile);
         categoryRepository.save(noneCategory);
         categoryRepository.save(studyCategory);
         categoryRepository.save(workoutCategory);
         categoryRepository.save(restCategory);
         categoryRepository.save(meetingCategory);
-        return memberRepository.save(member);
+        return;
     }
 }

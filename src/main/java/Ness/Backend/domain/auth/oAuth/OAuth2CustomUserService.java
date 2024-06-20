@@ -35,6 +35,7 @@ public class OAuth2CustomUserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        attributes.forEach((key, value) -> log.info(key + ": " + value));
 
         /*공급자 정보인 registrationId(구글, 카카오, 네이버)*/
         String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();

@@ -26,7 +26,8 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public void createMember(String email, String password, String picture, String nickname, String name, Boolean isEmailActive) {
+    public void createMember(String email, String password, String picture, String nickname,
+                             String name, Boolean isEmailActive, Boolean isOnBoarded) {
         Member member = Member.builder()
                 .email(email)
                 .password(bCryptPasswordEncoder.encode(password)) //비밀번호는 해싱해서 DB에 저장
@@ -39,8 +40,9 @@ public class MemberService {
                 .nickname(nickname)
                 .name(name)
                 .member(member)
-                .isEmailActive(isEmailActive)
+                .isEmailActive(isEmailActive) // 디폴트로 false, 온보딩 마치면 true 변환
                 .personaType(PersonaType.NESS) //디폴트로 NESS를 저장해줌, 나중에 개인 페이지에서 변경 가능
+                .onBoarding(isOnBoarded)
                 .build();
 
         profileRepository.save(profile);
@@ -71,7 +73,7 @@ public class MemberService {
         //핑크
         Category restCategory = Category.builder()
                 .member(member)
-                .name("\uD83D\uDEDF여가")
+                .name("✨여가")
                 .color("#FF75C8")
                 .build();
 

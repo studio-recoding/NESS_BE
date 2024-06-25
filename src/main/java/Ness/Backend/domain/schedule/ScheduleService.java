@@ -14,6 +14,7 @@ import Ness.Backend.domain.schedule.dto.response.GetScheduleDetailDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
+import Ness.Backend.global.error.exception.NotFoundCategoryException;
 import Ness.Backend.global.fastApi.FastApiDeleteScheduleApi;
 import Ness.Backend.global.fastApi.FastApiPostScheduleApi;
 import Ness.Backend.global.fastApi.FastApiPutScheduleApi;
@@ -137,25 +138,30 @@ public class ScheduleService {
         Member member = memberRepository.findMemberById(memberId);
         Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
 
+        /* 사용자가 Accept 했으면 스케쥴 생성하기 */
         if(idAccepted){
-            /* 사용자가 Accept 했으면 스케쥴 생성하기 */
-            Chat chat = chatRepository.findChatById(chatId);
+            /* 카테고리 연견관계가 정상적인 경우*/
+            if(category != null){
+                Chat chat = chatRepository.findChatById(chatId);
 
-            Schedule newSchedule = Schedule.builder()
-                    .info(postScheduleDto.getInfo())
-                    .location(postScheduleDto.getLocation())
-                    .person(postScheduleDto.getPerson())
-                    .startTime(postScheduleDto.getStartTime())
-                    .endTime(postScheduleDto.getEndTime())
-                    .member(member)
-                    .category(category)
-                    .chat(chat)
-                    .build();
+                Schedule newSchedule = Schedule.builder()
+                        .info(postScheduleDto.getInfo())
+                        .location(postScheduleDto.getLocation())
+                        .person(postScheduleDto.getPerson())
+                        .startTime(postScheduleDto.getStartTime())
+                        .endTime(postScheduleDto.getEndTime())
+                        .member(member)
+                        .category(category)
+                        .chat(chat)
+                        .build();
 
-            scheduleRepository.save(newSchedule);
+                scheduleRepository.save(newSchedule);
 
-            chatService.createNewChat("일정을 추가해드렸습니다:)", ChatType.AI, 1, member);
-
+                chatService.createNewChat("일정을 추가해드렸습니다:)", ChatType.AI, 1, member);
+            }
+            else{
+                throw new NotFoundCategoryException();
+            }
         } else {
             chatService.createNewChat("일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
         }
@@ -204,16 +210,18 @@ public class ScheduleService {
                                   ZonedDateTime startTime, ZonedDateTime endTime,
                                   String category, Long category_id, Long memberId, Long scheduleId){
 
+        // null 값은 전달되서는 안됨
         if(endTime == null){
             endTime = startTime;
         }
 
+        // 서울 시간대로 VectorDB에 저장
         PostFastApiScheduleDto dto = PostFastApiScheduleDto.builder()
                 .info(info)
                 .location(location)
                 .person(person)
-                .startTime(startTime)
-                .endTime(endTime)
+                .startTime(startTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")))
+                .endTime(endTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")))
                 .category(category)
                 .category_id(category_id)
                 .member_id(memberId)

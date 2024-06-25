@@ -37,8 +37,13 @@ public class GetProfileDto {
     @JsonProperty("email")
     private String email;
 
+    @Schema(description = "사용자의 온보딩 여부", example = "false")
+    @JsonProperty("onBoarding")
+    private boolean onBoarding;
+
     @Builder
-    public GetProfileDto(Long id, String pictureUrl, String nickname, String name, PersonaType persona, boolean isEmailActive, String email){
+    public GetProfileDto(Long id, String pictureUrl, String nickname, String name,
+                         PersonaType persona, boolean isEmailActive, String email, boolean onBoarding){
         this.id = id;
         this.pictureUrl = pictureUrl;
         this.nickname = nickname;
@@ -46,5 +51,6 @@ public class GetProfileDto {
         this.persona = persona;
         this.isEmailActive = isEmailActive;
         this.email = email;
+        this.onBoarding = onBoarding;
     }
 }

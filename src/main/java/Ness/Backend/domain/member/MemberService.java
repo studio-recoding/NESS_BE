@@ -71,7 +71,7 @@ public class MemberService {
         //핑크
         Category restCategory = Category.builder()
                 .member(member)
-                .name("\uD83D\uDEDF여가")
+                .name("✨여가")
                 .color("#FF75C8")
                 .build();
 

@@ -210,16 +210,18 @@ public class ScheduleService {
                                   ZonedDateTime startTime, ZonedDateTime endTime,
                                   String category, Long category_id, Long memberId, Long scheduleId){
 
+        // null 값은 전달되서는 안됨
         if(endTime == null){
             endTime = startTime;
         }
 
+        // 서울 시간대로 VectorDB에 저장
         PostFastApiScheduleDto dto = PostFastApiScheduleDto.builder()
                 .info(info)
                 .location(location)
                 .person(person)
-                .startTime(startTime)
-                .endTime(endTime)
+                .startTime(startTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")))
+                .endTime(endTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")))
                 .category(category)
                 .category_id(category_id)
                 .member_id(memberId)

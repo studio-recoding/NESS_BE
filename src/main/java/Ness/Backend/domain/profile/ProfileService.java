@@ -1,6 +1,7 @@
 package Ness.Backend.domain.profile;
 
 import Ness.Backend.domain.profile.dto.request.PutProfileDto;
+import Ness.Backend.domain.profile.dto.response.GetOnBoardingDto;
 import Ness.Backend.domain.profile.dto.response.GetProfileDto;
 import Ness.Backend.domain.profile.entity.PersonaType;
 import Ness.Backend.domain.profile.entity.Profile;
@@ -36,6 +37,19 @@ public class ProfileService {
         return profile.getId();
     }
 
+    public GetOnBoardingDto getOnBoarding(Long memberId){
+        Profile profile = profileRepository.findProfileByMember_Id(memberId);
+
+        return GetOnBoardingDto.builder()
+                .onBoarding(profile.getOnBoarding())
+                .build();
+    }
+
+    public void updateOnBoarding(Long memberId, boolean isOnBoarded){
+        Profile profile = profileRepository.findProfileByMember_Id(memberId);
+        profile.updateOnBoarding(isOnBoarded);
+    }
+
     @Transactional(readOnly = true)
     public GetProfileDto getProfile(Long memberId, String email) {
         Profile profile = profileRepository.findProfileByMember_Id(memberId);
@@ -47,6 +61,7 @@ public class ProfileService {
                 .isEmailActive(profile.getIsEmailActive())
                 .email(email)
                 .persona(profile.getPersonaType())
+                .onBoarding(profile.getOnBoarding())
                 .build();
 
         return getProfileDto;

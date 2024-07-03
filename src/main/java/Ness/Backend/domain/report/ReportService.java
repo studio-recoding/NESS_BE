@@ -54,8 +54,6 @@ public class ReportService {
         if (reportMemory.isEmpty()){
             // 오늘치가 없다면 새롭게 생성하기
             String memory = postNewAiMemory(memberId, now);
-            // AI에서 이 접두사를 붙여서 반환하는 경우가 많이 발생함
-            memory = memory.replace("AI Recommendation: ", "");
 
             Member memberEntity = memberRepository.findMemberById(memberId);
 
@@ -231,6 +229,8 @@ public class ReportService {
     }
 
     public String parseAiRecommend(String text){
+        // AI에서 이 접두사를 붙여서 반환하는 경우가 많이 발생함
+        text = text.replace("AI Recommendation: ", "");
         return text.replace("\"", "");
     }
 

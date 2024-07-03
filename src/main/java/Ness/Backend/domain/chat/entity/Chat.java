@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,8 +30,8 @@ public class Chat {
     @Enumerated(EnumType.STRING)
     private ChatType chatType;
 
-    @OneToOne(mappedBy = "chat", fetch = FetchType.LAZY)
-    private Schedule schedule;
+    @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY)
+    private List<Schedule> schedules = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -37,13 +39,12 @@ public class Chat {
 
     @Builder
     public Chat(Long id, ZonedDateTime createdDate, String text, ChatType chatType,
-                int caseNumber, Schedule schedule, Member member) {
+                int caseNumber, Member member) {
         this.id = id;
         this.createdDate = createdDate;
         this.text = text;
         this.chatType = chatType;
         this.caseNumber = caseNumber;
-        this.schedule = schedule;
         this.member = member;
     }
 }

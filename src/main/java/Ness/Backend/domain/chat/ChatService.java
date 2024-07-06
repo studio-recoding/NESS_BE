@@ -58,6 +58,7 @@ public class ChatService {
                         .text(chat.getText())
                         .caseNumber(chat.getCaseNumber())
                         .chatType(chat.getChatType().toString())
+                        .metadata(chat.getMetadata())
                         .build())
                 .toList();
         return new GetChatListDto(getChatDtos);
@@ -87,6 +88,7 @@ public class ChatService {
                 .text(AiDto.getAnswer())
                 .chatType(ChatType.AI)
                 .caseNumber(AiDto.getCaseNumber()) //AI는 받아온 값으로 저장
+                .metadata(AiDto.getMetadata())
                 .member(memberEntity)
                 .build();
 

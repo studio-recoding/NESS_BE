@@ -24,6 +24,8 @@ public class Chat {
 
     private String text;
 
+    private String metadata;
+
     private int caseNumber;
 
     //AI 발화인지, USER 발화인지 구분해주는 타입 값
@@ -39,12 +41,13 @@ public class Chat {
 
     @Builder
     public Chat(Long id, ZonedDateTime createdDate, String text, ChatType chatType,
-                int caseNumber, Member member) {
+                int caseNumber, Member member, String metadata) {
         this.id = id;
         this.createdDate = createdDate;
         this.text = text;
         this.chatType = chatType;
         this.caseNumber = caseNumber;
         this.member = member;
+        this.metadata = metadata;
     }
 }

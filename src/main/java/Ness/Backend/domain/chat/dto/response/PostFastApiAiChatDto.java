@@ -17,4 +17,7 @@ public class PostFastApiAiChatDto {
 
     @JsonProperty("case")
     private int caseNumber;
+
+    @JsonProperty("metadata")
+    private String metadata;
 }

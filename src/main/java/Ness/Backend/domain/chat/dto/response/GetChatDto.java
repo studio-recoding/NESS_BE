@@ -18,6 +18,9 @@ public class GetChatDto {
     @Schema(description = "채팅 내용", example = "오늘 내가 공부한 내역을 보여줘.")
     private String text;
 
+    @Schema(description = "채팅 메타데이터", example = "일정에 대한 JSON 구조")
+    private String metadata;
+
     @Schema(description = "발화자 구분", example = "AI")
     private String chatType;
 
@@ -25,11 +28,12 @@ public class GetChatDto {
     private int caseNumber;
 
     @Builder
-    public GetChatDto(Long id, String createdDate, String text, String chatType, int caseNumber){
+    public GetChatDto(Long id, String createdDate, String text, String chatType, int caseNumber, String metadata){
         this.id = id;
         this.createdDate = createdDate;
         this.text = text;
         this.chatType = chatType;
         this.caseNumber = caseNumber;
+        this.metadata = metadata;
     }
 }

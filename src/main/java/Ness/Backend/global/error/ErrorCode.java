@@ -38,7 +38,10 @@ public enum ErrorCode {
     NOTFOUND_CATEGORY(BAD_REQUEST, "CATE003", "해당 카테고리가 해당 맴버에게 존재하지 않습니다."),
 
     /* 리포트 관련 */
-    MISMATCH_REPORT_RECOMMEND(BAD_REQUEST, "RPT001", "한 줄 추천이 존재하지 않습니다.");
+    MISMATCH_REPORT_RECOMMEND(BAD_REQUEST, "RPT001", "한 줄 추천이 존재하지 않습니다."),
+
+    /* 스케쥴 관련 */
+    NOTFOUND_SCHEDULE(BAD_REQUEST, "SCHE001", "해당 스케쥴이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

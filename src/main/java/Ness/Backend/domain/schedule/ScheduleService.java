@@ -158,13 +158,13 @@ public class ScheduleService {
 
                 scheduleRepository.save(newSchedule);
 
-                chatService.createNewChat("일정을 추가해드렸습니다:)", ChatType.AI, 1, member);
+                chatService.createNewChat("\"" + postScheduleDto.getInfo() + "\" " + "일정을 추가해드렸습니다:)", ChatType.AI, 1, member);
             }
             else{
                 throw new NotFoundCategoryException();
             }
         } else {
-            chatService.createNewChat("일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
+            chatService.createNewChat("\"" + postScheduleDto.getInfo() + "\" " + "일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
         }
 
         // 모든 채팅 내역 반환
@@ -193,10 +193,12 @@ public class ScheduleService {
                     log.error("Failed to delete data in Vector DB");
                 }
 
+                String info = schedule.getInfo();
+
                 //RDB에서 삭제
                 scheduleRepository.delete(schedule);
 
-                chatService.createNewChat("일정을 삭제해드렸습니다!", ChatType.AI, 1, member);
+                chatService.createNewChat("\"" + info + "\" " + "일정을 삭제해드렸습니다!", ChatType.AI, 1, member);
             }
             else{
                 throw new NotFoundScheduleException();

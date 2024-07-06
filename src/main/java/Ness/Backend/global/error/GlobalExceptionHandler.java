@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
@@ -25,6 +27,14 @@ public class GlobalExceptionHandler {
         log.error("handleBusinessException", baseException);
         final ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(httpServletRequest);
         return new ResponseEntity<>(ErrorResponse.onFailure(baseException.getErrorCode(), baseException.getMessage()),null, baseException.getErrorCode().getHttpStatus());
+    }
+
+    // 잘못된 API 경로 요청 따로 처리(디스코드 알림에서 제외하기 위함)
+    @ExceptionHandler(NoResourceFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException noResourceFoundException, HttpServletRequest httpServletRequest) {
+        log.error("handleNoResourceFoundException", noResourceFoundException);
+        final ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(httpServletRequest);
+        return new ResponseEntity<>(ErrorResponse.onFailure(ErrorCode._INTERNAL_SERVER_ERROR), null, INTERNAL_SERVER_ERROR);
     }
 
     // 따로 처리하지 않은 500 에러 모두 처리

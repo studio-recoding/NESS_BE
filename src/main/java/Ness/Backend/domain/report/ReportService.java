@@ -23,9 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +74,36 @@ public class ReportService {
     }
 
     public GetReportMemoryListDto createReportMemoryListDto(List<ReportMemory> reportMemories) {
+        ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
+        LocalDate startDate = ZonedDateTime.now(koreaZoneId).toLocalDate().minusDays(13);
+
+        // 주어진 기간 내의 모든 날짜 리스트 생성
+        List<LocalDate> allDates = Stream.iterate(startDate, date -> date.plusDays(1))
+                .limit(14)
+                .toList();
+
+        List<GetReportMemoryDto> getReportMemoryDtos = allDates.stream()
+                .map(date -> {
+                    // 해당 날짜의 ReportMemory 객체를 찾음 (한국 시간대 기준으로 LocalDate 비교)
+                    ReportMemory memory = reportMemories.stream()
+                            .filter(m -> m.getCreatedDate().withZoneSameInstant(koreaZoneId).toLocalDate().equals(date))
+                            .findFirst()
+                            .orElse(null);
+
+                    // ReportMemory 객체가 존재하면 해당 객체를 기반으로 DTO 생성, 없으면 임시 DTO 생성
+                    return GetReportMemoryDto.builder()
+                            .id(memory != null ? memory.getId() : 0) // 존재하지 않으면 ID는 0
+                            .createdDate(memory != null ? memory.getCreatedDate().toString() : date.atStartOfDay(koreaZoneId).toString()) // 존재하지 않으면 해당 날짜의 00:00 KST 사용
+                            .memory(memory != null ? memory.getMemory() : "\uD83C\uDE1A") // 임시 메모리 데이터
+                            .build();
+                })
+                .toList();
+
+        return new GetReportMemoryListDto(getReportMemoryDtos);
+    }
+
+    /*
+    public GetReportMemoryListDto createReportMemoryListDto(List<ReportMemory> reportMemories) {
         //ReportMemoryListResponseDto에 매핑
         List<GetReportMemoryDto> getReportMemoryDtos = reportMemories.stream()
                 .map(memory -> GetReportMemoryDto.builder()
@@ -83,6 +115,7 @@ public class ReportService {
 
         return new GetReportMemoryListDto(getReportMemoryDtos);
     }
+     */
 
     public String postNewAiMemory(Long memberId, ZonedDateTime today){
         String persona = getPersona(memberId);
@@ -229,6 +262,8 @@ public class ReportService {
     }
 
     public String parseAiRecommend(String text){
+        // AI에서 이 접두사를 붙여서 반환하는 경우가 많이 발생함
+        text = text.replace("AI Recommendation: ", "");
         return text.replace("\"", "");
     }
 

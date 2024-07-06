@@ -58,4 +58,11 @@ public class ScheduleController {
         GetChatListDto oneUserChats = scheduleService.postAiScheduleAccept(member.getId(), isAccepted, chatId, postScheduleDto);
         return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
     }
+
+    @DeleteMapping("/ai")
+    @Operation(summary = "AI에 의해서 삭제된 스케쥴", description = "프론트가 보내주는 AI에 의해서 생성된 새로운 스케쥴을 Accept/Deny합니다.")
+    public ResponseEntity<GetChatListDto> DeleteAiSchedule(@AuthUser Member member, @RequestParam Boolean isAccepted, @RequestParam Long scheduleId){
+        GetChatListDto oneUserChats = scheduleService.deleteAiScheduleAccept(member.getId(), isAccepted, scheduleId);
+        return new ResponseEntity<>(oneUserChats, HttpStatusCode.valueOf(200));
+    }
 }

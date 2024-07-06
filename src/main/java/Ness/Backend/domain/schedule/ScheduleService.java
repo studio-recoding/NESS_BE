@@ -15,6 +15,7 @@ import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
 import Ness.Backend.global.error.exception.NotFoundCategoryException;
+import Ness.Backend.global.error.exception.NotFoundScheduleException;
 import Ness.Backend.global.fastApi.FastApiDeleteScheduleApi;
 import Ness.Backend.global.fastApi.FastApiPostScheduleApi;
 import Ness.Backend.global.fastApi.FastApiPutScheduleApi;
@@ -164,6 +165,44 @@ public class ScheduleService {
             }
         } else {
             chatService.createNewChat("일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
+        }
+
+        // 모든 채팅 내역 반환
+        return chatService.getOneWeekUserChat(memberId);
+    }
+
+    /* 사용자가 AI가 삭제 요청한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
+    public GetChatListDto deleteAiScheduleAccept(Long memberId, Boolean idAccepted, Long scheduleId){
+        Member member = memberRepository.findMemberById(memberId);
+        Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
+
+        /* 사용자가 Accept 했으면 스케쥴 생성하기 */
+        if(idAccepted){
+            /* 삭제할 스케쥴이 정상적으로 존재하는 경우 */
+            if(schedule != null){
+                //VectorDB에서 삭제
+                DeleteFastApiScheduleDto dto = DeleteFastApiScheduleDto.builder()
+                        .member_id(memberId)
+                        .schedule_id(scheduleId)
+                        .build();
+
+                ResponseEntity<JsonNode> responseNode = fastApiDeleteScheduleApi.deleteFastApiSchedule(dto);
+                if (responseNode.getStatusCode() == HttpStatusCode.valueOf(204)) {
+                    log.info("Succeed to delete data in Vector DB");
+                } else {
+                    log.error("Failed to delete data in Vector DB");
+                }
+
+                //RDB에서 삭제
+                scheduleRepository.delete(schedule);
+
+                chatService.createNewChat("일정을 삭제해드렸습니다!", ChatType.AI, 1, member);
+            }
+            else{
+                throw new NotFoundScheduleException();
+            }
+        } else {
+            chatService.createNewChat("일정 추가를 취소했습니다.\n다른 할 일이 있으면 알려주세요.", ChatType.AI, 1, member);
         }
 
         // 모든 채팅 내역 반환

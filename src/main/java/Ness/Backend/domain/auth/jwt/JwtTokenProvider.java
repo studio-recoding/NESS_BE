@@ -148,4 +148,27 @@ public class JwtTokenProvider {
 
         return tokenMember;
     }
+
+    public boolean validRefreshToken(String refreshToken){
+        /* email 값이 null이 아닌지 확인 */
+        String authKey = getAuthKeyClaim(refreshToken);
+        if (authKey == null){
+            return false;
+        }
+
+        /* JWT_EXPIRATION_TIME이 지나지 않았는지 확인 */
+        Date expiresAt = getExpireTimeClaim(refreshToken);
+        if (!this.validExpiredTime(expiresAt)) {
+            return false;
+        }
+
+        /* email 값이 정상적으로 있고, JWT_EXPIRATION_TIME도 지나지 않았다면,
+         * 해당 토큰의 email 정보를 가진 맴버가 있는지 DB에서 확인 */
+        Member tokenMember = memberRepository.findMemberByEmail(authKey);
+        if (tokenMember == null) {
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -1,5 +1,6 @@
 package Ness.Backend.domain.auth.oAuth;
 
+import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.auth.jwt.entity.JwtToken;
 import Ness.Backend.domain.auth.security.AuthDetails;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${frontend.redirect-url}")
     private String frontRedirectUrl;
@@ -32,11 +35,11 @@ public class OAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         /*인증에 성공한 사용자*/
         AuthDetails oAuth2User = (AuthDetails) authentication.getPrincipal();
 
-        /*JwtToken 생성*/
+        /* JwtToken 생성*/
         JwtToken jwtToken = jwtTokenProvider.generateJwtToken(oAuth2User.getUsername());
 
-        //TODO: RefreshToken update
-        //refreshTokenService.saveRefreshToken(jwtToken.getJwtRefreshToken(),oAuth2User.getUser().getAuthKey());
+        /* RefreshToken 저장하기 */
+        refreshTokenService.saveRefreshToken(jwtToken.getJwtRefreshToken(), oAuth2User.getUsername());
 
         /*JwtToken과 함께 리다이렉트*/
         String targetUrl = UriComponentsBuilder.fromUriString(setRedirectUrl(request.getServerName()))

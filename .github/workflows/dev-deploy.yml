@@ -77,7 +77,7 @@ jobs:
           host: ${{ secrets.HOST_DEV }}
           username: ${{ secrets.USER_DEV }}
           key: ${{ secrets.KEY_DEV }}
-          script: mkdir -p ./dev
+          script: mkdir -p ./ness
 
       ## 소스 코드 복사 붙여넣기
       - name: copy source via ssh key
@@ -85,12 +85,15 @@ jobs:
         with:
           switches: -avzr --delete
           path: ./config
-          remote_path: ./dev
+          remote_path: ./ness
           remote_host: ${{ secrets.HOST_DEV }}
           remote_user: ${{ secrets.USER_DEV }}
           remote_key: ${{ secrets.KEY_DEV }}
 
       ## EC2에 배포(CD)
+      ## 아래 두 개는 이미 되어 있는 상태
+      ## docker network create ness_network
+      ## docker network connect ness_network redis-server
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
@@ -105,3 +108,4 @@ jobs:
             sudo docker rmi $(sudo docker images -q)
             docker pull jeonhaeseung/ness-server-dev:dev
             docker run -d --name backend-server -p 80:8080 --restart unless-stopped jeonhaeseung/ness-server-dev:dev
+            docker network connect ness_network backend-server

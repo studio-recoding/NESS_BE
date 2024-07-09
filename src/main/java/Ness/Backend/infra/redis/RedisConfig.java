@@ -38,7 +38,7 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisConfig, clientConfig);
     }
 
-    /* Use redis template for redis*/
+    /* Use redis template for redis */
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         /* Most basic configuration */

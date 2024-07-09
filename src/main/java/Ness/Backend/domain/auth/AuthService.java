@@ -34,7 +34,9 @@ public class AuthService {
     @Transactional
     public GetJwtTokenDto reIssuance(Member member, PostRefreshTokenDto postRefreshTokenDto) {
         /* refreshToken 유효성 확인 */
-        if (!jwtTokenProvider.validRefreshToken(postRefreshTokenDto.getJwtRefreshToken())) {
+        String refreshToken = postRefreshTokenDto.getJwtRefreshToken().substring(7);
+
+        if (!jwtTokenProvider.validRefreshToken(refreshToken)) {
             throw new UnauthorizedException(ErrorCode.INVALID_TOKEN);
         }
 

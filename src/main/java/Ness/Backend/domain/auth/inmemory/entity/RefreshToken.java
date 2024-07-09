@@ -10,7 +10,8 @@ import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @NoArgsConstructor
-@RedisHash(value = "refreshToken", timeToLive = 60*60*24*14)
+//@RedisHash(value = "refreshToken", timeToLive = 60*60*24*14)
+@RedisHash(value = "refreshToken", timeToLive = 5)
 public class RefreshToken { /* Redis에 저장해서 RefreshToken이 유효한지 검증 */
     @Id
     @Indexed
@@ -27,6 +28,7 @@ public class RefreshToken { /* Redis에 저장해서 RefreshToken이 유효한�
     public RefreshToken(String jwtRefreshToken, String authKey) {
         this.jwtRefreshToken = jwtRefreshToken;
         this.authKey = authKey;
-        this.ttl = 1000L * 60 * 60 * 24 * 14;
+        //this.ttl = 1000L * 60 * 60 * 24 * 14;
+        this.ttl = 1000L * 5;
     }
 }

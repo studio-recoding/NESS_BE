@@ -67,50 +67,6 @@ public class ScheduleService {
                         .findOneDaySchedulesByMember_Id(memberId, date));
     }
 
-    /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
-    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto){
-        Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
-        Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
-        
-        //RDB에서 변경
-        schedule.changeSchedule(
-                putScheduleDto.getInfo(),
-                putScheduleDto.getLocation(),
-                putScheduleDto.getPerson(),
-                putScheduleDto.getStartTime(),
-                putScheduleDto.getEndTime(),
-                category);
-
-        //VectorDB에서 변경
-        ZonedDateTime endTime = putScheduleDto.getEndTime();
-        if(endTime == null){
-            endTime =  putScheduleDto.getStartTime();
-        }
-
-        PutFastApiScheduleDto dto = PutFastApiScheduleDto.builder()
-                .info(putScheduleDto.getInfo())
-                .location(putScheduleDto.getLocation())
-                .person(putScheduleDto.getPerson())
-                .startTime(putScheduleDto.getStartTime())
-                .endTime(endTime)
-                .category(category.getName())
-                .category_id(category.getId())
-                .category_color(category.getColor())
-                .member_id(memberId)
-                .schedule_id(putScheduleDto.getId())
-                .build();
-
-        ResponseEntity<JsonNode> responseNode = fastApiPutScheduleApi.putFastApiSchedule(dto);
-
-        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
-            log.info("Succeed to put data in Vector DB");
-        } else {
-            log.error("Failed to put data in Vector DB");
-        }
-
-        return getOneDayUserSchedule(memberId, putScheduleDto.getOriginalTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
-    }
-
     /* 사용자가 직접 삭제한 스케쥴 */
     public GetScheduleListDto deleteSchedule(Long memberId, Long scheduleId){
         Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
@@ -273,6 +229,68 @@ public class ScheduleService {
                 .build();
 
         ResponseEntity<JsonNode> responseNode = fastApiPostScheduleApi.creatFastApiSchedule(dto);
+        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
+            log.info("Succeed to save data in Vector DB");
+        } else {
+            log.error("Failed to save data in Vector DB");
+        }
+    }
+
+    /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
+    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto){
+        Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
+        Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
+
+        //RDB에서 변경
+        schedule.changeSchedule(
+                putScheduleDto.getInfo(),
+                putScheduleDto.getLocation(),
+                putScheduleDto.getPerson(),
+                putScheduleDto.getStartTime(),
+                putScheduleDto.getEndTime(),
+                category);
+
+        //VectorDB에서 변경
+        putAiSchedule(
+                putScheduleDto.getInfo(),
+                putScheduleDto.getLocation(),
+                putScheduleDto.getPerson(),
+                putScheduleDto.getStartTime(),
+                putScheduleDto.getEndTime(),
+                category.getName(),
+                category.getId(),
+                category.getColor(),
+                memberId,
+                putScheduleDto.getId());
+
+        return getOneDayUserSchedule(memberId, putScheduleDto.getOriginalTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
+    }
+
+    /*스케쥴 변경을 VectorDB에 저장하는 API 호출 */
+    public void putAiSchedule(String info, String location, String person,
+                                  ZonedDateTime startTime, ZonedDateTime endTime,
+                                  String category, Long category_id, String category_color, Long memberId, Long scheduleId){
+
+        // null 값은 전달되서는 안됨
+        if(endTime == null){
+            endTime = startTime;
+        }
+
+        PutFastApiScheduleDto dto = PutFastApiScheduleDto.builder()
+                .info(info)
+                .location(location)
+                .person(person)
+                .startTime(startTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")))
+                .endTime(endTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")))
+                .category(category)
+                .category_id(category_id)
+                .category_color(category_color)
+                .member_id(memberId)
+                .schedule_id(scheduleId)
+                .build();
+
+        ResponseEntity<JsonNode> responseNode = fastApiPutScheduleApi.putFastApiSchedule(dto);
+
         if (responseNode.getStatusCode() == HttpStatusCode.valueOf(201)) {
             log.info("Succeed to save data in Vector DB");
         } else {

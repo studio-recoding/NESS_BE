@@ -16,6 +16,7 @@ public class RefreshToken { /* Redis에 저장해서 RefreshToken이 유효한�
     @Indexed
     private String jwtRefreshToken;
 
+    // 맴버 이메일로 설정
     private String authKey;
 
     //리프레시 토큰의 생명 주기(14일)

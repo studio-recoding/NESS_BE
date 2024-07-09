@@ -67,7 +67,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         } catch (TokenExpiredException e){
             log.error(e + " EXPIRED_TOKEN");
-            //request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
             setResponse(response, ErrorCode.EXPIRED_TOKEN);
         } catch (SignatureVerificationException e){
             log.error(e + " INVALID_TOKEN_SIGNATURE");

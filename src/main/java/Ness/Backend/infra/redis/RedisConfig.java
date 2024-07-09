@@ -1,5 +1,6 @@
 package Ness.Backend.infra.redis;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 @Configuration
+@Slf4j
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -35,6 +37,8 @@ public class RedisConfig {
                         .commandTimeout(Duration.ofSeconds(1)) //No longer than 1 second
                         .shutdownTimeout(Duration.ZERO) //Immediately shutdown after application shutdown
                         .build();
+
+        log.info("Connected to Redis at {}:{}", host, port);
         return new LettuceConnectionFactory(redisConfig, clientConfig);
     }
 

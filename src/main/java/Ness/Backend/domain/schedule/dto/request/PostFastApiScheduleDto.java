@@ -43,4 +43,7 @@ public class PostFastApiScheduleDto {
 
     @JsonProperty("category_id")
     private Long category_id;
+
+    @JsonProperty("category_color")
+    private String category_color;
 }

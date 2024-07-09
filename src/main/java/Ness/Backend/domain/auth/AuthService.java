@@ -46,7 +46,7 @@ public class AuthService {
         }
 
         final GetJwtTokenDto generateToken = GetJwtTokenDto.builder()
-                .jwtAccessToken(jwtTokenProvider.generateAccessToken(member.getEmail(), new Date()))
+                .jwtAccessToken("Bearer " + jwtTokenProvider.generateAccessToken(member.getEmail(), new Date()))
                 .jwtRefreshToken(postRefreshTokenDto.getJwtRefreshToken())
                 .build();
 

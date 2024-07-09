@@ -95,6 +95,7 @@ public class ScheduleService {
                 .endTime(endTime)
                 .category(category.getName())
                 .category_id(category.getId())
+                .category_color(category.getColor())
                 .member_id(memberId)
                 .schedule_id(putScheduleDto.getId())
                 .build();
@@ -239,6 +240,7 @@ public class ScheduleService {
                 postScheduleDto.getEndTime(),
                 category.getName(),
                 category.getId(),
+                category.getColor(),
                 newSchedule.getMember().getId(),
                 newSchedule.getId());
 
@@ -249,7 +251,7 @@ public class ScheduleService {
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */
     public void postNewAiSchedule(String info, String location, String person,
                                   ZonedDateTime startTime, ZonedDateTime endTime,
-                                  String category, Long category_id, Long memberId, Long scheduleId){
+                                  String category, Long category_id, String category_color, Long memberId, Long scheduleId){
 
         // null 값은 전달되서는 안됨
         if(endTime == null){
@@ -265,6 +267,7 @@ public class ScheduleService {
                 .endTime(endTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")))
                 .category(category)
                 .category_id(category_id)
+                .category_color(category_color)
                 .member_id(memberId)
                 .schedule_id(scheduleId)
                 .build();

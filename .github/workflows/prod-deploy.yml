@@ -105,8 +105,8 @@ jobs:
           script: |
             sh ./prod/config/scripts/deploy.sh
 
-            sudo docker stop $(sudo docker ps -a -q)
-            sudo docker rm $(sudo docker ps -a -q)
+            sudo docker stop $(sudo docker ps -a --filter="name=backend-server" -q)
+            sudo docker rm $(sudo docker ps -a --filter="name=backend-server" -q)
             sudo docker rmi $(sudo docker images -q)
             docker pull jeonhaeseung/ness-server-prod:main
             docker run -d --name backend-server -p 80:8080 --restart unless-stopped jeonhaeseung/ness-server-prod:main

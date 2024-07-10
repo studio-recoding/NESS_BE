@@ -1,6 +1,5 @@
 package Ness.Backend.domain.auth.oAuth;
 
-import Ness.Backend.global.error.ErrorCode;
 import Ness.Backend.global.error.exception.OAuthVerificationException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

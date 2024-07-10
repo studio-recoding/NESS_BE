@@ -39,6 +39,3 @@ out/
 ### Secrets ###
 application-dev.yml
 application-prod.yml
-
-## etc ###
-docker-compose.yml

@@ -28,8 +28,9 @@ public class JwtTokenProvider {
     /* 토큰의 만료 시간 설정
      * jwtAccessToken은 1시간, jwtRefreshToken은 1주 */
     //private static final long JWT_EXPIRATION_TIME = 1000L * 60 * 60; //1시간
-    private static final long JWT_EXPIRATION_TIME = 1000L * 60 * 60 * 24; //개발 테스트용: 하루
-    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14;
+    //private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14; //14일
+    private static final long JWT_EXPIRATION_TIME = 1000L * 60 * 2;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 5;
 
     private static final String AUTHORITIES_KEY = "auth";
 
@@ -147,5 +148,28 @@ public class JwtTokenProvider {
         }
 
         return tokenMember;
+    }
+
+    public boolean validRefreshToken(String refreshToken){
+        /* email 값이 null이 아닌지 확인 */
+        String authKey = getAuthKeyClaim(refreshToken);
+        if (authKey == null){
+            return false;
+        }
+
+        /* JWT_EXPIRATION_TIME이 지나지 않았는지 확인 */
+        Date expiresAt = getExpireTimeClaim(refreshToken);
+        if (!this.validExpiredTime(expiresAt)) {
+            return false;
+        }
+
+        /* email 값이 정상적으로 있고, JWT_EXPIRATION_TIME도 지나지 않았다면,
+         * 해당 토큰의 email 정보를 가진 맴버가 있는지 DB에서 확인 */
+        Member tokenMember = memberRepository.findMemberByEmail(authKey);
+        if (tokenMember == null) {
+            return false;
+        }
+
+        return true;
     }
 }

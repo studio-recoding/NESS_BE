@@ -5,14 +5,12 @@ import Ness.Backend.domain.report.ReportService;
 import Ness.Backend.domain.report.dto.response.PostFastApiAiRecommendActivityDto;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
 import Ness.Backend.domain.todo.TodoService;
-import Ness.Backend.domain.todo.dto.response.PostFastApiRecommendDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor

@@ -42,7 +42,7 @@ public class SecurityConfig {
 
     @Bean
     public OAuthSuccessHandler oAuthSuccessHandler(){
-        return new OAuthSuccessHandler(jwtTokenProvider());
+        return new OAuthSuccessHandler(jwtTokenProvider(), refreshTokenService);
     }
 
     @Bean

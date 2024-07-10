@@ -8,6 +8,7 @@ import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.member.MemberRepository;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.schedule.ScheduleRepository;
+import Ness.Backend.domain.schedule.ScheduleService;
 import Ness.Backend.domain.schedule.entity.Schedule;
 import Ness.Backend.global.error.exception.DefaultCategoryException;
 import Ness.Backend.global.error.exception.DuplicateCategoryException;
@@ -28,6 +29,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
+    private final ScheduleService scheduleService;
     /* 특정 유저의 카테고리 전부 가져오기 */
     @Transactional(readOnly = true)
     public GetCategoryListDto getUserCategory(Long memberId) {
@@ -93,11 +95,24 @@ public class CategoryService {
             //디폴트 카테고리 찾기
             Category defaultCategory = categoryRepository.findCategoryByMember_idAndIsDefaultNone(memberId, true);
 
-            //삭제할 카테고리의 일정은 모두 디폴트로 옮기기
+            //삭제할 카테고리의 일정은 모두 디폴트로 옮기고, 변경 사항을 VectorDB에도 저장하기
             List<Schedule> changeScheduleList = scheduleRepository.findSchedulesByCategory_Id(categoryId);
 
-            changeScheduleList.forEach(
-                    schedule -> schedule.changeCategory(defaultCategory));
+            changeScheduleList.forEach(schedule -> {
+                schedule.changeCategory(defaultCategory);
+                
+                scheduleService.putAiSchedule(
+                        schedule.getInfo(),
+                        schedule.getLocation(),
+                        schedule.getPerson(),
+                        schedule.getStartTime(),
+                        schedule.getEndTime(),
+                        schedule.getCategory().getName(),
+                        schedule.getCategory().getId(),
+                        schedule.getCategory().getColor(),
+                        schedule.getMember().getId(),
+                        schedule.getId());
+            });
             
             //해당 카테고리 삭제
             log.info(categoryId + "번 카테고리 " + deleteCategory.getName() + " 삭제");

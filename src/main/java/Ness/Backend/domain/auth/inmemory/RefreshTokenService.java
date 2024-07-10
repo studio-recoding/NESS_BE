@@ -19,4 +19,10 @@ public class RefreshTokenService {
                 .build();
         refreshTokenRepository.save(token);
     }
+
+    @Transactional
+    public void removeRefreshToken(String refreshToken) {
+        refreshTokenRepository.findRefreshTokenByJwtRefreshToken(refreshToken)
+                .ifPresent(token -> refreshTokenRepository.delete(token));
+    }
 }

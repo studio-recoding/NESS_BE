@@ -5,7 +5,6 @@ import Ness.Backend.domain.profile.entity.Profile;
 import Ness.Backend.domain.schedule.ScheduleRepository;
 import Ness.Backend.domain.schedule.ScheduleService;
 import Ness.Backend.domain.schedule.dto.response.GetScheduleDto;
-import Ness.Backend.domain.schedule.dto.response.GetScheduleListDto;
 import Ness.Backend.domain.schedule.entity.Schedule;
 import Ness.Backend.domain.todo.dto.request.PostFastApiTodoCategoryDto;
 import Ness.Backend.domain.todo.dto.request.PostFastApiTodoDto;

@@ -3,6 +3,7 @@ package Ness.Backend.domain.auth;
 import Ness.Backend.domain.auth.dto.request.PostRefreshTokenDto;
 import Ness.Backend.domain.auth.dto.response.GetJwtTokenDto;
 import Ness.Backend.domain.auth.inmemory.RefreshTokenRepository;
+import Ness.Backend.domain.auth.inmemory.RefreshTokenService;
 import Ness.Backend.domain.auth.jwt.JwtTokenProvider;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.error.ErrorCode;
@@ -19,6 +20,7 @@ import java.util.Date;
 public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public void logout(Member member, PostRefreshTokenDto postRefreshTokenDto) {
@@ -27,7 +29,7 @@ public class AuthService {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        refreshTokenRepository.deleteRefreshTokenByJwtRefreshToken(postRefreshTokenDto.getJwtRefreshToken());
+        refreshTokenService.removeRefreshToken(postRefreshTokenDto.getJwtRefreshToken());
         SecurityContextHolder.clearContext();
     }
 
@@ -52,4 +54,6 @@ public class AuthService {
 
         return generateToken;
     }
+
+
 }

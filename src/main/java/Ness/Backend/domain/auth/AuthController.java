@@ -6,6 +6,8 @@ import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.global.auth.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +21,9 @@ public class AuthController {
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃 요청", description = "로그아웃 요청 API 입니다.")
-    public void logout(@AuthUser Member member, @RequestBody PostRefreshTokenDto postRefreshTokenDto) {
+    public ResponseEntity<?> logout(@AuthUser Member member, @RequestBody PostRefreshTokenDto postRefreshTokenDto) {
         authService.logout(member, postRefreshTokenDto);
+        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("/reIssuance")

@@ -7,6 +7,4 @@ import java.util.Optional;
 
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Long> {
     Optional<RefreshToken> findRefreshTokenByJwtRefreshToken(String refreshToken);
-
-    void deleteRefreshTokenByJwtRefreshToken(String refreshToken);
 }

@@ -76,6 +76,22 @@ public class CategoryService {
             //중복되지 않은 카테고리일 경우는 변경사항 저장 가능
             log.info(putCategoryDto.getId() + "번 카테고리 " + changeCategory.getName() + " 수정");
             changeCategory.changeCategory(putCategoryDto.getName(), putCategoryDto.getColor());
+
+            //카테고리 이름 또는 컬러 변경 사항을 VectorDB에도 저장
+            List<Schedule> changeScheduleList = scheduleRepository.findSchedulesByCategory_Id(putCategoryDto.getId());
+            changeScheduleList.forEach(schedule -> {
+                scheduleService.putAiSchedule(
+                        schedule.getInfo(),
+                        schedule.getLocation(),
+                        schedule.getPerson(),
+                        schedule.getStartTime(),
+                        schedule.getEndTime(),
+                        putCategoryDto.getName(),
+                        schedule.getCategory().getId(),
+                        putCategoryDto.getColor(),
+                        schedule.getMember().getId(),
+                        schedule.getId());
+            });
         }
         else {
             throw new DuplicateCategoryException();

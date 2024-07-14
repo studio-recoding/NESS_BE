@@ -1,5 +1,6 @@
 package Ness.Backend.domain.schedule.entity;
 
+import Ness.Backend.domain.bookmark.entity.Bookmark;
 import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.chat.entity.Chat;
 import Ness.Backend.domain.member.entity.Member;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,6 +45,9 @@ public class Schedule {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
+
+    @OneToMany(mappedBy = "schedule")
+    private List<Bookmark> bookmarks = new ArrayList<>();
 
     @Builder
     public Schedule(Long id, String info, String location, String person, ZonedDateTime startTime, ZonedDateTime endTime,

@@ -92,22 +92,23 @@ public class ScheduleService {
     }
 
     /* 사용자가 AI가 생성한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
-    public GetChatListDto postAiScheduleAccept(Long memberId, Boolean idAccepted, Long chatId, PostScheduleDto postScheduleDto){
+    public GetChatListDto postAiScheduleAccept(Long memberId, Boolean idAccepted, Long chatId, PostMetaDataScheduleDto postMetaDataScheduleDto){
         Member member = memberRepository.findMemberById(memberId);
-        Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
+        Category category = categoryRepository.findCategoryById(postMetaDataScheduleDto.getCategoryNum());
 
         /* 사용자가 Accept 했으면 스케쥴 생성하기 */
         if(idAccepted){
             /* 카테고리 연견관계가 정상적인 경우*/
             if(category != null){
                 Chat chat = chatRepository.findChatById(chatId);
-
+                
+                //RDB에 저장
                 Schedule newSchedule = Schedule.builder()
-                        .info(postScheduleDto.getInfo())
-                        .location(postScheduleDto.getLocation())
-                        .person(postScheduleDto.getPerson())
-                        .startTime(postScheduleDto.getStartTime())
-                        .endTime(postScheduleDto.getEndTime())
+                        .info(postMetaDataScheduleDto.getInfo())
+                        .location(postMetaDataScheduleDto.getLocation())
+                        .person(postMetaDataScheduleDto.getPerson())
+                        .startTime(postMetaDataScheduleDto.getStartTime())
+                        .endTime(postMetaDataScheduleDto.getEndTime())
                         .member(member)
                         .category(category)
                         .chat(chat)
@@ -115,13 +116,28 @@ public class ScheduleService {
 
                 scheduleRepository.save(newSchedule);
 
-                chatService.createNewChat("\"" + postScheduleDto.getInfo() + "\" " + "일정을 추가해드렸습니다:)", ChatType.AI, 1, member);
+                //vectorDB에 저장하기
+                postNewAiSchedule(
+                        postMetaDataScheduleDto.getInfo(),
+                        postMetaDataScheduleDto.getLocation(),
+                        postMetaDataScheduleDto.getPerson(),
+                        postMetaDataScheduleDto.getStartTime(),
+                        postMetaDataScheduleDto.getEndTime(),
+                        category.getName(),
+                        category.getId(),
+                        category.getColor(),
+                        newSchedule.getMember().getId(),
+                        newSchedule.getId());
+
+                chatService.createNewChatWithMetaData("\"" + postMetaDataScheduleDto.getInfo() + "\" " + "일정을 추가해드렸습니다! 관련 검색 결과를 추천해드릴게요. 원하는 내용을 스크랩해주세요:)",
+                        ChatType.AI, 10, member, "{\"keyword\":\"" + postMetaDataScheduleDto.getKeyword() + "\",\"scheduleId\":" + newSchedule.getId() + "}"
+                );
             }
             else{
                 throw new NotFoundCategoryException();
             }
         } else {
-            chatService.createNewChat("\"" + postScheduleDto.getInfo() + "\" " + "일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
+            chatService.createNewChat("\"" + postMetaDataScheduleDto.getInfo() + "\" " + "일정 추가를 취소했습니다.\n더 필요한 것이 있으시면 알려주세요!", ChatType.AI, 1, member);
         }
 
         // 모든 채팅 내역 반환

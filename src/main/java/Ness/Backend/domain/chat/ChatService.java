@@ -46,6 +46,20 @@ public class ChatService {
         chatRepository.save(chat);
     }
 
+    /* 새로운 채팅 생성 및 RDB에 저장 */
+    public void createNewChatWithMetaData(String text, ChatType chatType, int caseNumber, Member member, String metadata){
+        Chat chat = Chat.builder()
+                .createdDate(createdZonedDate())
+                .text(text)
+                .chatType(chatType)
+                .caseNumber(caseNumber)
+                .member(member)
+                .metadata(metadata)
+                .build();
+
+        chatRepository.save(chat);
+    }
+
     /* 일주일 치 채팅 데이터 가져오기*/
     public GetChatListDto getOneWeekUserChat(Long memberId){
         List<Chat> chatList = chatRepository.findOneWeekUserChatsByMember_Id(memberId);

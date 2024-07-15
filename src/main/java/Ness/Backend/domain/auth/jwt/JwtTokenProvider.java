@@ -27,7 +27,8 @@ public class JwtTokenProvider {
 
     /* 토큰의 만료 시간 설정
      * jwtAccessToken은 1시간, jwtRefreshToken은 1주 */
-    private static final long JWT_EXPIRATION_TIME = 1000L * 60 * 60; //1시간
+    //private static final long JWT_EXPIRATION_TIME = 1000L * 60 * 60; //1시간
+    private static final long JWT_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 7; //7일
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14; //14일
 
     private static final String AUTHORITIES_KEY = "auth";

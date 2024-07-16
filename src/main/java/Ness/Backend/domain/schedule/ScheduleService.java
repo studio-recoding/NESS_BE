@@ -1,5 +1,7 @@
 package Ness.Backend.domain.schedule;
 
+import Ness.Backend.domain.bookmark.BookmarkRepository;
+import Ness.Backend.domain.bookmark.entity.Bookmark;
 import Ness.Backend.domain.category.CategoryRepository;
 import Ness.Backend.domain.category.entity.Category;
 import Ness.Backend.domain.chat.ChatRepository;
@@ -38,6 +40,7 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final MemberRepository memberRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final CategoryRepository categoryRepository;
     private final ChatRepository chatRepository;
     private final ChatService chatService;
@@ -158,6 +161,7 @@ public class ScheduleService {
     /* 사용자가 직접 삭제한 스케쥴 */
     public GetScheduleListDto deleteSchedule(Long memberId, Long scheduleId){
         Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
+        List<Bookmark> bookmarks = bookmarkRepository.findBookmarksBySchedule_Id(scheduleId);
         ZonedDateTime scheduleTime = schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"));
 
         //VectorDB에서 삭제
@@ -174,6 +178,7 @@ public class ScheduleService {
         }
 
         //RDB에서 삭제
+        bookmarkRepository.deleteAll(bookmarks);
         scheduleRepository.delete(schedule);
 
         return getOneDayUserSchedule(memberId, scheduleTime);
@@ -182,6 +187,7 @@ public class ScheduleService {
     /* 사용자가 AI가 삭제 요청한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
     public GetChatListDto deleteAiScheduleAccept(Long memberId, Boolean idAccepted, Long scheduleId){
         Member member = memberRepository.findMemberById(memberId);
+        List<Bookmark> bookmarks = bookmarkRepository.findBookmarksBySchedule_Id(scheduleId);
         Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
 
         /* 사용자가 Accept 했으면 스케쥴 생성하기 */
@@ -204,6 +210,7 @@ public class ScheduleService {
                 String info = schedule.getInfo();
 
                 //RDB에서 삭제
+                bookmarkRepository.deleteAll(bookmarks);
                 scheduleRepository.delete(schedule);
 
                 chatService.createNewChat("\"" + info + "\" " + "일정을 삭제해드렸습니다!", ChatType.AI, 1, member);

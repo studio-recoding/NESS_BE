@@ -219,6 +219,36 @@ public class ScheduleService {
         return chatService.getOneWeekUserChat(memberId);
     }
 
+    /* 사용자가 직접 변경한 스케쥴을 RDB & VectorDB에 저장 */
+    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto){
+        Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
+        Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
+
+        //RDB에서 변경
+        schedule.changeSchedule(
+                putScheduleDto.getInfo(),
+                putScheduleDto.getLocation(),
+                putScheduleDto.getPerson(),
+                putScheduleDto.getStartTime(),
+                putScheduleDto.getEndTime(),
+                category);
+
+        //VectorDB에서 변경
+        putAiSchedule(
+                putScheduleDto.getInfo(),
+                putScheduleDto.getLocation(),
+                putScheduleDto.getPerson(),
+                putScheduleDto.getStartTime(),
+                putScheduleDto.getEndTime(),
+                category.getName(),
+                category.getId(),
+                category.getColor(),
+                memberId,
+                putScheduleDto.getId());
+
+        return getOneDayUserSchedule(memberId, putScheduleDto.getOriginalTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
+    }
+
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */
     public void postNewAiSchedule(String info, String location, String person,
                                   ZonedDateTime startTime, ZonedDateTime endTime,
@@ -251,37 +281,7 @@ public class ScheduleService {
         }
     }
 
-    /* 사용자가 직접 변경한 스케쥴 RDB에 저장하는 로직 */
-    public GetScheduleListDto changeSchedule(Long memberId, PutScheduleDto putScheduleDto){
-        Schedule schedule = scheduleRepository.findScheduleById(putScheduleDto.getId());
-        Category category = categoryRepository.findCategoryById(putScheduleDto.getCategoryNum());
-
-        //RDB에서 변경
-        schedule.changeSchedule(
-                putScheduleDto.getInfo(),
-                putScheduleDto.getLocation(),
-                putScheduleDto.getPerson(),
-                putScheduleDto.getStartTime(),
-                putScheduleDto.getEndTime(),
-                category);
-
-        //VectorDB에서 변경
-        putAiSchedule(
-                putScheduleDto.getInfo(),
-                putScheduleDto.getLocation(),
-                putScheduleDto.getPerson(),
-                putScheduleDto.getStartTime(),
-                putScheduleDto.getEndTime(),
-                category.getName(),
-                category.getId(),
-                category.getColor(),
-                memberId,
-                putScheduleDto.getId());
-
-        return getOneDayUserSchedule(memberId, putScheduleDto.getOriginalTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
-    }
-
-    /*스케쥴 변경을 VectorDB에 저장하는 API 호출 */
+    /* 변경된 스케쥴을 VectorDB에 저장하는 API 호출 */
     public void putAiSchedule(String info, String location, String person,
                                   ZonedDateTime startTime, ZonedDateTime endTime,
                                   String category, Long category_id, String category_color, Long memberId, Long scheduleId){

@@ -67,28 +67,39 @@ public class ScheduleService {
                         .findOneDaySchedulesByMember_Id(memberId, date));
     }
 
-    /* 사용자가 직접 삭제한 스케쥴 */
-    public GetScheduleListDto deleteSchedule(Long memberId, Long scheduleId){
-        Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
-        ZonedDateTime scheduleTime = schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+    /* 사용자가 직접 생성한 스케쥴을 RDB & VectorDB에 저장 */
+    public GetScheduleListDto postNewUserSchedule(Long memberId, PostScheduleDto postScheduleDto){
+        Member memberEntity = memberRepository.findMemberById(memberId);
+        Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
 
-        //VectorDB에서 삭제
-        DeleteFastApiScheduleDto dto = DeleteFastApiScheduleDto.builder()
-                .member_id(memberId)
-                .schedule_id(scheduleId)
+        //새로운 채팅 생성
+        Schedule newSchedule = Schedule.builder()
+                .info(postScheduleDto.getInfo())
+                .location(postScheduleDto.getLocation())
+                .person(postScheduleDto.getPerson())
+                .startTime(postScheduleDto.getStartTime())
+                .endTime(postScheduleDto.getEndTime())
+                .member(memberEntity)
+                .category(category)
+                //.chat() //사용자가 직접 생성했으므로 연관관계 없음
                 .build();
 
-        ResponseEntity<JsonNode> responseNode = fastApiDeleteScheduleApi.deleteFastApiSchedule(dto);
-        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(204)) {
-            log.info("Succeed to delete data in Vector DB");
-        } else {
-            log.error("Failed to delete data in Vector DB");
-        }
+        scheduleRepository.save(newSchedule);
 
-        //RDB에서 삭제
-        scheduleRepository.delete(schedule);
+        postNewAiSchedule(
+                postScheduleDto.getInfo(),
+                postScheduleDto.getLocation(),
+                postScheduleDto.getPerson(),
+                postScheduleDto.getStartTime(),
+                postScheduleDto.getEndTime(),
+                category.getName(),
+                category.getId(),
+                category.getColor(),
+                newSchedule.getMember().getId(),
+                newSchedule.getId());
 
-        return getOneDayUserSchedule(memberId, scheduleTime);
+        log.info("Succeed to save user created schedule data in RDB & VectorDB");
+        return getOneDayUserSchedule(memberId, newSchedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 사용자가 AI가 생성한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
@@ -144,6 +155,30 @@ public class ScheduleService {
         return chatService.getOneWeekUserChat(memberId);
     }
 
+    /* 사용자가 직접 삭제한 스케쥴 */
+    public GetScheduleListDto deleteSchedule(Long memberId, Long scheduleId){
+        Schedule schedule = scheduleRepository.findScheduleById(scheduleId);
+        ZonedDateTime scheduleTime = schedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
+        //VectorDB에서 삭제
+        DeleteFastApiScheduleDto dto = DeleteFastApiScheduleDto.builder()
+                .member_id(memberId)
+                .schedule_id(scheduleId)
+                .build();
+
+        ResponseEntity<JsonNode> responseNode = fastApiDeleteScheduleApi.deleteFastApiSchedule(dto);
+        if (responseNode.getStatusCode() == HttpStatusCode.valueOf(204)) {
+            log.info("Succeed to delete data in Vector DB");
+        } else {
+            log.error("Failed to delete data in Vector DB");
+        }
+
+        //RDB에서 삭제
+        scheduleRepository.delete(schedule);
+
+        return getOneDayUserSchedule(memberId, scheduleTime);
+    }
+
     /* 사용자가 AI가 삭제 요청한 스케쥴을 Accept/Deny한 여부에 따라서 채팅 및 스케쥴 저장 */
     public GetChatListDto deleteAiScheduleAccept(Long memberId, Boolean idAccepted, Long scheduleId){
         Member member = memberRepository.findMemberById(memberId);
@@ -182,42 +217,6 @@ public class ScheduleService {
 
         // 모든 채팅 내역 반환
         return chatService.getOneWeekUserChat(memberId);
-    }
-
-
-    /* 사용자가 직접 생성한 스케쥴을 RDB & VectorDB에 저장 */
-    public GetScheduleListDto postNewUserSchedule(Long memberId, PostScheduleDto postScheduleDto){
-        Member memberEntity = memberRepository.findMemberById(memberId);
-        Category category = categoryRepository.findCategoryById(postScheduleDto.getCategoryNum());
-
-        //새로운 채팅 생성
-        Schedule newSchedule = Schedule.builder()
-                .info(postScheduleDto.getInfo())
-                .location(postScheduleDto.getLocation())
-                .person(postScheduleDto.getPerson())
-                .startTime(postScheduleDto.getStartTime())
-                .endTime(postScheduleDto.getEndTime())
-                .member(memberEntity)
-                .category(category)
-                //.chat() //사용자가 직접 생성했으므로 연관관계 없음
-                .build();
-
-        scheduleRepository.save(newSchedule);
-
-        postNewAiSchedule(
-                postScheduleDto.getInfo(),
-                postScheduleDto.getLocation(),
-                postScheduleDto.getPerson(),
-                postScheduleDto.getStartTime(),
-                postScheduleDto.getEndTime(),
-                category.getName(),
-                category.getId(),
-                category.getColor(),
-                newSchedule.getMember().getId(),
-                newSchedule.getId());
-
-        log.info("Succeed to save user created schedule data in RDB & VectorDB");
-        return getOneDayUserSchedule(memberId, newSchedule.getStartTime().withZoneSameInstant(ZoneId.of("Asia/Seoul")));
     }
 
     /* 새로운 스케쥴을 VectorDB에 저장하는 API 호출 */

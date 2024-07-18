@@ -65,7 +65,7 @@ public class DiscordMessageGenerator {
     /* 인포 메세지 생성 */
     public DiscordMessageDto createInfoMessage(Long memberId, String name) {
         return DiscordMessageDto.builder()
-                .content("##🚀 새로운 유저 가입 🚀")
+                .content("## 🚀 새로운 유저 가입 🚀")
                 .embeds(List.of(DiscordEmbedDto.builder()
                                 .title("ℹ️ 유저 정보")
                                 .description("### 🕖 유저 가입 시간\n"

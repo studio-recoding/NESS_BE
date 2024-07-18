@@ -56,6 +56,7 @@ public class ProfileService {
         GetProfileDto getProfileDto = GetProfileDto.builder()
                 .id(profile.getId())
                 .pictureUrl(createPictureUrl(memberId, profile))
+                .pictureKey(profile.getPictureKey())
                 .nickname(profile.getNickname())
                 .name(profile.getName())
                 .isEmailActive(profile.getIsEmailActive())

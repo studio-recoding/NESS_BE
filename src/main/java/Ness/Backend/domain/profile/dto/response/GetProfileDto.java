@@ -19,6 +19,9 @@ public class GetProfileDto {
     @Schema(description = "사용자의 공유 프로필 URL", example = "https://lh3.googleusercontent.com/...")
     private String pictureUrl;
 
+    @Schema(description = "사용자의 S3 프로필 사진 경로", example = "/profile/1/...")
+    private String pictureKey;
+
     @Schema(description = "사용자의 닉네임", example = "DongDong")
     private String nickname;
 
@@ -42,10 +45,11 @@ public class GetProfileDto {
     private boolean onBoarding;
 
     @Builder
-    public GetProfileDto(Long id, String pictureUrl, String nickname, String name,
+    public GetProfileDto(Long id, String pictureUrl, String pictureKey, String nickname, String name,
                          PersonaType persona, boolean isEmailActive, String email, boolean onBoarding){
         this.id = id;
         this.pictureUrl = pictureUrl;
+        this.pictureKey = pictureKey;
         this.nickname = nickname;
         this.name = name;
         this.persona = persona;

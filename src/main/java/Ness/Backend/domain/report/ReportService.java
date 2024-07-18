@@ -18,6 +18,7 @@ import Ness.Backend.global.error.exception.NotFoundException;
 import Ness.Backend.global.fastApi.FastApiMemoryApi;
 import Ness.Backend.global.fastApi.FastApiRecommendApi;
 import Ness.Backend.global.fastApi.FastApiTagApi;
+import Ness.Backend.global.time.GlobalTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,13 +44,14 @@ public class ReportService {
     private final FastApiMemoryApi fastApiMemoryApi;
     private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
+    private final GlobalTime globalTime;
 
     /* 메모리 가져오는 로직 */
     public GetReportMemoryListDto getMemory(Long memberId){
         log.info("getMemory called by member: " + memberId);
 
         // 오늘 날짜 가져오기
-        ZonedDateTime now = getToday();
+        ZonedDateTime now = globalTime.getToday();
 
         List<ReportMemory> reportMemory = reportMemoryRepository.findTodayReportMemoryByMember_Id(memberId);
 
@@ -137,12 +139,12 @@ public class ReportService {
         log.info("getTag called by member: " + memberId);
 
         // 오늘 날짜 가져오기
-        ZonedDateTime now = getToday();
+        ZonedDateTime now = globalTime.getToday();
 
         List<ReportTag> reportTags = reportTagRepository.findLastMonthReportTagByMember_Id(memberId);
 
         if (reportTags == null || reportTags.isEmpty()) {
-            PostFastApiAiTagListDto aiDto = postNewAiTag(memberId, getToday());
+            PostFastApiAiTagListDto aiDto = postNewAiTag(memberId, globalTime.getToday());
 
             Member memberEntity = memberRepository.findMemberById(memberId);
 
@@ -175,7 +177,7 @@ public class ReportService {
     }
 
     public PostFastApiAiTagListDto getAiTag(Long memberId){
-        return postNewAiTag(memberId, getToday());
+        return postNewAiTag(memberId, globalTime.getToday());
     }
 
     public PostFastApiAiTagListDto postNewAiTag(Long memberId, ZonedDateTime today){
@@ -196,7 +198,7 @@ public class ReportService {
         log.info("getRecommendActivity called by member: " + memberId);
 
         // 오늘 날짜 가져오기
-        ZonedDateTime now = getToday();
+        ZonedDateTime now = globalTime.getToday();
         List<ReportRecommend> reportRecommends = reportRecommendRepository.findTodayReportRecommendByMember_Id(memberId);
 
         if(reportRecommends == null || reportRecommends.isEmpty()){
@@ -265,10 +267,6 @@ public class ReportService {
         // AI에서 이 접두사를 붙여서 반환하는 경우가 많이 발생함
         text = text.replace("AI Recommendation: ", "");
         return text.replace("\"", "");
-    }
-
-    public ZonedDateTime getToday(){
-        return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
     public String getPersona(Long memberId){

@@ -100,7 +100,7 @@ public class ChatService {
         Chat newAiChat = Chat.builder()
                 .createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul"))
                         .atZone(ZoneId.of("Asia/Seoul")))
-                .text(AiDto.getAnswer())
+                .text(parseAiChat(AiDto.getAnswer()))
                 .chatType(ChatType.AI)
                 .caseNumber(AiDto.getCaseNumber()) //AI는 받아온 값으로 저장
                 .metadata(AiDto.getMetadata())
@@ -132,5 +132,10 @@ public class ChatService {
         PostFastApiAiChatDto aiDto = fastApiChatApi.creatFastApiChat(userDto);
 
         return aiDto;
+    }
+
+    public String parseAiChat(String text){
+        // AI에서 이 접두사를 붙여서 반환하는 경우가 많이 발생함
+        return text.replace("NESS: ", "");
     }
 }

@@ -11,6 +11,7 @@ import Ness.Backend.domain.profile.entity.Profile;
 import Ness.Backend.domain.schedule.ScheduleService;
 import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
 import Ness.Backend.global.time.GlobalTime;
+import Ness.Backend.infra.discord.DiscordAlertSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class MemberService {
     private final ScheduleService scheduleService;
     private final ChatService chatService;
     private final GlobalTime globalTime;
+    private final DiscordAlertSender discordAlertSender;
 
     public void deleteMember(Member member) {
         profileRepository.delete(member.getProfile());
@@ -126,6 +128,9 @@ public class MemberService {
         // 새로운 채팅 생성
         chatService.createNewChat("NESS에 오신 것을 환영해요! 간단하게 채팅을 테스트해볼까요?\n" +
                 "\"내일 5시 디지털 경진대회 미팅 추가\"라고 채팅을 보내보세요.", ChatType.AI, 1, member);
+
+        // 알림 보내기
+        discordAlertSender.sendDiscordInfoAlarm(member.getId(), profile.getName());
 
         return;
     }

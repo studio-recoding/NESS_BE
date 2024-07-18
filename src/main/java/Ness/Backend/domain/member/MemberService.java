@@ -2,6 +2,8 @@ package Ness.Backend.domain.member;
 
 import Ness.Backend.domain.category.CategoryRepository;
 import Ness.Backend.domain.category.entity.Category;
+import Ness.Backend.domain.chat.ChatService;
+import Ness.Backend.domain.chat.entity.ChatType;
 import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.profile.ProfileRepository;
 import Ness.Backend.domain.profile.entity.PersonaType;
@@ -20,9 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CategoryRepository categoryRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ScheduleService scheduleService;
+    private final ChatService chatService;
     private final GlobalTime globalTime;
 
     public void deleteMember(Member member) {
@@ -98,7 +101,7 @@ public class MemberService {
 
         // 예시 스케쥴 2개 생성
         PostScheduleDto oneHourLaterSchedule = PostScheduleDto.builder()
-                .info("NESS 온보딩 진행하기")
+                .info("NESS 사용법 공부하기")
                 .location("현재 위치")
                 .person("")
                 .startTime(globalTime.getUpcomingOneHourTime())
@@ -108,7 +111,7 @@ public class MemberService {
                 .build();
 
         PostScheduleDto twoHourLaterSchedule = PostScheduleDto.builder()
-                .info("NESS 사용법 공부하기")
+                .info("NESS와 함께 일정 관리 시작하기")
                 .location("")
                 .person("NESS")
                 .startTime(globalTime.getUpcomingTwoHourTime())
@@ -119,6 +122,10 @@ public class MemberService {
 
         scheduleService.postNewUserSchedule(member.getId(), oneHourLaterSchedule);
         scheduleService.postNewUserSchedule(member.getId(), twoHourLaterSchedule);
+
+        // 새로운 채팅 생성
+        chatService.createNewChat("NESS에 오신 것을 환영해요! 간단하게 채팅을 테스트해볼까요?\n" +
+                "\"내일 5시 디지털 경진대회 미팅 추가\"라고 채팅을 보내보세요.", ChatType.AI, 1, member);
 
         return;
     }

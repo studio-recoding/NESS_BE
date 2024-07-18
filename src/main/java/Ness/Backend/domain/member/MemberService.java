@@ -6,6 +6,9 @@ import Ness.Backend.domain.member.entity.Member;
 import Ness.Backend.domain.profile.ProfileRepository;
 import Ness.Backend.domain.profile.entity.PersonaType;
 import Ness.Backend.domain.profile.entity.Profile;
+import Ness.Backend.domain.schedule.ScheduleService;
+import Ness.Backend.domain.schedule.dto.request.PostScheduleDto;
+import Ness.Backend.global.time.GlobalTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,9 @@ public class MemberService {
     private final ProfileRepository profileRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CategoryRepository categoryRepository;
+    private final ScheduleService scheduleService;
+    private final GlobalTime globalTime;
+
     public void deleteMember(Member member) {
         profileRepository.delete(member.getProfile());
         /* 소프트 삭제 */
@@ -40,9 +46,9 @@ public class MemberService {
                 .nickname(nickname)
                 .name(name)
                 .member(member)
-                .isEmailActive(isEmailActive) // 디폴트로 false, 온보딩 마치면 true 변환
+                .isEmailActive(isEmailActive) // 디폴트로 true, 나중에 개인 페이지에서 변경 가능
                 .personaType(PersonaType.NESS) //디폴트로 NESS를 저장해줌, 나중에 개인 페이지에서 변경 가능
-                .onBoarding(isOnBoarded)
+                .onBoarding(isOnBoarded) // 디폴트로 false, 온보딩 마치면 true 변환
                 .build();
 
         profileRepository.save(profile);
@@ -89,6 +95,31 @@ public class MemberService {
         categoryRepository.save(workoutCategory);
         categoryRepository.save(restCategory);
         categoryRepository.save(meetingCategory);
+
+        // 예시 스케쥴 2개 생성
+        PostScheduleDto oneHourLaterSchedule = PostScheduleDto.builder()
+                .info("NESS 온보딩 진행하기")
+                .location("현재 위치")
+                .person("")
+                .startTime(globalTime.getUpcomingOneHourTime())
+                .endTime(globalTime.getUpcomingOneHourTime().plusMinutes(30))
+                .categoryNum(meetingCategory.getId())
+                //.chat() //chat 종속성은 없음
+                .build();
+
+        PostScheduleDto twoHourLaterSchedule = PostScheduleDto.builder()
+                .info("NESS 사용법 공부하기")
+                .location("")
+                .person("NESS")
+                .startTime(globalTime.getUpcomingTwoHourTime())
+                .endTime(globalTime.getUpcomingTwoHourTime().plusMinutes(30))
+                .categoryNum(studyCategory.getId())
+                //.chat() //chat 종속성은 없음
+                .build();
+
+        scheduleService.postNewUserSchedule(member.getId(), oneHourLaterSchedule);
+        scheduleService.postNewUserSchedule(member.getId(), twoHourLaterSchedule);
+
         return;
     }
 }

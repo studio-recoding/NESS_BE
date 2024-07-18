@@ -11,7 +11,7 @@ import Ness.Backend.domain.todo.dto.request.PostFastApiTodoDto;
 import Ness.Backend.domain.todo.dto.request.PostFastApiTodoListDto;
 import Ness.Backend.domain.todo.dto.response.PostFastApiRecommendListDto;
 import Ness.Backend.global.fastApi.FastApiTodoApi;
-import Ness.Backend.global.time.Time;
+import Ness.Backend.global.time.GlobalTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class TodoService {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleService scheduleService;
     private final ProfileRepository profileRepository;
-    private final Time time;
+    private final GlobalTime globalTime;
 
     /* 일정 관련 한 줄 추천 가져오는 로직 */
     public List<GetScheduleDto> getTodo(Long memberId){
@@ -37,7 +37,7 @@ public class TodoService {
 
         Profile userProfile = profileRepository.findProfileByMember_Id(memberId);
         // 오늘 날짜 가져오기
-        ZonedDateTime now = time.getToday();
+        ZonedDateTime now = globalTime.getToday();
         List<Schedule> upcomingSchedules = scheduleRepository.findUpcomingSchedulesByStart_Time(memberId, now);
 
         List<Schedule> filteredSchedules = upcomingSchedules.stream()

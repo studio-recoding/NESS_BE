@@ -13,6 +13,7 @@ import Ness.Backend.domain.profile.ProfileRepository;
 import Ness.Backend.domain.profile.entity.PersonaType;
 import Ness.Backend.domain.profile.entity.Profile;
 import Ness.Backend.global.fastApi.FastApiChatApi;
+import Ness.Backend.global.time.GlobalTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -32,11 +32,12 @@ public class ChatService {
     private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
     private final FastApiChatApi fastApiChatApi;
+    private final GlobalTime globalTime;
 
     /* 새로운 채팅 생성 및 RDB에 저장 */
     public void createNewChat(String text, ChatType chatType, int caseNumber, Member member){
         Chat chat = Chat.builder()
-                .createdDate(createdZonedDate())
+                .createdDate(globalTime.createdZonedDate())
                 .text(text)
                 .chatType(chatType)
                 .caseNumber(caseNumber)
@@ -49,7 +50,7 @@ public class ChatService {
     /* 새로운 채팅 생성 및 RDB에 저장 */
     public void createNewChatWithMetaData(String text, ChatType chatType, int caseNumber, Member member, String metadata){
         Chat chat = Chat.builder()
-                .createdDate(createdZonedDate())
+                .createdDate(globalTime.createdZonedDate())
                 .text(text)
                 .chatType(chatType)
                 .caseNumber(caseNumber)
@@ -84,7 +85,7 @@ public class ChatService {
         Profile profileEntity = profileRepository.findProfileByMember_Id(memberId);
         //새로운 유저 채팅 저장
         Chat newUserChat = Chat.builder()
-                .createdDate(createdZonedDate())
+                .createdDate(globalTime.createdZonedDate())
                 .text(postUserChatDto.getText())
                 .chatType(postUserChatDto.getChatType())
                 .caseNumber(0) //유저는 디폴트로 case 0
@@ -131,11 +132,5 @@ public class ChatService {
         PostFastApiAiChatDto aiDto = fastApiChatApi.creatFastApiChat(userDto);
 
         return aiDto;
-    }
-
-    public ZonedDateTime createdZonedDate(){
-        return LocalDateTime
-                .now(ZoneId.of("Asia/Seoul"))
-                .atZone(ZoneId.of("Asia/Seoul"));
     }
 }

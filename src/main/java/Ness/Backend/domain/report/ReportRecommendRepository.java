@@ -11,7 +11,7 @@ public interface ReportRecommendRepository extends JpaRepository<ReportRecommend
     // 특정 맴버의 오늘 하루 생성된 한줄 추천 데이터만 반환
     @Query( value = "SELECT * FROM report_recommend " +
             "WHERE member_id = :memberId " +
-            "AND DATE(CONVERT_TZ(created_date, '+00:00', '+09:00')) = CURDATE() " +
+            "AND DATE(CONVERT_TZ(created_date, '+00:00', '+09:00')) = DATE(CONVERT_TZ(NOW(), '+00:00', '+09:00')) " +
             "ORDER BY created_date ASC",
             nativeQuery = true)
     List<ReportRecommend> findTodayReportRecommendByMember_Id(

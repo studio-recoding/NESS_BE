@@ -30,7 +30,7 @@ public class EmailService {
     }
 
     // 매일 오전 자정에 스케쥴링(서버 시간 서울)
-    @Scheduled(cron = "0 0 12 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     public void scheduleEmailCron(){
         log.info("스케쥴링 활성화");
         List<Member> activeMembers = memberRepository.findMembersByProfileIsEmailActive(true);
